@@ -211,8 +211,10 @@ No hay PHP instalado en esta máquina. Para comprobar la sintaxis sin Docker:
 ## Datos marcador (NO son reales)
 
 Antes de publicar hay que reemplazar:
-- `src/content/agency.ts` → WhatsApp `51987654321`, `contacto@afcrtecnologia.com`,
-  `+51 987 654 321`, dirección y redes.
+- `src/content/agency.ts` → `contacto@afcrtecnologia.com` (el buzón aún no
+  existe), dirección postal y perfiles de redes.
+  El teléfono y el WhatsApp (`+51 958 650 186` / `51958650186`) **ya son reales**:
+  no volver a tratarlos como marcador.
 - `src/content/cases.ts` → todas las métricas (+64 %, 96.8 %, 71 %…) son
   ilustrativas. No presentarlas como resultados reales.
 - `src/content/agency.ts` → métricas de la sección 07 (15+, 99.4 %, 350+, 4.2x).

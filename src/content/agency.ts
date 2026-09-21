@@ -21,14 +21,14 @@ export const agency = {
   longDescription:
     'AFCRtecnologia es una agencia boutique de inteligencia artificial con base en Lima. Construimos agentes autónomos, automatizaciones de procesos y software impulsado por IA para empresas que necesitan resultados operativos, no pilotos eternos.',
 
-  /** Contacto — reemplaza con tus datos reales antes de publicar. */
+  /** Contacto. El teléfono y el WhatsApp son reales; el correo aún no. */
   email: 'contacto@afcrtecnologia.com',
   salesEmail: 'proyectos@afcrtecnologia.com',
-  phoneDisplay: '+51 987 654 321',
+  phoneDisplay: '+51 958 650 186',
 
   whatsapp: {
     /** Formato internacional sin «+» ni espacios. */
-    number: '51987654321',
+    number: '51958650186',
     message:
       'Hola AFCRtecnologia, me gustaría agendar una llamada de diagnóstico de IA para mi empresa.',
   },
