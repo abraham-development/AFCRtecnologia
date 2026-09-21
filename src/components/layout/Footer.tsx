@@ -2,7 +2,7 @@
 
 import { ArrowUp, ArrowUpRight } from 'lucide-react';
 
-import { agency, navItems, whatsappUrl } from '@/content/agency';
+import { agency, hasPhone, hasWhatsApp, navItems, whatsappUrl } from '@/content/agency';
 import { scrollToSection } from '@/lib/utils';
 
 export function Footer() {
@@ -62,19 +62,21 @@ export function Footer() {
                   {agency.email}
                 </a>
               </li>
-              <li>
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cursor="expand"
-                  className="text-text-primary hover:text-accent-cyan inline-flex items-center gap-1.5 transition-colors"
-                >
-                  WhatsApp
-                  <ArrowUpRight size={13} strokeWidth={1.5} />
-                </a>
-              </li>
-              <li className="text-text-secondary">{agency.phoneDisplay}</li>
+              {hasWhatsApp ? (
+                <li>
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cursor="expand"
+                    className="text-text-primary hover:text-accent-cyan inline-flex items-center gap-1.5 transition-colors"
+                  >
+                    WhatsApp
+                    <ArrowUpRight size={13} strokeWidth={1.5} />
+                  </a>
+                </li>
+              ) : null}
+              {hasPhone ? <li className="text-text-secondary">{agency.phoneDisplay}</li> : null}
               <li className="text-text-secondary">
                 {agency.address.locality}, {agency.country}
               </li>

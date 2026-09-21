@@ -11,7 +11,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .env
+# Datos de contacto reales y secretos: nunca al repositorio publico
 .env.*
+!.env.example
 .vercel
 *.tsbuildinfo
 next-env.d.ts

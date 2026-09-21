@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
-import { agency, navItems, whatsappUrl } from '@/content/agency';
+import { agency, hasWhatsApp, navItems, whatsappUrl } from '@/content/agency';
 import { scrollToSection } from '@/lib/utils';
 
 interface FullscreenMenuProps {
@@ -160,16 +160,18 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
               >
                 {agency.email}
               </a>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cursor="expand"
-                className="text-text-primary hover:text-accent-cyan mt-1 flex items-center gap-1.5 text-sm transition-colors"
-              >
-                WhatsApp Business
-                <ArrowUpRight size={13} strokeWidth={1.5} />
-              </a>
+              {hasWhatsApp ? (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor="expand"
+                  className="text-text-primary hover:text-accent-cyan mt-1 flex items-center gap-1.5 text-sm transition-colors"
+                >
+                  WhatsApp Business
+                  <ArrowUpRight size={13} strokeWidth={1.5} />
+                </a>
+              ) : null}
             </div>
 
             <div>

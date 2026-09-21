@@ -213,8 +213,18 @@ No hay PHP instalado en esta máquina. Para comprobar la sintaxis sin Docker:
 Antes de publicar hay que reemplazar:
 - `src/content/agency.ts` → `contacto@afcrtecnologia.com` (el buzón aún no
   existe), dirección postal y perfiles de redes.
-  El teléfono y el WhatsApp (`+51 958 650 186` / `51958650186`) **ya son reales**:
-  no volver a tratarlos como marcador.
+
+**El teléfono y el WhatsApp ya son reales y NO están en el repositorio.**
+Llegan por `NEXT_PUBLIC_PHONE_DISPLAY` y `NEXT_PUBLIC_WHATSAPP_NUMBER`
+(ver `.env.example`), definidos en `.env.local`, `.env.production` —ambos
+ignorados por git— y en las variables de entorno del sitio en Hostinger.
+Nunca escribas el número en un archivo versionado, este incluido.
+
+⚠ Son `NEXT_PUBLIC_*`: se incrustan en el HTML publicado, así que esto los
+saca de GitHub pero no los oculta de los visitantes. Es inevitable: el botón
+de WhatsApp necesita el número. Si las variables faltan, la interfaz oculta
+el teléfono y el botón (`hasPhone` / `hasWhatsApp`) en lugar de publicar un
+enlace roto. Cambiarlas exige **un build nuevo**, no basta con reiniciar.
 - `src/content/cases.ts` → todas las métricas (+64 %, 96.8 %, 71 %…) son
   ilustrativas. No presentarlas como resultados reales.
 - `src/content/agency.ts` → métricas de la sección 07 (15+, 99.4 %, 350+, 4.2x).

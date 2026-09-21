@@ -21,14 +21,24 @@ export const agency = {
   longDescription:
     'AFCRtecnologia es una agencia boutique de inteligencia artificial con base en Lima. Construimos agentes autónomos, automatizaciones de procesos y software impulsado por IA para empresas que necesitan resultados operativos, no pilotos eternos.',
 
-  /** Contacto. El teléfono y el WhatsApp son reales; el correo aún no. */
+  /** Contacto. El correo aún es marcador; el teléfono vive en el entorno. */
   email: 'contacto@afcrtecnologia.com',
   salesEmail: 'proyectos@afcrtecnologia.com',
-  phoneDisplay: '+51 958 650 186',
+
+  /**
+   * Teléfono y WhatsApp llegan por variables de entorno para no quedar
+   * escritos en el repositorio (que es público).
+   *
+   * ⚠ Esto NO los oculta del sitio: `NEXT_PUBLIC_*` se incrusta en el HTML
+   * durante el build y el botón de WhatsApp necesita el número para funcionar.
+   * Si faltan, la interfaz oculta el teléfono y el botón en lugar de publicar
+   * un enlace roto.
+   */
+  phoneDisplay: process.env.NEXT_PUBLIC_PHONE_DISPLAY ?? '',
 
   whatsapp: {
     /** Formato internacional sin «+» ni espacios. */
-    number: '51958650186',
+    number: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '',
     message:
       'Hola AFCRtecnologia, me gustaría agendar una llamada de diagnóstico de IA para mi empresa.',
   },
@@ -57,10 +67,14 @@ export const agency = {
   },
 } as const;
 
-/** URL de WhatsApp Business con mensaje precargado. */
-export const whatsappUrl = `https://wa.me/${agency.whatsapp.number}?text=${encodeURIComponent(
-  agency.whatsapp.message,
-)}`;
+/** ¿Hay número configurado? Si no, la interfaz no muestra esos canales. */
+export const hasWhatsApp = agency.whatsapp.number.trim().length > 0;
+export const hasPhone = agency.phoneDisplay.trim().length > 0;
+
+/** URL de WhatsApp Business con mensaje precargado (vacía si no hay número). */
+export const whatsappUrl = hasWhatsApp
+  ? `https://wa.me/${agency.whatsapp.number}?text=${encodeURIComponent(agency.whatsapp.message)}`
+  : '';
 
 /** Indice del menu fullscreen (01 — 07). */
 export const navItems: NavItem[] = [

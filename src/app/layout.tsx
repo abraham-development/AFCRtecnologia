@@ -9,7 +9,7 @@ import ReadingProgress from '@/components/effects/ReadingProgress';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import SmoothScrollProvider from '@/components/layout/SmoothScrollProvider';
-import { agency } from '@/content/agency';
+import { agency, hasPhone } from '@/content/agency';
 
 /* -------------------------------------------------------------------------- */
 /*  Tipografia                                                                 */
@@ -104,7 +104,7 @@ const jsonLd = {
   description: agency.longDescription,
   url: siteUrl,
   email: agency.email,
-  telephone: agency.phoneDisplay,
+  ...(hasPhone ? { telephone: agency.phoneDisplay } : {}),
   foundingDate: agency.founded,
   areaServed: ['PE', 'LATAM', 'Global'],
   knowsLanguage: ['es', 'en'],

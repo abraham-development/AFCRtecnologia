@@ -10,7 +10,7 @@ import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
 import KeyBadge from '@/components/ui/KeyBadge';
 import SectionBadge from '@/components/ui/SectionBadge';
 import Toast from '@/components/ui/Toast';
-import { agency, whatsappUrl } from '@/content/agency';
+import { agency, hasPhone, hasWhatsApp, whatsappUrl } from '@/content/agency';
 import { contactSchema, type ContactInput, type ContactResponse } from '@/lib/validations';
 import type { SubmitState, ToastMessage } from '@/types';
 import { cn } from '@/lib/utils';
@@ -138,17 +138,19 @@ export function Contact() {
             <div className="border-border-editorial mt-10 border-t pt-8">
               <p className="text-micro text-text-secondary">CANAL DIRECTO</p>
 
-              <ButtonMagnetic
-                variant="ghost"
-                href={whatsappUrl}
-                external
-                className="mt-5 w-full sm:w-auto"
-                aria-label="Escribir por WhatsApp Business"
-              >
-                <MessageCircle size={16} strokeWidth={1.5} aria-hidden="true" />
-                Escribir por WhatsApp
-                <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
-              </ButtonMagnetic>
+              {hasWhatsApp ? (
+                <ButtonMagnetic
+                  variant="ghost"
+                  href={whatsappUrl}
+                  external
+                  className="mt-5 w-full sm:w-auto"
+                  aria-label="Escribir por WhatsApp Business"
+                >
+                  <MessageCircle size={16} strokeWidth={1.5} aria-hidden="true" />
+                  Escribir por WhatsApp
+                  <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
+                </ButtonMagnetic>
+              ) : null}
 
               <dl className="mt-8 space-y-3 text-sm">
                 <div className="flex gap-3">
@@ -163,10 +165,12 @@ export function Contact() {
                     </a>
                   </dd>
                 </div>
-                <div className="flex gap-3">
-                  <dt className="text-micro text-text-secondary w-24 shrink-0 pt-0.5">TELÉFONO</dt>
-                  <dd className="text-text-primary">{agency.phoneDisplay}</dd>
-                </div>
+                {hasPhone ? (
+                  <div className="flex gap-3">
+                    <dt className="text-micro text-text-secondary w-24 shrink-0 pt-0.5">TELÉFONO</dt>
+                    <dd className="text-text-primary">{agency.phoneDisplay}</dd>
+                  </div>
+                ) : null}
                 <div className="flex gap-3">
                   <dt className="text-micro text-text-secondary w-24 shrink-0 pt-0.5">BASE</dt>
                   <dd className="text-text-primary">
