@@ -1,0 +1,281 @@
+@import 'tailwindcss';
+
+/* ========================================================================== */
+/*  TOKENS DE DISEÑO — AFCRtecnologia                                         */
+/*  Tailwind v4 es CSS-first: este bloque reemplaza a tailwind.config.ts.      */
+/*  Cada variable genera utilidades (bg-bg-primary, text-accent-cyan, ...).    */
+/* ========================================================================== */
+@theme {
+  /* Superficies */
+  --color-bg-primary: #0d1828;
+  --color-bg-secondary: #101b2d;
+  --color-bg-darkest: #080f1c;
+
+  /* Tipografia */
+  --color-text-primary: #e8e5dd;
+  --color-text-secondary: #9da8b8;
+
+  /* Acento */
+  --color-accent-cyan: #5bc2d8;
+  --color-accent-cyan-glow: rgba(91, 194, 216, 0.1);
+
+  /* Estructura */
+  --color-border-editorial: #243049;
+
+  /* Familias tipograficas (inyectadas por next/font en <html>) */
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+
+  /* Radios: geometria editorial, nada de tarjetas SaaS */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+
+  /* Curvas */
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-swift: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Ritmo vertical de capitulo */
+  --spacing-chapter: clamp(5rem, 11vw, 10rem);
+}
+
+/* ========================================================================== */
+/*  BASE                                                                       */
+/* ========================================================================== */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scrollbar-width: none;
+    background-color: var(--color-bg-primary);
+  }
+
+  html::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv01';
+    /* `clip` (no `hidden`) evita overflow horizontal sin romper position:sticky */
+    overflow-x: clip;
+    min-height: 100svh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-cyan);
+    color: var(--color-bg-darkest);
+  }
+
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-accent-cyan);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img,
+  svg,
+  canvas {
+    max-width: 100%;
+  }
+}
+
+/* ========================================================================== */
+/*  LENIS — scroll suave                                                       */
+/* ========================================================================== */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Cursor propio: ocultamos el nativo solo cuando el custom esta activo */
+html.afcr-cursor,
+html.afcr-cursor * {
+  cursor: none !important;
+}
+
+/* ========================================================================== */
+/*  UTILIDADES EDITORIALES                                                     */
+/* ========================================================================== */
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 1600px;
+  padding-inline: clamp(1.25rem, 4.5vw, 5rem);
+}
+
+@utility text-display {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(2.5rem, 7vw, 7.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+@utility text-display-sm {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(1.9rem, 4.2vw, 3.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+@utility text-display-xs {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(1.45rem, 2.4vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+@utility text-micro {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@utility text-data {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+}
+
+/* Trama de cuadricula editorial de 1px */
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, var(--color-border-editorial) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border-editorial) 1px, transparent 1px);
+  background-size: 96px 96px;
+  opacity: 0.35;
+}
+
+/* Grano fino sobre fondos oscuros.
+   No toca `position`: si lo hiciera ganaria en la cascada a utilidades como
+   `absolute` aplicadas al mismo elemento. El consumidor debe estar posicionado
+   (relative, absolute o fixed), que es el caso en todos sus usos. */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Fondo de respaldo cuando WebGL no esta disponible */
+@utility webgl-fallback {
+  background:
+    radial-gradient(60% 55% at 22% 18%, rgba(91, 194, 216, 0.16) 0%, transparent 62%),
+    radial-gradient(48% 42% at 82% 72%, rgba(36, 48, 73, 0.72) 0%, transparent 70%),
+    linear-gradient(180deg, #0d1828 0%, #0a1322 58%, #080f1c 100%);
+}
+
+@utility hairline-t {
+  border-top: 1px solid var(--color-border-editorial);
+}
+
+@utility hairline-b {
+  border-bottom: 1px solid var(--color-border-editorial);
+}
+
+/* Marquesina infinita (la pista se duplica en el DOM) */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: afcr-marquee var(--marquee-duration, 42s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-track[data-paused='true'] {
+  animation-play-state: paused;
+}
+
+@keyframes afcr-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes afcr-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+.status-dot {
+  animation: afcr-pulse 2.4s var(--ease-swift) infinite;
+}
+
+/* Oculta la barra de scroll en carruseles horizontales */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================================================== */
+/*  ACCESIBILIDAD: movimiento reducido                                         */
+/* ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}

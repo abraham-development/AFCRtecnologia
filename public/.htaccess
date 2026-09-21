@@ -1,0 +1,80 @@
+# ============================================================================
+#  AFCRtecnologia — configuración para Hostinger (Apache / LiteSpeed)
+#  Este archivo se sube junto al sitio, dentro de public_html.
+# ============================================================================
+
+Options -Indexes
+DirectoryIndex index.html
+
+# ---------------------------------------------------------------------------
+#  HTTPS
+#  Actívalo desde hPanel → Sitios web → SSL → «Forzar HTTPS» (recomendado).
+#  Si prefieres hacerlo aquí, descomenta estas tres líneas:
+# ---------------------------------------------------------------------------
+# RewriteEngine On
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# ---------------------------------------------------------------------------
+#  Cabeceras de seguridad (equivalen a las de next.config.ts en modo Node)
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set X-DNS-Prefetch-Control "on"
+
+  # Los assets de Next llevan hash en el nombre: cachear un año es seguro.
+  <FilesMatch "\.(js|css|woff2|woff|svg|png|jpg|jpeg|webp|avif|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # El HTML debe revalidarse para que un despliegue se vea al instante.
+  <FilesMatch "\.(html|txt|xml|json)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# ---------------------------------------------------------------------------
+#  Compresión
+# ---------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript
+  AddOutputFilterByType BROTLI_COMPRESS application/json image/svg+xml
+</IfModule>
+
+# ---------------------------------------------------------------------------
+#  Tipos MIME
+# ---------------------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddType image/svg+xml            .svg
+  AddType font/woff2               .woff2
+  AddType application/manifest+json .webmanifest
+</IfModule>
+
+# ---------------------------------------------------------------------------
+#  Protección de archivos sensibles
+#  (la copia de leads se guarda fuera de public_html, esto es una red extra)
+# ---------------------------------------------------------------------------
+<FilesMatch "\.(jsonl|log|env|bak|sql|md)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# ---------------------------------------------------------------------------
+#  Página de error
+# ---------------------------------------------------------------------------
+ErrorDocument 404 /404.html
