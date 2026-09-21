@@ -103,6 +103,11 @@ como alternativa documentada por si se migra a un plan sin Node.
 | Build script | `build:hostinger` |
 | Output | `.next` · Root: `/` · Node 24 · npm |
 
+- **⚠ La configuración debe ser `next.config.mjs`, nunca `.ts`.** El contenedor
+  de build de Hostinger tiene una glibc antigua: `@next/swc-linux-x64-gnu` no
+  carga (`GLIBC_2.29 not found`), Next cae al fallback WASM y ese fallback no
+  transpila configs en TypeScript. El build muere con «Failed to load
+  next.config.ts». Verificado en un build real.
 - **⚠ El builder de Hostinger no soporta Turbopack.** `npm run build` (Next 16
   lo usa por defecto) falla allí. Por eso existe
   `build:hostinger` = `next build --webpack`, que es el script que Hostinger
