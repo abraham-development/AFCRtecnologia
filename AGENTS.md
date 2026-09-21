@@ -113,6 +113,14 @@ como alternativa documentada por si se migra a un plan sin Node.
   `build:hostinger` = `next build --webpack`, que es el script que Hostinger
   ejecuta. Verificado: el mismo problema obligó a `--webpack` en el proyecto
   hermano `creciendo_juntos`.
+- **⚠ Hostinger instala solo `dependencies`, nunca `devDependencies`.** Por eso
+  `tailwindcss`, `@tailwindcss/postcss`, `typescript` y los `@types/*` viven en
+  `dependencies`: si se mueven a dev, el build falla con
+  «Cannot find module '@tailwindcss/postcss'» y el alias `@/` deja de resolver.
+  Solo `eslint` y `eslint-config-next` pueden quedarse en dev.
+- Antes de pushear un cambio que afecte al build, simula su entorno:
+  copia el proyecto a un temporal, `npm install --omit=dev` y
+  `npm run build:hostinger`. Evita ciclos de despliegue fallido.
 - El otro sitio del plan, `magenta-flamingo-697303.hostingersite.com`, es de
   **creciendo_juntos**. No tocarlo: desplegar AFCR ahí lo borraría.
 
