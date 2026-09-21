@@ -88,6 +88,29 @@ Reglas que lo sostienen — no deshacerlas:
 - El endpoint del formulario se lee de `NEXT_PUBLIC_CONTACT_ENDPOINT`
   (por defecto `/api/contact`); el script estático lo fija a `/contact.php`.
 
+### Despliegue real: Hostinger + Git (producción)
+
+El plan es **Hostinger Business**, que sí ejecuta Node: la app se publica como
+aplicación Next.js (`app_type: next`, salida `.next`), **no** como export
+estático. El formulario usa por tanto `/api/contact`, y `contact.php` queda
+como alternativa documentada por si se migra a un plan sin Node.
+
+| Dato | Valor |
+| --- | --- |
+| Sitio | `afcrtecnologia.com` (vhost addon) |
+| Usuario hosting | `u574572243` |
+| Repo | `abraham-development/AFCRtecnologia`, rama `main` |
+| Build script | `build:hostinger` |
+| Output | `.next` · Root: `/` · Node 24 · npm |
+
+- **⚠ El builder de Hostinger no soporta Turbopack.** `npm run build` (Next 16
+  lo usa por defecto) falla allí. Por eso existe
+  `build:hostinger` = `next build --webpack`, que es el script que Hostinger
+  ejecuta. Verificado: el mismo problema obligó a `--webpack` en el proyecto
+  hermano `creciendo_juntos`.
+- El otro sitio del plan, `magenta-flamingo-697303.hostingersite.com`, es de
+  **creciendo_juntos**. No tocarlo: desplegar AFCR ahí lo borraría.
+
 ### ⚠ Acoplamiento a vigilar
 
 **`public/contact.php` duplica las reglas de `src/lib/validations.ts`.**
