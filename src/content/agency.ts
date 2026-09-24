@@ -106,7 +106,7 @@ export const navItems: NavItem[] = [
 
 /** Textos del encabezado. */
 export const headerCopy = {
-  advisorCta: 'CONTACTA CON UN ASESOR',
+  advisorCta: 'Contacta con un asesor por WhatsApp',
 };
 
 /** Destino del atajo E y de los CTA «Empezar un proyecto». */

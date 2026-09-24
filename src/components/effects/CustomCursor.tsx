@@ -7,10 +7,10 @@ import { useIsFinePointer, usePrefersReducedMotion } from '@/hooks/useMediaQuery
 const INTERACTIVE = 'a, button, summary, [data-cursor="expand"]';
 const TEXT_ENTRY = 'input, textarea, select, [contenteditable="true"]';
 
-const LEAN_MAX = 14;
+const LEAN_MAX = 8;
 
 /**
- * Puntero de un trazo: la punta es el hotspot y el cuerpo no la persigue.
+ * Puntero de alto contraste: la punta es el hotspot y el cuerpo no la persigue.
  * Solo en punteros finos y sin `prefers-reduced-motion`.
  */
 export function CustomCursor() {
@@ -112,7 +112,8 @@ export function CustomCursor() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[190]">
-      {/* Wrapper = posicion (transform). Hijo = inclinacion y escala. */}
+      {/* Wrapper = posicion. Halo y glifo animan sin alterar el hotspot.
+          Flecha negra con borde claro: visible sobre el fondo azul oscuro. */}
       <span
         ref={posRef}
         data-expanded="false"
@@ -120,23 +121,29 @@ export function CustomCursor() {
         data-typing="false"
         className="group absolute top-0 left-0 block opacity-0 transition-opacity duration-150 will-change-transform"
       >
+        <span className="absolute -top-[11px] -left-[11px] block size-6 scale-75 rounded-full border border-accent-cyan/70 opacity-0 transition-[opacity,scale] duration-200 ease-editorial group-data-[expanded=true]:scale-100 group-data-[expanded=true]:opacity-70 group-data-[pressed=true]:scale-75" />
         <span
           ref={glyphRef}
           className="block origin-top-left transition-[scale] duration-150 ease-editorial will-change-transform group-data-[pressed=true]:scale-90"
         >
           <svg
-            width="14"
-            height="16"
-            viewBox="0 0 14 16"
+            width="20"
+            height="24"
+            viewBox="0 0 20 24"
             fill="none"
-            className="overflow-visible text-text-primary"
+            className="overflow-visible"
           >
-            <path d="M0.5 0.5 L10.2 6.6 L3.4 10.4 Z" fill="currentColor" />
-            <path d="M6.2 8.2 L9.4 13.2" stroke="currentColor" strokeWidth="1" />
             <path
-              d="M0.5 0.5 L8.6 2.4"
-              strokeWidth="1"
-              className="stroke-accent-cyan opacity-0 transition-opacity duration-150 group-data-[expanded=true]:opacity-100"
+              d="M1 1 L17.2 11.5 L10.4 13.2 L14.7 20.7 L10.5 23 L6.3 15.5 L1 19 Z"
+              strokeWidth="3.5"
+              strokeLinejoin="round"
+              className="fill-text-primary stroke-text-primary"
+            />
+            <path
+              d="M1 1 L17.2 11.5 L10.4 13.2 L14.7 20.7 L10.5 23 L6.3 15.5 L1 19 Z"
+              strokeWidth="1.25"
+              strokeLinejoin="round"
+              className="fill-black stroke-black transition-colors duration-150 group-data-[expanded=true]:fill-accent-cyan group-data-[expanded=true]:stroke-black"
             />
           </svg>
         </span>

@@ -1,5 +1,16 @@
 @import 'tailwindcss';
 
+/* Carpetas de herramientas de agentes: contienen binarios que Tailwind leeria
+   como codigo y de los que sacaria clases corruptas (rompe el build). */
+@source not '../../.agents';
+@source not '../../.claude';
+@source not '../../.codex';
+@source not '../../.cursor';
+@source not '../../.impeccable';
+
+/* Pantallas bajas (moviles en horizontal): header compacto */
+@custom-variant short (@media (max-height: 480px));
+
 /* ========================================================================== */
 /*  TOKENS DE DISEÑO — AFCRtecnologia                                         */
 /*  Tailwind v4 es CSS-first: este bloque reemplaza a tailwind.config.ts.      */

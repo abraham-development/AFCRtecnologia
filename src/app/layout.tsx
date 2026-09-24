@@ -148,7 +148,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${fraunces.variable} ${frauncesDisplay.variable} ${inter.variable} ${plexMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-bg-primary text-text-primary antialiased">
+      <body
+        className="bg-bg-primary text-text-primary antialiased"
+        suppressHydrationWarning
+      >
         <script
           type="application/ld+json"
           // El JSON-LD es estatico y generado en el servidor.

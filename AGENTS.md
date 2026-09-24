@@ -1,7 +1,37 @@
 # AGENTS.md — AFCRtecnologia
 
-Landing page corporativa de AFCRtecnologia (agencia de IA, Lima, Perú).
-Una sola página de 9 capítulos, estética editorial tecnológica, sin CMS.
+Sitio corporativo de AFCRtecnologia (agencia de IA, Lima, Perú).
+Una página por ítem del navbar —Home, Servicios, Nosotros, Contáctanos— más
+las notas de noticias. Estética editorial tecnológica, sin CMS.
+
+## Rutas
+
+| Ruta | Página | Componentes |
+| --- | --- | --- |
+| `/` | Hero (titular de partículas) + Noticias | `src/components/home/` |
+| `/servicios` | Directorio de los 10 servicios | `src/components/services/` |
+| `/nosotros` | Clientes, proceso, principios, herramientas | `src/components/about/` |
+| `/contacto` | Canales directos + formulario (`#formulario`) | `src/components/contact/` |
+| `/noticias/[slug]` | Nota completa (`generateStaticParams`) | `src/components/news/` |
+
+- Todas las rutas son estáticas y funcionan también en `build:static`.
+- Cada `page.tsx` exporta su `metadata`. `sitemap.ts` se genera desde
+  `navItems` y `newsPosts`.
+- La navegación usa `next/link` y rutas (`navItems.href`). Las anclas entre
+  páginas van como hash (`/servicios#ia`); `SmoothScrollProvider` lleva cada
+  página nueva arriba o al ancla.
+- Las microinteracciones compartidas viven en `src/components/ui/`
+  (`TiltCard`, `ScrambleText`, `CursorPreview`, `ButtonMagnetic`). Todas se
+  apagan con `prefers-reduced-motion` y en punteros táctiles.
+- Fraunces fija `opsz` en 72 para texto display (`globals.css`); si no, la «e»
+  se lee como «c». El `h1` del hero usa `font-hero`: una instancia **estática**
+  (opsz 72, peso 300) en `src/fonts/`, porque Canvas 2D no admite ejes
+  variables y las partículas deben dibujar exactamente la letra del DOM.
+- Responsive verificado de 320 a 2560 px: sin scroll horizontal y con áreas
+  táctiles de 44 px o más hasta 1024 px. En móviles apaisados (alto ≤ 480 px)
+  el header se reduce a una fila y la navegación queda en el menú.
+- Contraste mínimo 4.5:1 en texto de cuerpo, también en estados «inactivos».
+La verdad de producto (clientes, servicios, qué no inventar) está en `PRODUCT.md`.
 
 Este archivo es la **fuente canónica** de contexto para cualquier agente
 (Claude Code, Codex, Cursor…). `CLAUDE.md` lo importa en vez de duplicarlo.
@@ -167,7 +197,7 @@ No hay PHP instalado en esta máquina. Para comprobar la sintaxis sin Docker:
   `dataset` por ref (`WebGLHeroBackground`).
 - Prohibido escribir un ref durante el render → sincronizarlo en un efecto.
 - Prohibidas las llamadas impuras (`Date.now()`, `Math.random()`) en el cuerpo
-  del componente → helper a nivel de módulo (ver `createToast` en `09-Contact`).
+  del componente → helper a nivel de módulo (ver `createToast` en `contact/ContactForm.tsx`).
 - RHF: usar `useWatch({ control, name })`, no `watch()` (el compilador no puede
   memoizar la función que devuelve).
 
@@ -186,9 +216,6 @@ No hay PHP instalado en esta máquina. Para comprobar la sintaxis sin Docker:
 ## Invariantes que no se deben romper
 
 **Accesibilidad**
-- El recorrido sticky del Método (desktop) es decorativo → `aria-hidden`.
-  La lista completa de las 7 etapas existe siempre y pasa a `lg:sr-only`:
-  si se cambia a `lg:hidden`, los lectores de pantalla pierden la sección.
 - Todo control interactivo lleva `aria-label` descriptivo; el foco visible es
   el contorno cian de `:focus-visible` definido en `globals.css`.
 - Contrastes verificados sobre `#0D1828`: `text-secondary` 7.4:1, cian 8.6:1.
@@ -202,7 +229,7 @@ No hay PHP instalado en esta máquina. Para comprobar la sintaxis sin Docker:
   `hidden`, que rompería `position: sticky`).
 
 **Atajos de teclado**
-- `E` → contacto + foco en `#contact-name`; `S` → soluciones. Nunca se disparan
+- `E` → `/contacto#formulario` + foco en `#contact-name`; `S` → `/servicios`. Nunca se disparan
   dentro de input, textarea, select o `contenteditable`
   (ver `src/hooks/useKeyboardShortcut.ts`).
 
@@ -212,7 +239,11 @@ No hay PHP instalado en esta máquina. Para comprobar la sintaxis sin Docker:
 
 Antes de publicar hay que reemplazar:
 - `src/content/agency.ts` → `contacto@afcrtecnologia.com` (el buzón aún no
-  existe), dirección postal y perfiles de redes.
+  existe), dirección postal y las URLs de Facebook, Instagram y LinkedIn
+  (`agency.socials`).
+- Footer → «Política de privacidad», «Términos de servicio» y «Libro de
+  Reclamaciones» son texto sin página todavía. El Libro de Reclamaciones es
+  obligatorio en Perú para negocios que atienden a consumidores.
 
 **El teléfono y el WhatsApp ya son reales y NO están en el repositorio.**
 Llegan por `NEXT_PUBLIC_PHONE_DISPLAY` y `NEXT_PUBLIC_WHATSAPP_NUMBER`
@@ -225,9 +256,14 @@ saca de GitHub pero no los oculta de los visitantes. Es inevitable: el botón
 de WhatsApp necesita el número. Si las variables faltan, la interfaz oculta
 el teléfono y el botón (`hasPhone` / `hasWhatsApp`) en lugar de publicar un
 enlace roto. Cambiarlas exige **un build nuevo**, no basta con reiniciar.
-- `src/content/cases.ts` → todas las métricas (+64 %, 96.8 %, 71 %…) son
-  ilustrativas. No presentarlas como resultados reales.
-- `src/content/agency.ts` → métricas de la sección 07 (15+, 99.4 %, 350+, 4.2x).
+
+- `src/content/news.ts` → **todas las notas son de ejemplo** (`sample: true`,
+  se muestran con la etiqueta EJEMPLO). Reemplazarlas por notas reales de AFCR
+  antes de publicar.
+
+Las métricas ilustrativas antiguas (casos de uso y sección Agencia) se
+eliminaron junto con esas secciones. Los servicios de `src/content/services.ts`
+no llevan plazos ni precios porque aún no están definidos.
 
 Un agente no debe inventar métricas nuevas ni convertir estos marcadores en
 afirmaciones verificadas.
@@ -241,3 +277,13 @@ Sin variables de entorno el lead solo queda en el log. Con
 `CONTACT_WEBHOOK_URL` se reenvía como JSON; con `RESEND_API_KEY` +
 `CONTACT_FROM_EMAIL` se envía por correo. El rate limit es por instancia:
 para multi-región hace falta Redis/KV.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

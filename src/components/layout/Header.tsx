@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import FullscreenMenu from '@/components/layout/FullscreenMenu';
 import BrandIcon from '@/components/ui/BrandIcon';
-import { agency, CONTACT_FORM_HREF, headerCopy, navItems } from '@/content/agency';
+import { agency, CONTACT_FORM_HREF, hasWhatsApp, headerCopy, navItems, whatsappUrl } from '@/content/agency';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
 import { cn } from '@/lib/utils';
 
@@ -60,44 +60,37 @@ export function Header() {
           scrolled ? 'bg-bg-primary/80 backdrop-blur-md' : 'bg-transparent',
         )}
       >
-        <div className="shell flex h-16 items-center justify-between gap-4 md:h-20 [@media(max-height:480px)]:h-14">
+        <div className="shell flex h-16 items-center justify-between gap-4 md:h-20 short:h-14">
           {/* Marca */}
           <Link
             href="/"
             data-cursor="expand"
             aria-label={`${agency.name}, ir al inicio`}
-            className="group flex shrink-0 items-baseline gap-2 py-3"
+            className="group flex shrink-0 items-baseline py-3 font-serif text-[1.375rem] leading-none tracking-[-0.03em] md:text-[1.625rem]"
           >
-            <span className="font-serif text-xl leading-none font-normal tracking-[-0.03em] md:text-2xl">
-              AFCR
-            </span>
-            <span className="text-micro text-text-secondary group-hover:text-accent-cyan transition-colors">
-              TECNOLOGIA
+            {/* Mismo logotipo que el footer: una sola palabra, dos tonos */}
+            <span className="text-text-primary font-normal">AFCR</span>
+            <span className="text-text-secondary group-hover:text-accent-cyan font-light transition-colors">
+              tecnologia
             </span>
           </Link>
-
-          {/* Etiqueta editorial */}
-          <span className="text-micro text-text-secondary border-border-editorial hidden border-l pl-5 lg:block">
-            {agency.tagline}
-          </span>
 
           <span aria-hidden="true" className="bg-border-editorial hidden h-px flex-1 lg:block" />
 
           {/* Acceso rapido + hamburguesa */}
           <div className="flex shrink-0 items-center gap-4 md:gap-6">
-            <Link
-              href={CONTACT_FORM_HREF}
-              data-cursor="expand"
-              aria-label={headerCopy.advisorCta}
-              className="text-micro text-text-primary hover:text-accent-cyan group hidden items-center gap-2.5 transition-colors sm:flex"
-            >
-              {headerCopy.advisorCta}
-              <BrandIcon
-                network="whatsapp"
-                size={17}
-                className="text-accent-cyan transition-transform duration-300 group-hover:scale-110"
-              />
-            </Link>
+            {hasWhatsApp ? (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-cursor="expand"
+                className="group border-accent-cyan/70 bg-bg-darkest/80 text-[0.875rem] font-medium text-text-primary hover:border-accent-cyan hover:bg-accent-cyan hover:text-bg-darkest focus-visible:bg-accent-cyan focus-visible:text-bg-darkest hidden max-w-[15.5rem] items-center gap-2.5 border px-3 py-2 text-left leading-tight transition-[background-color,border-color,color] duration-300 sm:inline-flex lg:max-w-none lg:px-4"
+              >
+                {headerCopy.advisorCta}
+                <BrandIcon network="whatsapp" size={16} className="shrink-0 text-accent-cyan group-hover:text-bg-darkest group-focus-visible:text-bg-darkest" />
+              </a>
+            ) : null}
 
             <button
               ref={toggleRef}
@@ -123,7 +116,7 @@ export function Header() {
         <nav
           aria-label="Navegación principal"
           className={cn(
-            'border-y transition-colors duration-500 [@media(max-height:480px)]:hidden',
+            'border-y transition-colors duration-500 short:hidden',
             scrolled ? 'border-border-editorial' : 'border-border-editorial/60',
           )}
         >
@@ -137,18 +130,19 @@ export function Header() {
                     data-cursor="expand"
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'text-micro group flex h-11 items-center gap-2 transition-colors',
-                      active ? 'text-accent-cyan' : 'text-text-secondary hover:text-text-primary',
+                      'group relative flex h-11 items-center text-[0.8125rem] font-medium tracking-[-0.005em] transition-colors min-[375px]:text-[0.875rem] md:text-[0.9375rem]',
+                      active ? 'text-text-primary' : 'text-text-primary/75 hover:text-text-primary',
                     )}
                   >
+                    {link.label}
+                    {/* Pagina actual: barra cian apoyada sobre la linea inferior del navbar */}
                     <span
                       aria-hidden="true"
                       className={cn(
-                        'bg-accent-cyan hidden h-1 w-1 transition-opacity duration-300 sm:inline-block',
-                        active ? 'opacity-100' : 'opacity-0 group-hover:opacity-40',
+                        'bg-accent-cyan absolute right-0 -bottom-px left-0 h-0.5 origin-left transition-[scale,opacity] duration-500 ease-(--ease-editorial)',
+                        active ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-60 group-hover:scale-x-100',
                       )}
                     />
-                    {link.label}
                   </Link>
                 </li>
               );
