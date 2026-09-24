@@ -30,7 +30,7 @@ export const serviceGroups: ServiceGroup[] = [
       },
       {
         id: 'sunat',
-        title: 'Integraciones con SUNAT: CPE y SIRE',
+        title: 'Integraciones con la API de SUNAT: CPE y SIRE',
         shortTitle: 'Integraciones SUNAT',
         description:
           'Emisión de comprobantes de pago electrónicos desde tu sistema y declaración de registros de compras y ventas en el SIRE.',

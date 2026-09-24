@@ -11,24 +11,6 @@ import type { NewsCategory, NewsPost } from '@/types';
  */
 export const newsPosts: NewsPost[] = [
   {
-    slug: 'que-es-el-sire-y-como-automatizarlo',
-    title: 'Qué es el SIRE de SUNAT y cómo dejar de llenarlo a mano',
-    excerpt:
-      'El Sistema Integrado de Registros Electrónicos cambia la forma de llevar compras y ventas. Te explicamos qué pide y qué parte se puede automatizar.',
-    category: 'Negocio',
-    date: '2026-09-18',
-    readingTime: '6 min',
-    sample: true,
-    body: [
-      'El SIRE (Sistema Integrado de Registros Electrónicos) es la plataforma de SUNAT para llevar el Registro de Ventas e Ingresos y el Registro de Compras de forma electrónica. En lugar de construir los registros desde cero, SUNAT propone una versión a partir de los comprobantes electrónicos que ya conoce, y el contribuyente la revisa, completa y acepta.',
-      '## Qué cambia para tu negocio',
-      'El trabajo deja de ser digitar y pasa a ser conciliar: comparar lo que SUNAT propone con lo que registra tu sistema contable, resolver diferencias y enviar a tiempo. Ese cruce es repetitivo y es justo donde más errores aparecen.',
-      '## Qué se puede automatizar',
-      'Descargar la propuesta, cruzarla con tus comprobantes, marcar las diferencias y preparar los ajustes son tareas que un flujo automatizado puede hacer cada mes. La persona responsable solo revisa las excepciones y confirma.',
-      'Si ya emites comprobantes desde tu propio sistema, la integración con la API de SUNAT permite cerrar el ciclo completo: emitir, registrar y declarar con la misma información.',
-    ],
-  },
-  {
     slug: 'hermes-agent-agente-de-ia-de-codigo-abierto',
     title: 'Hermes Agent: un agente de IA de código abierto que puedes alojar tú',
     excerpt:
