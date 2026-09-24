@@ -78,7 +78,7 @@ async function sendEmail(lead: Lead): Promise<void> {
     `Correo:   ${lead.email}`,
     `Teléfono: ${lead.phone || '—'}`,
     '',
-    'Proceso a automatizar:',
+    'Mensaje:',
     lead.message,
     '',
     `Recibido: ${lead.receivedAt}`,

@@ -215,7 +215,7 @@ $cuerpo = implode("\n", [
     'Correo:   ' . $correo,
     'Teléfono: ' . ($telefono !== '' ? $telefono : '—'),
     '',
-    'Proceso a automatizar:',
+    'Mensaje:',
     $mensaje,
     '',
     'Recibido: ' . $lead['receivedAt'],

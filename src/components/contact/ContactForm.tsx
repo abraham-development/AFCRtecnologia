@@ -1,21 +1,17 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowUpRight, LoaderCircle, MessageCircle, Send } from 'lucide-react';
-import { motion } from 'motion/react';
-import { useState } from 'react';
+import { Check, LoaderCircle, Send } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
 import KeyBadge from '@/components/ui/KeyBadge';
-import SectionBadge from '@/components/ui/SectionBadge';
 import Toast from '@/components/ui/Toast';
-import { agency, hasPhone, hasWhatsApp, whatsappUrl } from '@/content/agency';
+import { agency, contactCopy } from '@/content/agency';
 import { contactSchema, type ContactInput, type ContactResponse } from '@/lib/validations';
 import type { SubmitState, ToastMessage } from '@/types';
 import { cn } from '@/lib/utils';
-
-const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
  * Destino del formulario. En el build de Node es el route handler; en el
@@ -36,9 +32,13 @@ function createToast(
 }
 
 const FIELD_BASE =
-  'w-full border-b bg-transparent pt-2 pb-3 text-text-primary placeholder:text-text-secondary/50 transition-colors duration-300 focus:outline-none';
+  'peer w-full border-b bg-transparent pt-2 pb-3 text-text-primary placeholder:text-text-secondary/50 transition-colors duration-300 focus:outline-none';
 
-export function Contact() {
+/** Linea cian que crece bajo el campo con foco (hermana `peer` del input). */
+const FOCUS_LINE =
+  'bg-accent-cyan pointer-events-none absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 transition-[scale] duration-500 ease-(--ease-editorial) peer-focus:scale-x-100';
+
+export function ContactForm() {
   const [state, setState] = useState<SubmitState>('idle');
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
@@ -104,6 +104,16 @@ export function Contact() {
     }
   };
 
+  /* Llegada desde «Empezar un proyecto» o el atajo E: foco en el primer campo */
+  useEffect(() => {
+    if (window.location.hash !== '#formulario') return;
+    const timer = window.setTimeout(
+      () => document.getElementById('contact-name')?.focus({ preventScroll: true }),
+      700,
+    );
+    return () => window.clearTimeout(timer);
+  }, []);
+
   const fieldState = (field: keyof ContactInput) => {
     if (errors[field]) return 'border-red-400/70';
     if (touchedFields[field]) return 'border-accent-cyan/60';
@@ -111,82 +121,21 @@ export function Contact() {
   };
 
   return (
-    <section id="contacto" aria-labelledby="contacto-title" className="hairline-t py-chapter scroll-mt-20">
+    <section id="formulario" aria-labelledby="formulario-title" className="hairline-t py-chapter scroll-mt-28">
       <div className="shell">
-        <SectionBadge index="09" title="CONTACTO" meta={`RESPUESTA < 24 H · ${agency.timezone}`} />
-
-        <div className="mt-12 grid gap-14 md:mt-16 lg:grid-cols-12 lg:gap-16">
-          {/* Columna editorial */}
-          <div className="lg:col-span-5">
-            <motion.h2
-              id="contacto-title"
-              initial={{ opacity: 0, y: 26 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.7, ease: EASE }}
-              className="text-display-sm max-w-[14ch]"
-            >
-              ¿Tienes un proceso que debería funcionar solo?
-            </motion.h2>
-
-            <p className="text-text-secondary mt-8 max-w-md leading-relaxed">
-              Cuéntanos qué quieres mejorar. En una llamada de diagnóstico de 30 minutos
-              identificaremos oportunidades reales de retorno con IA.
+        <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-4">
+            <h2 id="formulario-title" className="text-display-sm max-w-[12ch]">
+              {contactCopy.formTitle}
+            </h2>
+            <p className="text-text-secondary mt-6 max-w-sm leading-relaxed">{contactCopy.formLede}</p>
+            <p className="text-text-secondary border-border-editorial mt-10 border-t pt-6 text-xs leading-relaxed">
+              {agency.legal.privacyNote}
             </p>
-
-            {/* Canal directo */}
-            <div className="border-border-editorial mt-10 border-t pt-8">
-              <p className="text-micro text-text-secondary">CANAL DIRECTO</p>
-
-              {hasWhatsApp ? (
-                <ButtonMagnetic
-                  variant="ghost"
-                  href={whatsappUrl}
-                  external
-                  className="mt-5 w-full sm:w-auto"
-                  aria-label="Escribir por WhatsApp Business"
-                >
-                  <MessageCircle size={16} strokeWidth={1.5} aria-hidden="true" />
-                  Escribir por WhatsApp
-                  <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
-                </ButtonMagnetic>
-              ) : null}
-
-              <dl className="mt-8 space-y-3 text-sm">
-                <div className="flex gap-3">
-                  <dt className="text-micro text-text-secondary w-24 shrink-0 pt-0.5">CORREO</dt>
-                  <dd>
-                    <a
-                      href={`mailto:${agency.email}`}
-                      data-cursor="expand"
-                      className="text-text-primary hover:text-accent-cyan transition-colors"
-                    >
-                      {agency.email}
-                    </a>
-                  </dd>
-                </div>
-                {hasPhone ? (
-                  <div className="flex gap-3">
-                    <dt className="text-micro text-text-secondary w-24 shrink-0 pt-0.5">TELÉFONO</dt>
-                    <dd className="text-text-primary">{agency.phoneDisplay}</dd>
-                  </div>
-                ) : null}
-                <div className="flex gap-3">
-                  <dt className="text-micro text-text-secondary w-24 shrink-0 pt-0.5">BASE</dt>
-                  <dd className="text-text-primary">
-                    {agency.address.locality}, {agency.country}
-                  </dd>
-                </div>
-              </dl>
-
-              <p className="text-text-secondary mt-8 text-xs leading-relaxed">
-                {agency.legal.privacyNote}
-              </p>
-            </div>
           </div>
 
           {/* Formulario */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-8">
             <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-8 sm:grid-cols-2">
               {/* Trampa anti-spam */}
               <div aria-hidden="true" className="sr-only">
@@ -204,16 +153,19 @@ export function Contact() {
                 <label htmlFor="contact-name" className="text-micro text-text-secondary block">
                   Nombre <span className="text-accent-cyan">*</span>
                 </label>
-                <input
-                  id="contact-name"
-                  type="text"
-                  autoComplete="name"
-                  placeholder="Nombre y apellido"
-                  aria-invalid={Boolean(errors.name)}
-                  aria-describedby={errors.name ? 'error-name' : undefined}
-                  className={cn(FIELD_BASE, fieldState('name'))}
-                  {...register('name')}
-                />
+                <div className="relative">
+                  <input
+                    id="contact-name"
+                    type="text"
+                    autoComplete="name"
+                    placeholder="Nombre y apellido"
+                    aria-invalid={Boolean(errors.name)}
+                    aria-describedby={errors.name ? 'error-name' : undefined}
+                    className={cn(FIELD_BASE, fieldState('name'))}
+                    {...register('name')}
+                  />
+                  <span aria-hidden="true" className={FOCUS_LINE} />
+                </div>
                 {errors.name ? (
                   <p id="error-name" role="alert" className="mt-2 text-xs text-red-400">
                     {errors.name.message}
@@ -225,16 +177,19 @@ export function Contact() {
                 <label htmlFor="contact-company" className="text-micro text-text-secondary block">
                   Empresa <span className="text-accent-cyan">*</span>
                 </label>
-                <input
-                  id="contact-company"
-                  type="text"
-                  autoComplete="organization"
-                  placeholder="Razón social o marca"
-                  aria-invalid={Boolean(errors.company)}
-                  aria-describedby={errors.company ? 'error-company' : undefined}
-                  className={cn(FIELD_BASE, fieldState('company'))}
-                  {...register('company')}
-                />
+                <div className="relative">
+                  <input
+                    id="contact-company"
+                    type="text"
+                    autoComplete="organization"
+                    placeholder="Razón social o marca"
+                    aria-invalid={Boolean(errors.company)}
+                    aria-describedby={errors.company ? 'error-company' : undefined}
+                    className={cn(FIELD_BASE, fieldState('company'))}
+                    {...register('company')}
+                  />
+                  <span aria-hidden="true" className={FOCUS_LINE} />
+                </div>
                 {errors.company ? (
                   <p id="error-company" role="alert" className="mt-2 text-xs text-red-400">
                     {errors.company.message}
@@ -244,19 +199,22 @@ export function Contact() {
 
               <div>
                 <label htmlFor="contact-email" className="text-micro text-text-secondary block">
-                  Correo corporativo <span className="text-accent-cyan">*</span>
+                  Correo <span className="text-accent-cyan">*</span>
                 </label>
-                <input
-                  id="contact-email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  placeholder="nombre@empresa.com"
-                  aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? 'error-email' : undefined}
-                  className={cn(FIELD_BASE, fieldState('email'))}
-                  {...register('email')}
-                />
+                <div className="relative">
+                  <input
+                    id="contact-email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    placeholder="nombre@empresa.com"
+                    aria-invalid={Boolean(errors.email)}
+                    aria-describedby={errors.email ? 'error-email' : undefined}
+                    className={cn(FIELD_BASE, fieldState('email'))}
+                    {...register('email')}
+                  />
+                  <span aria-hidden="true" className={FOCUS_LINE} />
+                </div>
                 {errors.email ? (
                   <p id="error-email" role="alert" className="mt-2 text-xs text-red-400">
                     {errors.email.message}
@@ -268,17 +226,20 @@ export function Contact() {
                 <label htmlFor="contact-phone" className="text-micro text-text-secondary block">
                   Teléfono <span className="normal-case">(opcional)</span>
                 </label>
-                <input
-                  id="contact-phone"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  placeholder="+51 999 999 999"
-                  aria-invalid={Boolean(errors.phone)}
-                  aria-describedby={errors.phone ? 'error-phone' : undefined}
-                  className={cn(FIELD_BASE, fieldState('phone'))}
-                  {...register('phone')}
-                />
+                <div className="relative">
+                  <input
+                    id="contact-phone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="+51 999 999 999"
+                    aria-invalid={Boolean(errors.phone)}
+                    aria-describedby={errors.phone ? 'error-phone' : undefined}
+                    className={cn(FIELD_BASE, fieldState('phone'))}
+                    {...register('phone')}
+                  />
+                  <span aria-hidden="true" className={FOCUS_LINE} />
+                </div>
                 {errors.phone ? (
                   <p id="error-phone" role="alert" className="mt-2 text-xs text-red-400">
                     {errors.phone.message}
@@ -289,21 +250,24 @@ export function Contact() {
               <div className="sm:col-span-2">
                 <div className="flex items-baseline justify-between gap-4">
                   <label htmlFor="contact-message" className="text-micro text-text-secondary block">
-                    Proceso a automatizar <span className="text-accent-cyan">*</span>
+                    ¿En qué te ayudamos? <span className="text-accent-cyan">*</span>
                   </label>
                   <span className="text-micro text-text-secondary tabular-nums">
                     {messageLength}/2000
                   </span>
                 </div>
-                <textarea
-                  id="contact-message"
-                  rows={4}
-                  placeholder="Describe el proceso: qué se hace hoy manualmente, con qué herramientas y cuántas horas consume."
-                  aria-invalid={Boolean(errors.message)}
-                  aria-describedby={errors.message ? 'error-message' : undefined}
-                  className={cn(FIELD_BASE, fieldState('message'), 'resize-y')}
-                  {...register('message')}
-                />
+                <div className="relative">
+                  <textarea
+                    id="contact-message"
+                    rows={4}
+                    placeholder="¿Qué servicio te interesa y qué quieres lograr? Por ejemplo: facturar con SUNAT desde mi sistema, o atender pedidos por WhatsApp."
+                    aria-invalid={Boolean(errors.message)}
+                    aria-describedby={errors.message ? 'error-message' : undefined}
+                    className={cn(FIELD_BASE, fieldState('message'), 'resize-y')}
+                    {...register('message')}
+                  />
+                  <span aria-hidden="true" className={FOCUS_LINE} />
+                </div>
                 {errors.message ? (
                   <p id="error-message" role="alert" className="mt-2 text-xs text-red-400">
                     {errors.message.message}
@@ -324,7 +288,10 @@ export function Contact() {
                       Enviando…
                     </>
                   ) : state === 'success' ? (
-                    <>Solicitud recibida</>
+                    <>
+                      <Check size={16} strokeWidth={1.5} aria-hidden="true" />
+                      Solicitud recibida
+                    </>
                   ) : (
                     <>
                       <Send size={15} strokeWidth={1.5} aria-hidden="true" />
@@ -341,7 +308,7 @@ export function Contact() {
                       ? 'TE CONTACTAREMOS EN MENOS DE 24 HORAS'
                       : state === 'error'
                         ? 'REVISA LOS DATOS O ESCRÍBENOS POR WHATSAPP'
-                        : 'DIAGNÓSTICO SIN COSTO · 30 MINUTOS'}
+                        : contactCopy.formHint}
                 </p>
               </div>
             </form>
@@ -354,4 +321,4 @@ export function Contact() {
   );
 }
 
-export default Contact;
+export default ContactForm;

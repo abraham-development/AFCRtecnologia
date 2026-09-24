@@ -2,10 +2,10 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
 import { agency, hasWhatsApp, navItems, whatsappUrl } from '@/content/agency';
-import { scrollToSection } from '@/lib/utils';
 
 interface FullscreenMenuProps {
   open: boolean;
@@ -69,11 +69,6 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
     };
   }, [open, onClose]);
 
-  const go = (href: string) => {
-    onClose();
-    window.setTimeout(() => scrollToSection(href, -72), 420);
-  };
-
   return (
     <AnimatePresence>
       {open ? (
@@ -107,7 +102,7 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
             </button>
           </div>
 
-          {/* Indice 01 — 07 */}
+          {/* Indice 01 — 04 */}
           <nav aria-label="Secciones" className="shell flex flex-1 flex-col justify-center py-10">
             <ul className="w-full">
               {navItems.map((item, index) => (
@@ -119,13 +114,10 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
                   transition={{ duration: 0.6, ease: EASE, delay: 0.22 + index * 0.05 }}
                   className="border-border-editorial border-b last:border-b-0"
                 >
-                  <a
+                  <Link
                     href={item.href}
                     data-cursor="expand"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      go(item.href);
-                    }}
+                    onClick={onClose}
                     className="group flex items-baseline gap-5 py-4 transition-colors sm:gap-8 md:py-5"
                   >
                     <span className="text-micro text-text-secondary group-hover:text-accent-cyan w-8 shrink-0 transition-colors">
@@ -137,7 +129,7 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
                     <span className="text-micro text-text-secondary hidden shrink-0 md:block">
                       {item.meta}
                     </span>
-                  </a>
+                  </Link>
                 </motion.li>
               ))}
             </ul>
@@ -149,7 +141,7 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="shell hairline-t grid shrink-0 gap-6 py-8 md:grid-cols-3"
+            className="shell hairline-t grid shrink-0 gap-6 py-8 md:grid-cols-2"
           >
             <div>
               <p className="text-micro text-text-secondary mb-3">CONTACTO DIRECTO</p>
@@ -174,9 +166,9 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
               ) : null}
             </div>
 
-            <div>
+            <div className="md:text-right">
               <p className="text-micro text-text-secondary mb-3">REDES</p>
-              <ul className="flex flex-wrap gap-x-5 gap-y-1">
+              <ul className="flex flex-wrap gap-x-5 gap-y-1 md:justify-end">
                 {agency.socials.map((social) => (
                   <li key={social.label}>
                     <a
@@ -191,11 +183,6 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            <div className="md:text-right">
-              <p className="text-micro text-text-secondary mb-3">ESTADO</p>
-              <p className="text-data text-accent-cyan">{agency.status}</p>
             </div>
           </motion.div>
         </motion.div>

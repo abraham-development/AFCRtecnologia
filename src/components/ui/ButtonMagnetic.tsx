@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
+import Link from 'next/link';
 import { useRef, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
 
 import { useIsFinePointer } from '@/hooks/useMediaQuery';
@@ -19,6 +20,9 @@ interface ButtonMagneticProps {
   /** Intensidad del efecto magnetico (0 lo desactiva). */
   strength?: number;
 }
+
+/** Enlace interno con navegacion del App Router (sin recargar la pagina). */
+const MotionLink = motion.create(Link);
 
 const BASE =
   'group relative inline-flex items-center justify-center gap-3 rounded-xs px-6 py-4 text-sm tracking-[0.02em] transition-colors duration-300 disabled:cursor-not-allowed disabled:opacity-50';
@@ -77,6 +81,14 @@ export function ButtonMagnetic({
     'data-cursor': 'expand' as const,
     ...rest,
   };
+
+  if (href && !external) {
+    return (
+      <MotionLink {...shared} href={href} onClick={onClick}>
+        {children}
+      </MotionLink>
+    );
+  }
 
   if (href) {
     return (

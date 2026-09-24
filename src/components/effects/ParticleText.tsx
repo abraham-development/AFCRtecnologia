@@ -22,7 +22,20 @@ interface ParticleTextProps {
   /** Arranca el ensamblado (lo dispara el preloader a traves del Hero). */
   active?: boolean;
   className?: string;
+  /**
+   * Tono dominante: `accent` = mayormente cian (texto de respaldo cian),
+   * `primary` = mayormente blanco hueso (texto de respaldo claro).
+   */
+  variant?: 'accent' | 'primary';
+  /** Presupuesto de particulas: varias instancias en pantalla se lo reparten. */
+  maxParticles?: number;
 }
+
+/** Proporcion de particulas en tono hueso y opacidad de ese tono, por variante. */
+const VARIANTS = {
+  accent: { boneRatio: 0.22, boneAlpha: 0.55, fallback: 'text-accent-cyan' },
+  primary: { boneRatio: 0.84, boneAlpha: 0.94, fallback: 'text-text-primary' },
+} as const;
 
 /** Margen alrededor del texto para que las particulas puedan salirse sin recorte. */
 const PAD = 32;
@@ -30,14 +43,20 @@ const REPEL_RADIUS = 110;
 const REPEL_FORCE = 620;
 const SPRING = 0.085;
 const DAMPING = 0.8;
-const MAX_PARTICLES = 7000;
+const DEFAULT_MAX_PARTICLES = 7000;
 
 /**
  * Texto compuesto por particulas cian que se dispersan al paso del cursor
  * y vuelven a agruparse. El texto real permanece en el DOM (invisible pero
  * accesible); si el canvas no puede montarse, se muestra con acento cian.
  */
-export function ParticleText({ text, active = true, className }: ParticleTextProps) {
+export function ParticleText({
+  text,
+  active = true,
+  className,
+  variant = 'accent',
+  maxParticles = DEFAULT_MAX_PARTICLES,
+}: ParticleTextProps) {
   const wrapRef = useRef<HTMLSpanElement | null>(null);
   const textRef = useRef<HTMLSpanElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -58,6 +77,7 @@ export function ParticleText({ text, active = true, className }: ParticleTextPro
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const { boneRatio, boneAlpha } = VARIANTS[variant];
     let particles: Particle[] = [];
     let frame = 0;
     let dpr = 1;
@@ -135,7 +155,8 @@ export function ParticleText({ text, active = true, className }: ParticleTextPro
         for (let y = 0; y < off.height; y += step) {
           for (let x = 0; x < off.width; x += step) {
             const alpha = image[(y * off.width + x) * 4 + 3] ?? 0;
-            if (alpha < 128) continue;
+            // Umbral bajo: los trazos finos de Fraunces (travesaño de la «e») tambien reciben particulas
+            if (alpha < 48) continue;
 
             const hx = x / dpr;
             const hy = y / dpr;
@@ -146,12 +167,12 @@ export function ParticleText({ text, active = true, className }: ParticleTextPro
               y: hy + (Math.random() - 0.5) * cssHeight * 1.1,
               vx: 0,
               vy: 0,
-              tone: Math.random() > 0.78 ? 1 : 0,
+              tone: Math.random() < boneRatio ? 1 : 0,
             });
           }
         }
 
-        if (sampled.length <= MAX_PARTICLES) break;
+        if (sampled.length <= maxParticles) break;
         step += 1;
       }
 
@@ -198,7 +219,7 @@ export function ParticleText({ text, active = true, className }: ParticleTextPro
         if (particle.tone === 0) ctx.fillRect(particle.x, particle.y, 1.7, 1.7);
       }
 
-      ctx.fillStyle = 'rgba(232, 229, 221, 0.55)';
+      ctx.fillStyle = `rgba(232, 229, 221, ${boneAlpha})`;
       for (const particle of particles) {
         if (particle.tone === 1) ctx.fillRect(particle.x, particle.y, 1.7, 1.7);
       }
@@ -281,7 +302,7 @@ export function ParticleText({ text, active = true, className }: ParticleTextPro
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
     };
-  }, [text, active, reduced]);
+  }, [text, active, reduced, variant, maxParticles]);
 
   return (
     <span ref={wrapRef} className={cn('relative inline-block align-baseline', className)}>
@@ -289,7 +310,7 @@ export function ParticleText({ text, active = true, className }: ParticleTextPro
         ref={textRef}
         className={cn(
           'relative z-10 block transition-opacity duration-700',
-          enabled ? 'opacity-0' : 'text-accent-cyan opacity-100',
+          enabled ? 'opacity-0' : cn(VARIANTS[variant].fallback, 'opacity-100'),
         )}
       >
         {text}

@@ -44,6 +44,13 @@ declare global {
 }
 
 /**
+ * Desplazamiento para `scrollToSection` que compensa el header fijo de dos
+ * niveles (barra de marca + navbar). Si cambia la altura del header, se
+ * ajusta aqui y en `scroll-mt-*` de las secciones.
+ */
+export const HEADER_OFFSET = -112;
+
+/**
  * Scroll suave hacia una seccion. Usa Lenis si esta disponible;
  * si no (o con `prefers-reduced-motion`), cae a la API nativa.
  */
@@ -62,6 +69,19 @@ export function scrollToSection(id: string, offset = 0): void {
 
   const top = target.getBoundingClientRect().top + window.scrollY + offset;
   window.scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+}
+
+/** Vuelve al inicio de la pagina actual (Lenis si esta activo). */
+export function scrollToTop(immediate = false): void {
+  if (typeof window === 'undefined') return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lenis = window.__afcrLenis;
+
+  if (lenis && !reduced) {
+    lenis.scrollTo(0, immediate ? { immediate: true } : { duration: 1.2 });
+    return;
+  }
+  window.scrollTo({ top: 0, behavior: immediate || reduced ? 'auto' : 'smooth' });
 }
 
 /* -------------------------------------------------------------------------- */

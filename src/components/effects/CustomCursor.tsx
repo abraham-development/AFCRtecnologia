@@ -3,12 +3,14 @@
 import { useEffect, useRef } from 'react';
 
 import { useIsFinePointer, usePrefersReducedMotion } from '@/hooks/useMediaQuery';
-import { lerp } from '@/lib/utils';
 
-const INTERACTIVE = 'a, button, input, textarea, select, summary, [data-cursor="expand"]';
+const INTERACTIVE = 'a, button, summary, [data-cursor="expand"]';
+const TEXT_ENTRY = 'input, textarea, select, [contenteditable="true"]';
+
+const LEAN_MAX = 14;
 
 /**
- * Cursor compuesto: punto de 4px + anillo cian de 32px con amortiguacion.
+ * Puntero de un trazo: la punta es el hotspot y el cuerpo no la persigue.
  * Solo en punteros finos y sin `prefers-reduced-motion`.
  */
 export function CustomCursor() {
@@ -16,21 +18,22 @@ export function CustomCursor() {
   const reduced = usePrefersReducedMotion();
   const enabled = finePointer && !reduced;
 
-  const dotRef = useRef<HTMLSpanElement | null>(null);
-  const ringRef = useRef<HTMLSpanElement | null>(null);
+  const posRef = useRef<HTMLSpanElement | null>(null);
+  const glyphRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
 
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-    if (!dot || !ring) return;
+    const pos = posRef.current;
+    const glyph = glyphRef.current;
+    if (!pos || !glyph) return;
 
     const root = document.documentElement;
     root.classList.add('afcr-cursor');
 
-    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const ringPos = { ...target };
+    const target = { x: 0, y: 0 };
+    const previous = { x: 0, y: 0 };
+    let lean = 0;
     let visible = false;
     let frame = 0;
 
@@ -38,39 +41,53 @@ export function CustomCursor() {
       target.x = event.clientX;
       target.y = event.clientY;
 
+      const node = event.target instanceof Element ? event.target : null;
+      const typing = Boolean(node?.closest(TEXT_ENTRY));
+      const active = Boolean(node?.closest(INTERACTIVE));
+
+      pos.dataset.expanded = !typing && active ? 'true' : 'false';
+      pos.dataset.typing = typing ? 'true' : 'false';
+
       if (!visible) {
         visible = true;
-        ringPos.x = target.x;
-        ringPos.y = target.y;
-        dot.style.opacity = '1';
-        ring.style.opacity = '1';
+        previous.x = target.x;
+        previous.y = target.y;
       }
 
-      const node = event.target instanceof Element ? event.target.closest(INTERACTIVE) : null;
-      ring.dataset.expanded = node ? 'true' : 'false';
+      pos.style.opacity = typing ? '0' : '1';
     };
 
     const onLeave = () => {
       visible = false;
-      dot.style.opacity = '0';
-      ring.style.opacity = '0';
+      pos.style.opacity = '0';
     };
 
     const onDown = () => {
-      ring.dataset.pressed = 'true';
+      pos.dataset.pressed = 'true';
     };
     const onUp = () => {
-      ring.dataset.pressed = 'false';
+      pos.dataset.pressed = 'false';
     };
 
     const render = () => {
-      // El punto sigue al puntero con casi cero latencia
-      dot.style.transform = `translate3d(${target.x}px, ${target.y}px, 0)`;
+      const dx = target.x - previous.x;
+      const dy = target.y - previous.y;
+      previous.x = target.x;
+      previous.y = target.y;
 
-      // El anillo lo persigue con amortiguacion (lerp 0.15)
-      ringPos.x = lerp(ringPos.x, target.x, 0.15);
-      ringPos.y = lerp(ringPos.y, target.y, 0.15);
-      ring.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0)`;
+      pos.style.transform = `translate3d(${target.x}px, ${target.y}px, 0)`;
+
+      const speed = Math.hypot(dx, dy);
+      let desired = 0;
+      if (speed > 0.6) {
+        const motion = Math.atan2(dy, dx);
+        const rest = Math.atan2(1, 0.28);
+        const delta = Math.atan2(Math.sin(motion - rest), Math.cos(motion - rest));
+        desired = Math.max(-LEAN_MAX, Math.min(LEAN_MAX, (delta * 180) / Math.PI * 0.28));
+      }
+
+      lean += (desired - lean) * (speed > 0.6 ? 0.5 : 0.28);
+      glyph.style.transform = `rotate(${lean.toFixed(2)}deg)`;
 
       frame = requestAnimationFrame(render);
     };
@@ -95,21 +112,34 @@ export function CustomCursor() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[190]">
-      {/* Wrapper = posicion (transform). Hijo = forma (translate/scale de Tailwind). */}
+      {/* Wrapper = posicion (transform). Hijo = inclinacion y escala. */}
       <span
-        ref={dotRef}
-        className="absolute top-0 left-0 block opacity-0 transition-opacity duration-300 will-change-transform"
-      >
-        <span className="block h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
-      </span>
-
-      <span
-        ref={ringRef}
+        ref={posRef}
         data-expanded="false"
         data-pressed="false"
-        className="group absolute top-0 left-0 block opacity-0 transition-opacity duration-300 will-change-transform"
+        data-typing="false"
+        className="group absolute top-0 left-0 block opacity-0 transition-opacity duration-150 will-change-transform"
       >
-        <span className="border-accent-cyan block h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-[scale,background-color,border-color] duration-300 ease-out group-data-[expanded=true]:scale-200 group-data-[expanded=true]:border-white/70 group-data-[expanded=true]:bg-white/10 group-data-[expanded=true]:mix-blend-difference group-data-[pressed=true]:scale-75" />
+        <span
+          ref={glyphRef}
+          className="block origin-top-left transition-[scale] duration-150 ease-editorial will-change-transform group-data-[pressed=true]:scale-90"
+        >
+          <svg
+            width="14"
+            height="16"
+            viewBox="0 0 14 16"
+            fill="none"
+            className="overflow-visible text-text-primary"
+          >
+            <path d="M0.5 0.5 L10.2 6.6 L3.4 10.4 Z" fill="currentColor" />
+            <path d="M6.2 8.2 L9.4 13.2" stroke="currentColor" strokeWidth="1" />
+            <path
+              d="M0.5 0.5 L8.6 2.4"
+              strokeWidth="1"
+              className="stroke-accent-cyan opacity-0 transition-opacity duration-150 group-data-[expanded=true]:opacity-100"
+            />
+          </svg>
+        </span>
       </span>
     </div>
   );

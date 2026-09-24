@@ -93,10 +93,7 @@ export function Preloader() {
             transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
             aria-hidden="true"
           >
-            <div className="flex items-start justify-between">
-              <span className="text-micro text-text-secondary">{agency.tagline}</span>
-              <span className="text-micro text-text-secondary">{agency.status}</span>
-            </div>
+            <span className="text-micro text-text-secondary">{agency.tagline}</span>
 
             <div className="flex items-end justify-between gap-6">
               <p className="font-serif text-2xl leading-none tracking-[-0.03em] md:text-3xl">

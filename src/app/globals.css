@@ -26,6 +26,8 @@
   --font-serif: var(--font-fraunces), ui-serif, Georgia, 'Times New Roman', serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+  /* Titular del hero: instancia estatica (ver layout.tsx) */
+  --font-hero: var(--font-fraunces-display), var(--font-fraunces), ui-serif, Georgia, serif;
 
   /* Radios: geometria editorial, nada de tarjetas SaaS */
   --radius-xs: 2px;
@@ -85,6 +87,14 @@
     text-wrap: balance;
   }
 
+  /* Fraunces con optical size automatico adelgaza tanto los trazos finos en
+     tamaños display que la «e» se lee como «c». Se fija el eje opsz en 72:
+     conserva el caracter editorial y mantiene legible el travesaño. */
+  .font-serif,
+  [class*='text-display'] {
+    font-variation-settings: 'opsz' 72;
+  }
+
   p {
     text-wrap: pretty;
   }
@@ -120,10 +130,21 @@ html.lenis body {
   pointer-events: none;
 }
 
-/* Cursor propio: ocultamos el nativo solo cuando el custom esta activo */
+/* Cursor propio: ocultamos el nativo solo cuando el custom esta activo.
+   En campos de texto vuelve el cursor de sistema para poder editar. */
 html.afcr-cursor,
 html.afcr-cursor * {
   cursor: none !important;
+}
+
+html.afcr-cursor :is(input, textarea, [contenteditable='true']),
+html.afcr-cursor :is(input, textarea, [contenteditable='true']) * {
+  cursor: text !important;
+}
+
+html.afcr-cursor select,
+html.afcr-cursor select * {
+  cursor: auto !important;
 }
 
 /* ========================================================================== */
@@ -139,7 +160,7 @@ html.afcr-cursor * {
 @utility text-display {
   font-family: var(--font-serif);
   font-weight: 300;
-  font-size: clamp(2.5rem, 7vw, 7.5rem);
+  font-size: clamp(2.5rem, 7vw, 6rem);
   line-height: 0.95;
   letter-spacing: -0.04em;
 }
@@ -233,22 +254,6 @@ html.afcr-cursor * {
   to {
     transform: translate3d(-50%, 0, 0);
   }
-}
-
-@keyframes afcr-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.35;
-    transform: scale(0.7);
-  }
-}
-
-.status-dot {
-  animation: afcr-pulse 2.4s var(--ease-swift) infinite;
 }
 
 /* Oculta la barra de scroll en carruseles horizontales */

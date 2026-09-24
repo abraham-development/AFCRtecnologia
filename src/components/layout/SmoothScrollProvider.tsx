@@ -1,9 +1,11 @@
 'use client';
 
 import Lenis from 'lenis';
+import { usePathname } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
 import { usePrefersReducedMotion } from '@/hooks/useMediaQuery';
+import { HEADER_OFFSET, scrollToSection, scrollToTop } from '@/lib/utils';
 
 /**
  * Scroll suave global (Lenis). Se expone en `window.__afcrLenis`
@@ -12,6 +14,19 @@ import { usePrefersReducedMotion } from '@/hooks/useMediaQuery';
  */
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   const reduced = usePrefersReducedMotion();
+  const pathname = usePathname();
+
+  /* Cambio de pagina: cada ruta empieza arriba, salvo que traiga un ancla
+     (p. ej. /servicios#ia o /contacto#formulario). Se espera un frame para
+     que la pagina nueva ya este en el DOM. */
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    const frame = requestAnimationFrame(() => {
+      if (hash) scrollToSection(hash, HEADER_OFFSET);
+      else scrollToTop(true);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pathname]);
 
   useEffect(() => {
     if (reduced) return;

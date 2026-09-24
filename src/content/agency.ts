@@ -1,4 +1,4 @@
-import type { Metric, NavItem } from '@/types';
+import type { Audience, NavItem, Principle, ProcessStep, SocialLink } from '@/types';
 
 /**
  * Constantes editables de AFCRtecnologia.
@@ -9,33 +9,32 @@ import type { Metric, NavItem } from '@/types';
 export const agency = {
   name: 'AFCRtecnologia',
   legalName: 'AFCRtecnologia S.A.C.',
-  role: 'Agencia de IA y Automatizacion Avanzada',
+  role: 'Software, automatización e inteligencia artificial',
   tagline: 'AGENCIA DE IA · LIMA, PERÚ',
-  status: 'ONLINE · LATAM & GLOBAL',
   founded: '2023',
   city: 'Lima',
   country: 'Perú',
   timezone: 'GMT-5',
   description:
     'Diseñamos agentes, automatizaciones y sistemas de IA que reducen trabajo operativo y generan resultados medibles.',
+  /** Resumen del catalogo completo (footer). */
+  summary:
+    'Desarrollamos software, automatizaciones y agentes de inteligencia artificial para que tu negocio atienda, venda y opere mejor.',
   longDescription:
-    'AFCRtecnologia es una agencia boutique de inteligencia artificial con base en Lima. Construimos agentes autónomos, automatizaciones de procesos y software impulsado por IA para empresas que necesitan resultados operativos, no pilotos eternos.',
+    'AFCRtecnologia es una agencia de tecnología con base en Lima. Construimos aplicaciones web y móviles, integramos tus sistemas con SUNAT, automatizamos procesos con n8n y desarrollamos agentes de IA —en la nube o en tus propios servidores— para pymes, empresas e instituciones educativas.',
 
-  /** Contacto. El correo aún es marcador; el teléfono vive en el entorno. */
+  /** Contacto. El correo aún es marcador; WhatsApp vive en el entorno. */
   email: 'contacto@afcrtecnologia.com',
   salesEmail: 'proyectos@afcrtecnologia.com',
 
   /**
-   * Teléfono y WhatsApp llegan por variables de entorno para no quedar
-   * escritos en el repositorio (que es público).
+   * WhatsApp llega por variable de entorno para no quedar escrito
+   * en el repositorio (que es público).
    *
-   * ⚠ Esto NO los oculta del sitio: `NEXT_PUBLIC_*` se incrusta en el HTML
-   * durante el build y el botón de WhatsApp necesita el número para funcionar.
-   * Si faltan, la interfaz oculta el teléfono y el botón en lugar de publicar
-   * un enlace roto.
+   * El número no se muestra: solo arma el enlace `wa.me`.
+   * `NEXT_PUBLIC_*` se incrusta en ese enlace durante el build.
+   * Si falta, la interfaz oculta el botón en lugar de publicar un enlace roto.
    */
-  phoneDisplay: process.env.NEXT_PUBLIC_PHONE_DISPLAY ?? '',
-
   whatsapp: {
     /** Formato internacional sin «+» ni espacios. */
     number: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '',
@@ -51,102 +50,180 @@ export const agency = {
     country: 'PE',
   },
 
+  /**
+   * ⚠ MARCADORES: las URLs de Facebook, Instagram y LinkedIn aun no estan
+   * confirmadas. Reemplazar antes de publicar. WhatsApp se agrega aparte
+   * (ver `socialLinks`) porque depende de la variable de entorno.
+   */
   socials: [
-    { label: 'LinkedIn', handle: '/company/afcrtecnologia', href: 'https://www.linkedin.com/company/afcrtecnologia' },
-    { label: 'GitHub', handle: '/afcrtecnologia', href: 'https://github.com/afcrtecnologia' },
-    { label: 'X', handle: '@afcrtecnologia', href: 'https://x.com/afcrtecnologia' },
-    { label: 'YouTube', handle: '/@afcrtecnologia', href: 'https://youtube.com/@afcrtecnologia' },
-  ],
+    { network: 'facebook', label: 'Facebook', handle: '/afcrtecnologia', href: 'https://www.facebook.com/afcrtecnologia' },
+    { network: 'instagram', label: 'Instagram', handle: '@afcrtecnologia', href: 'https://www.instagram.com/afcrtecnologia' },
+    { network: 'linkedin', label: 'LinkedIn', handle: '/company/afcrtecnologia', href: 'https://www.linkedin.com/company/afcrtecnologia' },
+  ] satisfies SocialLink[],
 
   legal: {
     rights: 'Todos los derechos reservados.',
     privacy: 'Política de privacidad',
     terms: 'Términos de servicio',
+    complaints: 'Libro de Reclamaciones',
     privacyNote:
       'Tus datos se usan únicamente para responder tu solicitud. No compartimos información con terceros ni entrenamos modelos con datos de clientes.',
   },
 } as const;
 
-/** ¿Hay número configurado? Si no, la interfaz no muestra esos canales. */
+/** ¿Hay número configurado? Si no, la interfaz no muestra el botón. */
 export const hasWhatsApp = agency.whatsapp.number.trim().length > 0;
-export const hasPhone = agency.phoneDisplay.trim().length > 0;
 
-/** URL de WhatsApp Business con mensaje precargado (vacía si no hay número). */
-export const whatsappUrl = hasWhatsApp
-  ? `https://wa.me/${agency.whatsapp.number}?text=${encodeURIComponent(agency.whatsapp.message)}`
-  : '';
+/** Enlace de WhatsApp con un mensaje precargado (vacío si no hay número). */
+export function whatsappLink(message: string): string {
+  if (!hasWhatsApp) return '';
+  return `https://wa.me/${agency.whatsapp.number}?text=${encodeURIComponent(message)}`;
+}
 
-/** Indice del menu fullscreen (01 — 07). */
+/** URL de WhatsApp Business con el mensaje general. */
+export const whatsappUrl = whatsappLink(agency.whatsapp.message);
+
+/** Mensaje precargado cuando el visitante consulta un servicio concreto. */
+export function serviceInquiry(serviceTitle: string): string {
+  return `Hola AFCRtecnologia, me interesa el servicio «${serviceTitle}». ¿Podemos conversar?`;
+}
+
+/** Redes para iconos: WhatsApp primero (canal principal) si esta configurado. */
+export const socialLinks: SocialLink[] = [
+  ...(hasWhatsApp
+    ? [{ network: 'whatsapp' as const, label: 'WhatsApp', handle: 'WhatsApp', href: whatsappUrl }]
+    : []),
+  ...agency.socials,
+];
+
+/** Navegacion principal: navbar, menu fullscreen y footer (una ruta por item). */
 export const navItems: NavItem[] = [
-  { index: '01', label: 'Soluciones', href: '#soluciones', meta: 'Cuatro sistemas' },
-  { index: '02', label: 'Método', href: '#metodo', meta: 'Siete etapas' },
-  { index: '03', label: 'Casos de uso', href: '#casos', meta: 'IA en producción' },
-  { index: '04', label: 'Servicios', href: '#servicios', meta: 'Cinco capacidades' },
-  { index: '05', label: 'Capacidades', href: '#capacidades', meta: 'Directorio técnico' },
-  { index: '06', label: 'Agencia', href: '#agencia', meta: 'Manifiesto y métricas' },
-  { index: '07', label: 'Recursos', href: '#recursos', meta: 'Criterio y análisis' },
+  { index: '01', label: 'Home', href: '/', meta: 'Inicio y noticias' },
+  { index: '02', label: 'Servicios', href: '/servicios', meta: 'Diez servicios' },
+  { index: '03', label: 'Nosotros', href: '/nosotros', meta: 'Quiénes somos' },
+  { index: '04', label: 'Contáctanos', href: '/contacto', meta: 'Respuesta < 24 h' },
 ];
 
-/** Contadores animados de la seccion 07. */
-export const metrics: Metric[] = [
+/** Textos del encabezado. */
+export const headerCopy = {
+  advisorCta: 'CONTACTA CON UN ASESOR',
+};
+
+/** Destino del atajo E y de los CTA «Empezar un proyecto». */
+export const CONTACT_FORM_HREF = '/contacto#formulario';
+
+/** Seccion Nosotros: para quien trabajamos. */
+export const audiences: Audience[] = [
   {
-    value: 15,
-    suffix: '+',
-    label: 'Automatizaciones desplegadas',
-    caption: 'Flujos en producción con monitoreo activo',
+    title: 'Pymes',
+    body: 'Tu página web, la facturación electrónica con SUNAT y un asistente de WhatsApp que atiende mientras tú te enfocas en vender.',
+    serviceGroupId: 'software',
   },
   {
-    value: 99.4,
-    suffix: '%',
-    decimals: 1,
-    label: 'Precisión operativa',
-    caption: 'Medida sobre tareas críticas con evaluación continua',
+    title: 'Empresas',
+    body: 'Agentes de IA, automatizaciones entre sistemas e IA instalada en tus propios servidores cuando los datos no pueden salir.',
+    serviceGroupId: 'ia',
   },
   {
-    value: 350,
-    suffix: '+',
-    label: 'Horas/mes ahorradas',
-    caption: 'Tiempo operativo devuelto a los equipos de nuestros clientes',
-  },
-  {
-    value: 4.2,
-    suffix: 'x',
-    decimals: 1,
-    label: 'Retorno de inversión',
-    caption: 'Promedio a 12 meses sobre proyectos con línea base medida',
+    title: 'Instituciones educativas',
+    body: 'Capacitaciones y charlas para que docentes, estudiantes y equipos usen la IA con criterio y responsabilidad.',
+    serviceGroupId: 'formacion',
   },
 ];
 
-/** Manifiesto de la seccion 07. */
-export const manifesto = [
+/** Seccion Nosotros: como trabajamos. */
+export const processSteps: ProcessStep[] = [
   {
     index: '01',
-    title: 'Privacidad corporativa primero',
-    body: 'Trabajamos con aislamiento de datos, despliegues privados y control total sobre lo que entra y sale de cada modelo. Ningún dato de cliente entrena modelos de terceros.',
+    title: 'Conversamos',
+    body: 'Nos cuentas qué quieres resolver. Entendemos tu operación antes de proponer tecnología.',
   },
   {
     index: '02',
-    title: 'Despliegue pragmático',
-    body: 'Preferimos un proceso funcionando en seis semanas antes que una transformación perfecta en dieciocho meses. Cada entrega tiene una métrica antes y después.',
+    title: 'Proponemos',
+    body: 'Te enviamos un alcance claro: qué construimos, con qué herramientas y qué recibirás.',
   },
   {
     index: '03',
-    title: 'Arquitecturas sin dependencia',
-    body: 'Diseñamos con capas intercambiables: si mañana cambia el proveedor de modelo, cambia una variable de entorno, no el sistema completo.',
+    title: 'Construimos',
+    body: 'Avances frecuentes que puedes probar. Nada de meses sin ver resultados.',
+  },
+  {
+    index: '04',
+    title: 'Acompañamos',
+    body: 'Capacitamos a tu equipo y seguimos disponibles para soporte y mejoras.',
   },
 ];
 
-/** Marquesina tecnologica infinita. */
+/** Seccion Nosotros: principios. */
+export const principles: Principle[] = [
+  {
+    title: 'Tus datos son tuyos',
+    body: 'Trabajamos con accesos controlados y, cuando hace falta, con IA instalada en tus servidores. Ningún dato de cliente entrena modelos de terceros.',
+  },
+  {
+    title: 'Soluciones que se usan',
+    body: 'Preferimos un sistema funcionando en semanas antes que un proyecto perfecto que nunca sale. Cada entrega resuelve algo concreto.',
+  },
+  {
+    title: 'Sin dependencia de un proveedor',
+    body: 'Diseñamos con piezas intercambiables: si mañana conviene otro modelo de IA u otra herramienta, se cambia sin rehacer todo.',
+  },
+];
+
+/** Marquesina de herramientas con las que trabajamos. */
 export const techStack = [
+  'N8N',
+  'WHATSAPP BUSINESS',
+  'API SUNAT',
   'OPENAI',
   'ANTHROPIC CLAUDE',
   'GOOGLE GEMINI',
-  'N8N',
-  'MAKE',
+  'HERMES AGENT',
   'PYTHON',
   'TYPESCRIPT',
   'DOCKER',
-  'QDRANT',
   'POSTGRESQL',
-  'AWS',
 ];
+
+/** Textos de la seccion Nosotros. */
+export const aboutCopy = {
+  title: 'Tecnología hecha en Lima para negocios reales.',
+  audiencesTitle: 'Para quién trabajamos',
+  audienceLink: 'Ver sus servicios',
+  processTitle: 'Cómo trabajamos',
+  principlesTitle: 'Lo que no negociamos',
+};
+
+/** Textos de la seccion Contacto (encabezado). */
+export const contactCopy = {
+  channelsTitle: 'Canales directos',
+  channels: {
+    whatsapp: {
+      label: 'WhatsApp',
+      value: 'Chatea con nosotros',
+      action: 'Abrir conversación',
+    },
+    email: { label: 'Correo', action: 'Escribir un correo' },
+  },
+  asideResponse: { label: 'RESPUESTA', value: '< 24 horas hábiles' },
+  asideBase: { label: 'BASE' },
+  formTitle: 'Déjanos tu mensaje.',
+  formLede:
+    'Una web, una integración con SUNAT, un chatbot o un agente de IA: cuéntanos qué necesitas y te respondemos con los siguientes pasos.',
+  formHint: 'LOS CAMPOS CON * SON OBLIGATORIOS',
+};
+
+/** Textos del footer. La banda final empuja a WhatsApp: conversar sin formulario. */
+export const footerCopy = {
+  titleStart: '¿Prefieres ',
+  titleAccent: 'conversar',
+  titleEnd: '?',
+  body: 'WhatsApp es la vía más rápida: escríbenos y conversa directamente con nuestro equipo.',
+  whatsappCta: 'Escribir por WhatsApp',
+  whatsappShort: 'WhatsApp',
+  fallbackCta: 'Ir al formulario',
+  columns: { nav: 'NAVEGACIÓN', services: 'SERVICIOS', contact: 'CONTACTO' },
+  labels: { whatsapp: 'WHATSAPP', email: 'CORREO', location: 'UBICACIÓN' },
+  backToTop: 'VOLVER ARRIBA',
+};

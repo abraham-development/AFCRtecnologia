@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Fraunces, IBM_Plex_Mono, Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 
 import './globals.css';
 
@@ -9,7 +10,8 @@ import ReadingProgress from '@/components/effects/ReadingProgress';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import SmoothScrollProvider from '@/components/layout/SmoothScrollProvider';
-import { agency, hasPhone } from '@/content/agency';
+import { agency } from '@/content/agency';
+import { allServices } from '@/content/services';
 
 /* -------------------------------------------------------------------------- */
 /*  Tipografia                                                                 */
@@ -20,6 +22,19 @@ const fraunces = Fraunces({
   display: 'swap',
   variable: '--font-fraunces',
   axes: ['SOFT', 'WONK', 'opsz'],
+});
+
+/**
+ * Fraunces estatica (opsz 72, peso 300) para el titular de particulas del hero.
+ * Canvas 2D no puede fijar ejes variables: con una instancia estatica el canvas
+ * y el texto real dibujan exactamente la misma letra, con la «e» legible.
+ * Instancia servida por Google Fonts (licencia OFL), subconjunto latin.
+ */
+const frauncesDisplay = localFont({
+  src: '../fonts/fraunces-display-opsz72-300-latin.woff2',
+  weight: '300',
+  display: 'swap',
+  variable: '--font-fraunces-display',
 });
 
 const inter = Inter({
@@ -50,14 +65,17 @@ export const metadata: Metadata = {
   description: agency.description,
   applicationName: agency.name,
   keywords: [
-    'agencia de inteligencia artificial',
+    'desarrollo de software Lima',
+    'aplicaciones web y móviles',
+    'diseño de páginas web',
+    'integración SUNAT CPE',
+    'SIRE SUNAT',
+    'automatización con n8n',
+    'chatbot de WhatsApp',
     'agentes de IA',
-    'automatización de procesos',
-    'n8n Perú',
-    'desarrollo con LLMs',
-    'RAG empresarial',
-    'consultoría IA Lima',
-    'automatización WhatsApp',
+    'Hermes Agent',
+    'IA on-premise',
+    'capacitaciones en inteligencia artificial',
   ],
   authors: [{ name: agency.name, url: siteUrl }],
   creator: agency.name,
@@ -104,7 +122,6 @@ const jsonLd = {
   description: agency.longDescription,
   url: siteUrl,
   email: agency.email,
-  ...(hasPhone ? { telephone: agency.phoneDisplay } : {}),
   foundingDate: agency.founded,
   areaServed: ['PE', 'LATAM', 'Global'],
   knowsLanguage: ['es', 'en'],
@@ -117,13 +134,7 @@ const jsonLd = {
     addressCountry: agency.address.country,
   },
   sameAs: agency.socials.map((social) => social.href),
-  serviceType: [
-    'Auditoría y estrategia de IA',
-    'Desarrollo de agentes autónomos',
-    'Automatización de procesos empresariales',
-    'Integración de LLMs',
-    'Optimización continua de sistemas de IA',
-  ],
+  serviceType: allServices.map((service) => service.title),
 };
 
 /* -------------------------------------------------------------------------- */
@@ -134,7 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="es"
-      className={`${fraunces.variable} ${inter.variable} ${plexMono.variable}`}
+      className={`${fraunces.variable} ${frauncesDisplay.variable} ${inter.variable} ${plexMono.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-bg-primary text-text-primary antialiased">
