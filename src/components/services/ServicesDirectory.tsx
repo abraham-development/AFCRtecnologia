@@ -16,7 +16,7 @@ import {
 } from '@/content/agency';
 import { serviceGroups, servicesCopy } from '@/content/services';
 import type { Service } from '@/types';
-import { cn, pad } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -105,12 +105,11 @@ export function ServicesDirectory() {
                         aria-pressed={isActive}
                         onClick={() => select(group.id)}
                         className={cn(
-                          'flex h-full min-h-16 w-full flex-col justify-between gap-2 px-2.5 py-3 text-left text-[0.8125rem] leading-snug hyphens-auto transition-colors',
+                          'flex h-full min-h-16 w-full items-center px-2.5 py-3 text-left text-[0.8125rem] leading-snug hyphens-auto transition-colors',
                           isActive ? 'text-accent-cyan' : 'hover:text-accent-cyan',
                         )}
                       >
                         {group.title}
-                        <span className="text-data tabular-nums">{pad(group.services.length)}</span>
                       </button>
                     </li>
                   );
@@ -131,7 +130,7 @@ export function ServicesDirectory() {
                         aria-pressed={isActive}
                         onClick={() => select(group.id)}
                         className={cn(
-                          'flex w-full items-center justify-between gap-4 py-5 text-left transition-colors duration-300',
+                          'flex w-full items-center gap-4 py-5 text-left transition-colors duration-300',
                           isActive ? 'text-accent-cyan' : 'text-text-secondary hover:text-text-primary',
                         )}
                       >
@@ -148,7 +147,6 @@ export function ServicesDirectory() {
                           )}
                           {group.title}
                         </span>
-                        <span className="text-data tabular-nums">{pad(group.services.length)}</span>
                       </button>
                     </li>
                   );
