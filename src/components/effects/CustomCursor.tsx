@@ -121,7 +121,7 @@ export function CustomCursor() {
         data-typing="false"
         className="group absolute top-0 left-0 block opacity-0 transition-opacity duration-150 will-change-transform"
       >
-        <span className="absolute -top-[11px] -left-[11px] block size-6 scale-75 rounded-full border border-accent-cyan/70 opacity-0 transition-[opacity,scale] duration-200 ease-editorial group-data-[expanded=true]:scale-100 group-data-[expanded=true]:opacity-70 group-data-[pressed=true]:scale-75" />
+        <span className="absolute -top-[11px] -left-[11px] block size-6 scale-75 rounded-full border border-accent-green/80 opacity-0 transition-[opacity,scale] duration-200 ease-editorial group-data-[expanded=true]:scale-100 group-data-[expanded=true]:opacity-70 group-data-[pressed=true]:scale-75" />
         <span
           ref={glyphRef}
           className="block origin-top-left transition-[scale] duration-150 ease-editorial will-change-transform group-data-[pressed=true]:scale-90"
@@ -143,7 +143,7 @@ export function CustomCursor() {
               d="M1 1 L17.2 11.5 L10.4 13.2 L14.7 20.7 L10.5 23 L6.3 15.5 L1 19 Z"
               strokeWidth="1.25"
               strokeLinejoin="round"
-              className="fill-black stroke-black transition-colors duration-150 group-data-[expanded=true]:fill-accent-cyan group-data-[expanded=true]:stroke-black"
+              className="fill-black stroke-black transition-colors duration-150 group-data-[expanded=true]:fill-accent-green group-data-[expanded=true]:stroke-black"
             />
           </svg>
         </span>

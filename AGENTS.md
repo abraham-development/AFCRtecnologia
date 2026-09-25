@@ -1,282 +1,313 @@
-# AGENTS.md — AFCRtecnologia
+# AGENTS.md — memoria operativa de AFCRtecnologia
 
-Sitio corporativo de AFCRtecnologia (agencia de IA, Lima, Perú).
-Una página por ítem del navbar —Home, Servicios, Nosotros, Contáctanos— más
-las notas de noticias. Estética editorial tecnológica, sin CMS.
+Sitio corporativo de AFCRtecnologia, agencia de software e IA de Lima, Perú.
+Estética editorial tecnológica, sin CMS. El objetivo del sitio es que el
+visitante identifique su servicio y contacte, preferentemente por WhatsApp.
 
-## Rutas
+Este archivo es la fuente canónica de contexto técnico y decisiones persistentes
+para cualquier agente. La verdad de producto, audiencias, servicios confirmados
+y afirmaciones permitidas vive en `PRODUCT.md`. No existe un `CLAUDE.md`
+duplicado: si una herramienta necesita un adaptador, debe limitarse a referenciar
+este archivo.
 
-| Ruta | Página | Componentes |
-| --- | --- | --- |
-| `/` | Hero (titular de partículas) + Noticias | `src/components/home/` |
-| `/servicios` | Directorio de los 10 servicios | `src/components/services/` |
-| `/nosotros` | Clientes, proceso, principios, herramientas | `src/components/about/` |
-| `/contacto` | Canales directos + formulario (`#formulario`) | `src/components/contact/` |
-| `/noticias/[slug]` | Nota completa (`generateStaticParams`) | `src/components/news/` |
+## Protocolo de memoria entre sesiones
 
-- Todas las rutas son estáticas y funcionan también en `build:static`.
-- Cada `page.tsx` exporta su `metadata`. `sitemap.ts` se genera desde
-  `navItems` y `newsPosts`.
-- La navegación usa `next/link` y rutas (`navItems.href`). Las anclas entre
-  páginas van como hash (`/servicios#ia`); `SmoothScrollProvider` lleva cada
-  página nueva arriba o al ancla.
-- Las microinteracciones compartidas viven en `src/components/ui/`
-  (`TiltCard`, `ScrambleText`, `CursorPreview`, `ButtonMagnetic`). Todas se
-  apagan con `prefers-reduced-motion` y en punteros táctiles.
-- Fraunces fija `opsz` en 72 para texto display (`globals.css`); si no, la «e»
-  se lee como «c». El `h1` del hero usa `font-hero`: una instancia **estática**
-  (opsz 72, peso 300) en `src/fonts/`, porque Canvas 2D no admite ejes
-  variables y las partículas deben dibujar exactamente la letra del DOM.
-- Responsive verificado de 320 a 2560 px: sin scroll horizontal y con áreas
-  táctiles de 44 px o más hasta 1024 px. En móviles apaisados (alto ≤ 480 px)
-  el header se reduce a una fila y la navegación queda en el menú.
-- Contraste mínimo 4.5:1 en texto de cuerpo, también en estados «inactivos».
-La verdad de producto (clientes, servicios, qué no inventar) está en `PRODUCT.md`.
+### Al comenzar
 
-Este archivo es la **fuente canónica** de contexto para cualquier agente
-(Claude Code, Codex, Cursor…). `CLAUDE.md` lo importa en vez de duplicarlo.
+1. Leer `AGENTS.md` y después `PRODUCT.md`.
+2. Ejecutar `git status --short` y revisar los diffs relacionados antes de
+   editar. El worktree puede contener cambios del usuario: no sobrescribirlos,
+   revertirlos ni incluirlos en un commit ajeno.
+3. Verificar en el código cualquier dato que pueda haber cambiado. Este archivo
+   orienta; el código, `package.json`, `package-lock.json` y Git confirman.
+4. Para tareas de Next.js, leer primero la guía relevante de
+   `node_modules/next/dist/docs/`; esta versión tiene cambios incompatibles con
+   conocimiento histórico de Next.
+
+### Qué conservar aquí
+
+- Arquitectura, invariantes, decisiones explícitas del usuario, trampas ya
+  verificadas y procedimientos de build/despliegue.
+- Actualizar este archivo en el mismo cambio cuando una decisión persistente
+  deje de ser cierta. No usarlo como changelog ni diario de tareas.
+- No guardar secretos, valores de `.env*`, teléfonos, tokens, PIDs, URLs de
+  preview temporales ni estados efímeros de servidores.
+- `.agents/`, `.claude/`, `.codex/`, `.cursor/`, `.impeccable/` y
+  `skills-lock.json` son artefactos de herramientas. No agregarlos a commits de
+  producto salvo petición explícita.
+
+### Antes de entregar
+
+1. Ejecutar `npm run typecheck && npm run lint && npm run build`.
+2. Si el cambio se desplegará en Hostinger, ejecutar además la simulación de
+   producción descrita en «Despliegue».
+3. Revisar `git diff --check` y `git status --short`.
+4. Informar con claridad qué quedó local, qué se confirmó visualmente y si hubo
+   commit, push o despliegue. Nunca asumir que una de esas acciones ocurrió.
 
 ---
 
-## Comandos
+## Estado estable actual — verificado en código el 2026-09-25
+
+- El sitio tiene Home, Servicios, Nosotros, Contáctanos y notas individuales.
+- El header muestra el logotipo textual «AFCRtecnologia», un CTA directo a
+  WhatsApp —solo si existe la variable— y una hamburguesa visible de tres
+  líneas. La frase «ONLINE - LATAM & GLOBAL» se eliminó intencionalmente y no
+  debe reintroducirse.
+- El texto del CTA es «Contacta con un asesor por WhatsApp» y abre `wa.me` en
+  una pestaña nueva. La estructura y el contenido del menú fullscreen no se
+  alteran al retocar la hamburguesa.
+- El cursor personalizado es una flecha de alto contraste de 20 × 24 px. Tiene
+  halo cian solo sobre controles interactivos, conserva el hotspot exacto,
+  vuelve al cursor nativo en campos de texto y se desactiva con puntero táctil
+  o `prefers-reduced-motion`.
+- `RootLayout` usa `suppressHydrationWarning` tanto en `<html>` como en
+  `<body>`. El segundo evita falsos positivos cuando una extensión modifica la
+  clase del body antes de hidratar (caso observado: `expansion-alids-init`).
+- Home contiene cinco notas de ejemplo. La nota mockup sobre SIRE/SUNAT fue
+  eliminada intencionalmente; no reintroducirla sin pedido. SUNAT sigue siendo
+  un servicio confirmado. La nota más reciente se vuelve destacada de forma
+  automática; actualmente es la de Hermes Agent.
+- Las notas restantes llevan `sample: true` y muestran «EJEMPLO»: no deben
+  presentarse como publicaciones reales de AFCR.
+
+---
+
+## Mapa del sitio
+
+| Ruta | Contenido | Implementación principal |
+| --- | --- | --- |
+| `/` | Hero de partículas + Noticias | `src/components/home/` |
+| `/servicios` | Directorio de 10 servicios | `src/components/services/` |
+| `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
+| `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
+| `/noticias/[slug]` | Nota completa con `generateStaticParams` | `src/components/news/` |
+
+- Las páginas se prerenderizan y también funcionan con `build:static`.
+  `/api/contact` solo existe en el build Node.
+- Cada `page.tsx` exporta `metadata`. `sitemap.ts` deriva rutas desde
+  `navItems` y `newsPosts`.
+- La navegación usa `next/link`. Las anclas entre páginas llevan ruta y hash,
+  por ejemplo `/servicios#ia`; `SmoothScrollProvider` gestiona inicio/ancla.
+- Copy y datos editables viven en `src/content/*.ts`; contratos en
+  `src/types/index.ts`. No duplicar copy entre componentes.
+
+## Mapa de código
+
+| Área | Fuente |
+| --- | --- |
+| Layout, metadata y JSON-LD | `src/app/layout.tsx` |
+| Tokens, Tailwind y estilos globales | `src/app/globals.css` |
+| Header, menú, footer y scroll | `src/components/layout/` |
+| Cursor, preloader, partículas, WebGL | `src/components/effects/` |
+| Microinteracciones compartidas | `src/components/ui/` |
+| Empresa, navegación y contacto | `src/content/agency.ts` |
+| Catálogo de servicios | `src/content/services.ts` |
+| Noticias | `src/content/news.ts` |
+| Validación compartida | `src/lib/validations.ts` |
+| Endpoint Node | `src/app/api/contact/route.node.ts` |
+| Fallback PHP estático | `public/contact.php` |
+
+---
+
+## Comandos y stack
 
 ```bash
-npm run dev             # desarrollo
-npm run build           # build de producción para servidor Node (incluye /api/contact)
-npm run start           # sirve ese build
-npm run build:static    # export estático para hosting compartido → out/
-npm run package:static  # build estático + ZIP listo para subir a Hostinger
-npm run lint            # ESLint — incluye reglas del React Compiler (son ERRORES)
+npm run dev             # Next en desarrollo
 npm run typecheck       # tsc --noEmit
+npm run lint            # ESLint + reglas React Compiler
+npm run build           # servidor Node con Turbopack
+npm run build:hostinger # servidor Node con webpack; producción real
+npm run start           # sirve .next
+npm run build:static    # export alternativo → out/
+npm run package:static  # export + ZIP para hosting sin Node
 ```
 
-**Antes de dar por terminado un cambio:** `npm run typecheck && npm run lint && npm run build`.
-Los tres deben pasar limpios. El lint no es opcional: las reglas
-`react-hooks/*` del React Compiler fallan el comando, no solo avisan.
+Node local 22 · Node Hostinger 24 · npm. No usar pnpm.
 
----
-
-## Stack (versiones verificadas en este repo)
-
-| Paquete | Versión | Nota |
+| Paquete | Versión verificada | Restricción |
 | --- | --- | --- |
-| next | 16.3.5 | App Router + Turbopack |
-| react / react-dom | 19.3.0 | React Compiler activo vía lint |
-| tailwindcss | 4.3.3 | **CSS-first** |
-| motion | 13.4.0 | reexporta `framer-motion`; se importa de `motion/react` |
-| three | 0.186.0 | sin `@react-three/fiber` |
-| lenis | 1.3.26 | scroll suave |
-| zod | 4.6.5 | validación cliente + servidor |
-| react-hook-form | 7.88.0 | con `@hookform/resolvers` 5.9.1 |
-| lucide-react | 1.47.0 | iconos |
-| typescript | 5.9.3 | estricto |
-
-Node 22 · npm. No mezclar con pnpm aunque esté instalado en la máquina.
+| Next | 16.3.5 | App Router; Turbopack local, webpack en Hostinger |
+| React / React DOM | 19.3.0 | React Compiler vigilado por ESLint |
+| Tailwind CSS | 4.3.3 | CSS-first, sin `tailwind.config.ts` |
+| Motion | 13.4.0 | importar desde `motion/react` |
+| Three.js | 0.186.0 | API plana, sin React Three Fiber |
+| Lenis | 1.3.26 | scroll suave |
+| Zod | 4.6.5 | esquema cliente/servidor |
+| React Hook Form | 7.88.0 | resolver 5.9.1 |
+| TypeScript | 5.9.3 | modo estricto |
 
 ---
 
-## Decisiones de arquitectura (no revertir sin motivo)
+## Decisiones de arquitectura
 
-1. **No existe `tailwind.config.ts` y no debe crearse.** Tailwind v4 es
-   CSS-first: los tokens viven en el bloque `@theme` de `src/app/globals.css`
-   y generan las utilidades (`bg-bg-primary`, `text-accent-cyan`,
-   `border-border-editorial`, `py-chapter`, `text-display`…).
-2. **Three.js plano, sin React Three Fiber.** Menos dependencias y control
-   directo del shader GLSL. `WebGLHeroBackground` se carga con
-   `next/dynamic` + `ssr: false`: Three **no debe entrar al bundle inicial**.
-3. **Todo el copy vive en `src/content/*.ts`.** Ningún texto visible se
-   escribe dentro de un componente. Los tipos están en `src/types/index.ts`.
-4. **Idioma:** identificadores y nombres de archivo en inglés
-   (`01-Hero.tsx`, `caseStudies`); comentarios, copy y `aria-label` en español.
-5. **Geometría editorial:** bordes de 1px `#243049`, `rounded-none`/`rounded-xs`,
-   sin sombras. La jerarquía se construye con opacidad y luminancia cian.
+1. **Tailwind v4 CSS-first.** Los tokens están en `@theme` de
+   `src/app/globals.css`. No crear `tailwind.config.ts`.
+2. **Three.js sin React Three Fiber.** `WebGLHeroBackground` se carga con
+   `next/dynamic` y `ssr: false`; Three no entra al bundle inicial.
+3. **Contenido centralizado.** Todo copy nuevo o modificado debe residir en
+   `src/content/*.ts`; componentes y nombres de archivo en inglés, copy,
+   comentarios y `aria-label` en español.
+4. **Geometría editorial.** Bordes de 1 px `#243049`, radios mínimos, sin
+   sombras decorativas; jerarquía mediante espacio, opacidad y cian.
+5. **Fuentes.** Fraunces usa `opsz: 72` en display. El `h1` del hero usa la
+   fuente estática `src/fonts/fraunces-display-opsz72-300-latin.woff2` porque
+   Canvas 2D no reproduce ejes variables con precisión.
+6. **Responsive.** Debe funcionar de 320 a 2560 px sin scroll horizontal y
+   con áreas táctiles ≥ 44 px hasta 1024 px. La variante CSS `short:`
+   (`max-height: 480px`) compacta el header y oculta el segundo navbar.
 
 ---
 
-## Dos objetivos de compilación
+## Compilación y despliegue
 
-El sitio se publica en **Hostinger hosting compartido**, que no ejecuta Node.
-Por eso hay dos modos, controlados por `BUILD_TARGET` en `next.config.ts`:
+### Producción actual: Hostinger Business + Git
 
-| | `npm run build` | `npm run build:static` |
-| --- | --- | --- |
-| Salida | servidor Node (`.next`) | estático (`out/`) |
-| Formulario | `/api/contact` (route handler) | `/contact.php` |
-| Cabeceras | `headers()` de `next.config.ts` | `public/.htaccess` |
-| Uso | Vercel / VPS | **producción actual** |
-
-Reglas que lo sostienen — no deshacerlas:
-
-- **El route handler se llama `src/app/api/contact/route.node.ts`, no `route.ts`.**
-  `pageExtensions` solo incluye `node.ts` fuera del modo estático, así queda
-  excluido del export (Next no admite handlers dinámicos con `output: 'export'`).
-  Si se renombra a `route.ts`, **el build estático falla**.
-- `robots.ts` y `sitemap.ts` exportan `dynamic = 'force-static'`. Sin eso el
-  export falla porque `new Date()` los vuelve dinámicos.
-- `headers()` no puede coexistir con `output: 'export'`: por eso el bloque va
-  en un spread condicional.
-- El endpoint del formulario se lee de `NEXT_PUBLIC_CONTACT_ENDPOINT`
-  (por defecto `/api/contact`); el script estático lo fija a `/contact.php`.
-
-### Despliegue real: Hostinger + Git (producción)
-
-El plan es **Hostinger Business**, que sí ejecuta Node: la app se publica como
-aplicación Next.js (`app_type: next`, salida `.next`), **no** como export
-estático. El formulario usa por tanto `/api/contact`, y `contact.php` queda
-como alternativa documentada por si se migra a un plan sin Node.
+La producción real ejecuta Next.js sobre Node; **no** usa el export estático.
 
 | Dato | Valor |
 | --- | --- |
-| Sitio | `afcrtecnologia.com` (vhost addon) |
+| Dominio | `afcrtecnologia.com` |
 | Usuario hosting | `u574572243` |
-| Repo | `abraham-development/AFCRtecnologia`, rama `main` |
-| Build script | `build:hostinger` |
-| Output | `.next` · Root: `/` · Node 24 · npm |
+| Repositorio | `abraham-development/AFCRtecnologia` |
+| Rama | `main` |
+| Tipo | `app_type: next` |
+| Build | `npm run build:hostinger` |
+| Salida | `.next` · raíz `/` · Node 24 · npm |
 
-- **⚠ La configuración debe ser `next.config.mjs`, nunca `.ts`.** El contenedor
-  de build de Hostinger tiene una glibc antigua: `@next/swc-linux-x64-gnu` no
-  carga (`GLIBC_2.29 not found`), Next cae al fallback WASM y ese fallback no
-  transpila configs en TypeScript. El build muere con «Failed to load
-  next.config.ts». Verificado en un build real.
-- **⚠ El builder de Hostinger no soporta Turbopack.** `npm run build` (Next 16
-  lo usa por defecto) falla allí. Por eso existe
-  `build:hostinger` = `next build --webpack`, que es el script que Hostinger
-  ejecuta. Verificado: el mismo problema obligó a `--webpack` en el proyecto
-  hermano `creciendo_juntos`.
-- **⚠ Hostinger instala solo `dependencies`, nunca `devDependencies`.** Por eso
-  `tailwindcss`, `@tailwindcss/postcss`, `typescript` y los `@types/*` viven en
-  `dependencies`: si se mueven a dev, el build falla con
-  «Cannot find module '@tailwindcss/postcss'» y el alias `@/` deja de resolver.
-  Solo `eslint` y `eslint-config-next` pueden quedarse en dev.
-- Antes de pushear un cambio que afecte al build, simula su entorno:
-  copia el proyecto a un temporal, `npm install --omit=dev` y
-  `npm run build:hostinger`. Evita ciclos de despliegue fallido.
-- El otro sitio del plan, `magenta-flamingo-697303.hostingersite.com`, es de
-  **creciendo_juntos**. No tocarlo: desplegar AFCR ahí lo borraría.
+Reglas críticas:
 
-### ⚠ Acoplamiento a vigilar
+- La configuración se llama `next.config.mjs`, nunca `.ts`. El contenedor de
+  Hostinger tiene una glibc antigua; SWC nativo falla y el fallback WASM no
+  transpila configuraciones TypeScript.
+- Hostinger no soporta Turbopack: allí se usa `next build --webpack` mediante
+  `build:hostinger`.
+- Hostinger instala solo `dependencies`. `tailwindcss`,
+  `@tailwindcss/postcss`, `typescript` y `@types/*` deben permanecer allí;
+  únicamente ESLint y `eslint-config-next` van en `devDependencies`.
+- Antes de pushear un cambio que afecte el build, copiar a un temporal,
+  ejecutar `npm install --omit=dev` y después `npm run build:hostinger`.
+- No desplegar en `magenta-flamingo-697303.hostingersite.com`: pertenece al
+  proyecto `creciendo_juntos` y se sobrescribiría.
 
-**`public/contact.php` duplica las reglas de `src/lib/validations.ts`.**
-Si cambias el esquema Zod (campos, longitudes, mensajes de error), hay que
-actualizar el PHP en el mismo commit o la validación de cliente y servidor
-dejarán de coincidir en producción. El PHP devuelve el mismo JSON
-(`{ ok, message, fieldErrors }`) y los mismos códigos 200/400/405/429/500.
+### Export estático: solo alternativa
 
-No hay PHP instalado en esta máquina. Para comprobar la sintaxis sin Docker:
-`npm i php-parser` en un directorio temporal y parsear el archivo.
+`BUILD_TARGET=static` activa `output: 'export'`, genera `out/`, desactiva el
+route handler y usa `/contact.php`. Mantener estas condiciones:
+
+- El handler debe seguir llamándose `route.node.ts`; `pageExtensions` excluye
+  `node.ts` del modo estático.
+- `robots.ts` y `sitemap.ts` conservan `dynamic = 'force-static'`.
+- `headers()` solo se declara en modo Node; Apache usa `public/.htaccess`.
+- `NEXT_PUBLIC_CONTACT_ENDPOINT` vale `/api/contact` por defecto y el script
+  estático lo fija en `/contact.php`.
+
+### Builds dentro de sandboxes
+
+- No ejecutar un build sobre el mismo `.next` mientras `next dev` esté activo.
+  Usar una copia temporal para no detener el servidor ni alterar sus locks.
+- Turbopack puede fallar en sandboxes que impiden abrir puertos internos. Si
+  ocurre, conservar el error original, ejecutar igualmente las verificaciones
+  posibles y validar el artefacto real con `build:hostinger` en un temporal.
+  No convertir una limitación del sandbox en un cambio permanente del proyecto.
 
 ---
 
-## Trampas ya pisadas (verificadas en navegador — no repetirlas)
+## Variables, datos y seguridad
+
+- `.env.local` y `.env.production` están ignorados por Git. Nunca imprimirlos,
+  copiarlos a documentación ni versionar sus valores.
+- WhatsApp llega por `NEXT_PUBLIC_WHATSAPP_NUMBER`. Si falta, ocultar el CTA
+  mediante `hasWhatsApp`; no generar enlaces vacíos. `.env.example` conserva
+  `NEXT_PUBLIC_PHONE_DISPLAY`, pero la interfaz actual no muestra el teléfono.
+- `NEXT_PUBLIC_*` se incrusta en el HTML. Cambiar esas variables exige un build
+  nuevo, no solo reiniciar la app.
+- Datos aún marcadores: correo y dirección en `src/content/agency.ts`; URLs de
+  Facebook, Instagram y LinkedIn; páginas legales del footer.
+- Todas las noticias actuales son ejemplos. No inventar métricas, clientes,
+  testimonios, precios, plazos ni resultados. Ver `PRODUCT.md` antes de tocar
+  afirmaciones comerciales.
+
+---
+
+## Invariantes de accesibilidad y rendimiento
+
+### Accesibilidad
+
+- Todo control interactivo tiene nombre accesible; `:focus-visible` usa el
+  contorno cian global.
+- Contraste mínimo de texto: 4.5:1, incluso en estados inactivos.
+- El cursor nativo debe reaparecer en `input`, `textarea`, `select` y
+  `contenteditable`.
+- El contenido y los controles siguen siendo utilizables con teclado,
+  JavaScript reducido y `prefers-reduced-motion`.
+
+### Rendimiento
+
+- Canvas y WebGL se pausan con `document.hidden` e `IntersectionObserver`.
+- `WebGLHeroBackground` apaga niebla y reduce partículas si no sostiene
+  aproximadamente 40 FPS. No retirar esa degradación.
+- `prefers-reduced-motion` desactiva Lenis, cursor, partículas y preloader.
+- Para contener el ancho usar `overflow-x: clip`, no `hidden`, porque este
+  último rompe `position: sticky`.
+
+### Atajos
+
+- `E` → `/contacto#formulario` y foco en `#contact-name`.
+- `S` → `/servicios`.
+- Nunca se activan dentro de `input`, `textarea`, `select` o
+  `contenteditable`; lógica en `src/hooks/useKeyboardShortcut.ts`.
+
+---
+
+## Trampas verificadas — no repetir
 
 ### Tailwind v4
-- **`scale-*` y `translate-*` usan las propiedades CSS `scale`/`translate`, no
-  `transform`.** Si un elemento lleva una utilidad `scale-*` de Tailwind y
-  además un `transform: translate3d(...)` por JS, la escala **multiplica** esa
-  traslación y el elemento se descoloca. Solución usada en `CustomCursor`:
-  wrapper con el `transform` (posición) + hijo con las utilidades (forma).
-- **Una `@utility` propia nunca debe declarar `position`.** La utilidad `noise`
-  tenía `position: relative` y ganaba en la cascada a `absolute` del mismo
-  elemento: sacó el fondo WebGL del flujo y empujó todo el hero fuera de
-  pantalla. `noise` hoy solo pinta el grano en `::after` y exige que el
-  consumidor ya esté posicionado.
+
+- `scale-*` y `translate-*` usan propiedades CSS independientes. En
+  `CustomCursor`, el wrapper posee `translate3d(...)` y el hijo recibe escala o
+  rotación; no unir ambas responsabilidades.
+- Una `@utility` propia nunca declara `position`. `noise` solo pinta grano en
+  `::after`; el consumidor aporta su posición.
+- Las carpetas de agentes están excluidas con `@source not` para impedir que
+  Tailwind extraiga clases corruptas desde documentación o binarios.
+- Usar la variante `short:` ya declarada; no repetir variantes arbitrarias de
+  `max-height` en JSX.
 
 ### Canvas 2D
-- **Canvas ignora `letter-spacing` del CSS.** Hay que copiarlo con
-  `ctx.letterSpacing = getComputedStyle(el).letterSpacing` en el contexto de
-  medición y en el de dibujo, o el trazado sale más ancho que el texto del DOM.
-- **El reset global `canvas { max-width: 100% }` comprime lienzos dimensionados
-  por JS.** Todo canvas con ancho calculado necesita `max-w-none`.
-- Para calzar con el DOM se usa `fontBoundingBoxAscent/Descent` y el
-  medio-interlineado `(lineHeight - (asc + desc)) / 2`, no las métricas de tinta.
 
-### React 19 / React Compiler (Next 16)
-- Prohibido `setState` **síncrono** dentro de un efecto. Patrones usados:
-  `useSyncExternalStore` (estado del preloader en `01-Hero`), o diferirlo a
-  `requestAnimationFrame` (`Preloader`), o eliminar el estado y escribir un
-  `dataset` por ref (`WebGLHeroBackground`).
-- Prohibido escribir un ref durante el render → sincronizarlo en un efecto.
-- Prohibidas las llamadas impuras (`Date.now()`, `Math.random()`) en el cuerpo
-  del componente → helper a nivel de módulo (ver `createToast` en `contact/ContactForm.tsx`).
-- RHF: usar `useWatch({ control, name })`, no `watch()` (el compilador no puede
-  memoizar la función que devuelve).
+- Canvas ignora `letter-spacing` CSS: copiarlo al contexto de medición y dibujo.
+- El reset `canvas { max-width: 100% }` comprime lienzos calculados por JS;
+  esos canvas necesitan `max-w-none`.
+- Alinear con el DOM mediante `fontBoundingBoxAscent/Descent` y el
+  medio-interlineado, no con métricas de tinta.
 
-### Zod + React Hook Form
-- El esquema de `src/lib/validations.ts` **no debe usar `.transform()`**: haría
-  divergir el tipo de entrada del de salida y rompería el tipado del resolver.
-  Las normalizaciones (p. ej. minúsculas del correo) se hacen en el route handler.
+### React 19 / React Compiler
 
-### ESLint
-- `eslint.config.mjs` ignora `.agents/`, `.claude/`, `.codex/`, `.cursor/` e
-  `.impeccable/`: son herramientas del entorno, no código de la landing.
-  Sin esos ignores aparecen ~280 avisos falsos.
+- No llamar `setState` síncronamente dentro de un efecto. Usar los patrones ya
+  presentes: `useSyncExternalStore`, `requestAnimationFrame` o `dataset` por ref.
+- No escribir refs durante render ni llamar `Date.now()` / `Math.random()` en
+  el cuerpo del componente.
+- Con RHF usar `useWatch({ control, name })`, no `watch()`.
+- `suppressHydrationWarning` en body responde a modificaciones externas del DOM;
+  no oculta divergencias de datos dentro de componentes.
 
----
+### Zod y formulario
 
-## Invariantes que no se deben romper
+- `src/lib/validations.ts` no usa `.transform()`: normalizar en el handler para
+  no separar los tipos de entrada/salida del resolver.
+- `public/contact.php` duplica las reglas Zod. Cambiar campos, límites o
+  mensajes exige actualizar ambos en el mismo commit. Deben conservar el mismo
+  JSON `{ ok, message, fieldErrors }` y códigos 200/400/405/429/500.
+- No hay PHP local. Para validar sintaxis, instalar `php-parser` únicamente en
+  un temporal.
 
-**Accesibilidad**
-- Todo control interactivo lleva `aria-label` descriptivo; el foco visible es
-  el contorno cian de `:focus-visible` definido en `globals.css`.
-- Contrastes verificados sobre `#0D1828`: `text-secondary` 7.4:1, cian 8.6:1.
+### Entrega de leads
 
-**Rendimiento**
-- Canvas y WebGL se pausan con `document.hidden` y con `IntersectionObserver`.
-- `WebGLHeroBackground` degrada solo: apaga la niebla y luego reduce partículas
-  si no sostiene ~40 FPS. No quitar esa lógica.
-- `prefers-reduced-motion` desactiva Lenis, cursor, partículas y preloader.
-- Nada debe superar `100vw`: los contenedores usan `overflow-x: clip` (no
-  `hidden`, que rompería `position: sticky`).
-
-**Atajos de teclado**
-- `E` → `/contacto#formulario` + foco en `#contact-name`; `S` → `/servicios`. Nunca se disparan
-  dentro de input, textarea, select o `contenteditable`
-  (ver `src/hooks/useKeyboardShortcut.ts`).
-
----
-
-## Datos marcador (NO son reales)
-
-Antes de publicar hay que reemplazar:
-- `src/content/agency.ts` → `contacto@afcrtecnologia.com` (el buzón aún no
-  existe), dirección postal y las URLs de Facebook, Instagram y LinkedIn
-  (`agency.socials`).
-- Footer → «Política de privacidad», «Términos de servicio» y «Libro de
-  Reclamaciones» son texto sin página todavía. El Libro de Reclamaciones es
-  obligatorio en Perú para negocios que atienden a consumidores.
-
-**El teléfono y el WhatsApp ya son reales y NO están en el repositorio.**
-Llegan por `NEXT_PUBLIC_PHONE_DISPLAY` y `NEXT_PUBLIC_WHATSAPP_NUMBER`
-(ver `.env.example`), definidos en `.env.local`, `.env.production` —ambos
-ignorados por git— y en las variables de entorno del sitio en Hostinger.
-Nunca escribas el número en un archivo versionado, este incluido.
-
-⚠ Son `NEXT_PUBLIC_*`: se incrustan en el HTML publicado, así que esto los
-saca de GitHub pero no los oculta de los visitantes. Es inevitable: el botón
-de WhatsApp necesita el número. Si las variables faltan, la interfaz oculta
-el teléfono y el botón (`hasPhone` / `hasWhatsApp`) en lugar de publicar un
-enlace roto. Cambiarlas exige **un build nuevo**, no basta con reiniciar.
-
-- `src/content/news.ts` → **todas las notas son de ejemplo** (`sample: true`,
-  se muestran con la etiqueta EJEMPLO). Reemplazarlas por notas reales de AFCR
-  antes de publicar.
-
-Las métricas ilustrativas antiguas (casos de uso y sección Agencia) se
-eliminaron junto con esas secciones. Los servicios de `src/content/services.ts`
-no llevan plazos ni precios porque aún no están definidos.
-
-Un agente no debe inventar métricas nuevas ni convertir estos marcadores en
-afirmaciones verificadas.
-
----
-
-## Entrega de leads
-
-`POST /api/contact` (Zod + honeypot + rate limit de 5/min por IP en memoria).
-Sin variables de entorno el lead solo queda en el log. Con
-`CONTACT_WEBHOOK_URL` se reenvía como JSON; con `RESEND_API_KEY` +
-`CONTACT_FROM_EMAIL` se envía por correo. El rate limit es por instancia:
-para multi-región hace falta Redis/KV.
+`POST /api/contact` aplica Zod, honeypot y rate limit en memoria de 5 solicitudes
+por minuto e IP. Sin integración, registra el lead en logs. Con
+`CONTACT_WEBHOOK_URL` reenvía JSON; con `RESEND_API_KEY` + `CONTACT_FROM_EMAIL`
+envía correo. El rate limit es por instancia; multi-región requiere Redis/KV.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

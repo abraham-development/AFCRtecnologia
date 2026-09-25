@@ -30,7 +30,7 @@ export const serviceGroups: ServiceGroup[] = [
       },
       {
         id: 'sunat',
-        title: 'Integraciones con la API de SUNAT: CPE y SIRE',
+        title: 'Integraciones de software con las APIs de diversos sistemas',
         shortTitle: 'Integraciones SUNAT',
         description:
           'Emisión de comprobantes de pago electrónicos desde tu sistema y declaración de registros de compras y ventas en el SIRE.',
@@ -87,8 +87,8 @@ export const serviceGroups: ServiceGroup[] = [
   },
   {
     id: 'formacion',
-    title: 'Formación y equipamiento',
-    summary: 'Personas preparadas para usar la IA y equipos listos para trabajar.',
+    title: 'Formación',
+    summary: 'Talleres y charlas para que tu equipo use la IA con criterio.',
     services: [
       {
         id: 'capacitaciones',
@@ -98,6 +98,13 @@ export const serviceGroups: ServiceGroup[] = [
           'Talleres para empresas e instituciones educativas sobre cómo usar la IA de forma útil, segura y responsable.',
         tags: ['Empresas', 'Instituciones educativas'],
       },
+    ],
+  },
+  {
+    id: 'equipamiento',
+    title: 'Equipamiento',
+    summary: 'Dispositivos para la oficina o el proyecto, elegidos con asesoría.',
+    services: [
       {
         id: 'dispositivos',
         title: 'Venta de dispositivos tecnológicos',
@@ -114,9 +121,6 @@ export const serviceGroups: ServiceGroup[] = [
 export const servicesCopy = {
   directoryTitle: 'Catálogo de servicios',
   indexLabel: 'Categorías de servicios',
-  /** Vista previa flotante: el mensaje que se abrira en WhatsApp. */
-  previewLabel: 'MENSAJE LISTO PARA WHATSAPP',
-  previewHint: 'Haz clic en Consultar y se abre la conversación.',
   inquiry: 'CONSULTAR',
   fallbackCta: '¿No lo ves en la lista? Escríbenos',
 };
