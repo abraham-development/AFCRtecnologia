@@ -21,7 +21,7 @@ export const agency = {
   summary:
     'Desarrollamos software, automatizaciones y agentes de inteligencia artificial para que tu negocio atienda, venda y opere mejor.',
   longDescription:
-    'AFCRtecnologia es una agencia de tecnología con base en Lima. Construimos aplicaciones web y móviles, integramos tus sistemas con SUNAT, automatizamos procesos con n8n y desarrollamos agentes de IA —en la nube o en tus propios servidores— para pymes, empresas e instituciones educativas.',
+    'AFCRtecnologia es una agencia de tecnología con base en Lima. Construimos aplicaciones web y móviles, integramos tus sistemas, automatizamos procesos con n8n y desarrollamos agentes de IA —en la nube o en tus propios servidores— para pymes, empresas e instituciones educativas.',
 
   /** Contacto. El correo aún es marcador; WhatsApp vive en el entorno. */
   email: 'contacto@afcrtecnologia.com',
