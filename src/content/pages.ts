@@ -26,10 +26,10 @@ export const homeCopy = {
 export const pageIntros = {
   services: {
     title: 'Diez servicios. Un solo equipo.',
-    lede: 'Desde tu página web y la facturación con SUNAT hasta agentes de IA en tus propios servidores. Elige por dónde empezar.',
+    lede: 'Desarrollo de software (aplicaciones web y móviles), diseño y desarrollo de páginas web, integraciones con APIs de diversos sistemas, automatizaciones con n8n, chatbots agénticos de WhatsApp, agentes de IA personalizados y con Hermes, IA local on-premise, capacitaciones y charlas sobre el manejo adecuado de la IA, y venta de dispositivos tecnológicos.',
     metaTitle: 'Servicios',
     metaDescription:
-      'Aplicaciones web y móviles, páginas web, integraciones con SUNAT (CPE y SIRE), automatizaciones con n8n, chatbots de WhatsApp, agentes de IA, IA on-premise, capacitaciones y dispositivos.',
+      'Desarrollo de software (web y móvil), páginas web, integraciones con APIs, automatizaciones con n8n, chatbots de WhatsApp, agentes de IA personalizados y con Hermes, IA on-premise, capacitaciones y venta de dispositivos.',
   },
   about: {
     title: 'Tecnología hecha en Lima para negocios reales.',
