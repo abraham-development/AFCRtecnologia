@@ -1,11 +1,12 @@
-import type { NewsCategory, NewsPost } from '@/types';
+import type { NewsPost } from '@/types';
 
 /**
- * Noticias y notas de AFCRtecnologia.
+ * Notas de RESPALDO de AFCRtecnologia.
  * ---------------------------------------------------------------
- * Se escriben a mano aqui. ⚠ Todas las notas actuales son EJEMPLOS
- * (`sample: true`) para ver el diseño: reemplazarlas por notas reales
- * antes de publicar. No inventar cifras, clientes ni citas.
+ * Las noticias reales viven en Supabase y se publican con el MCP del sitio
+ * (`/api/mcp`, ver docs/mcp.md). Estas notas solo se muestran cuando no hay
+ * claves de Supabase: build estatico o desarrollo sin `.env.local`. Tambien
+ * fueron el seed inicial de la tabla. ⚠ Son EJEMPLOS (`sample: true`).
  *
  * En `body`, un parrafo que empieza por «## » se muestra como subtitulo.
  */
@@ -97,8 +98,6 @@ export const newsPosts: NewsPost[] = [
   },
 ];
 
-export const newsCategories: NewsCategory[] = ['IA', 'Automatización', 'Software', 'Negocio'];
-
 /** Notas ordenadas de la mas reciente a la mas antigua. */
 export const sortedNews = [...newsPosts].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -115,20 +114,20 @@ export function formatNewsDate(iso: string): string {
 
 /** Textos de la seccion Noticias (Home) y de cada nota. */
 export const newsCopy = {
-  sectionTitle: 'Lo que está pasando en IA y tecnología.',
+  sectionTitle: 'Noticias relevantes de inteligencia artificial y tecnología.',
   sectionLede:
-    'Notas breves de nuestro equipo sobre inteligencia artificial, automatización y tecnología para negocios en el Perú.',
-  filterAll: 'Todas',
-  filterLabel: 'Filtrar noticias por categoría',
+    'Notas breves de nuestro equipo sobre inteligencia artificial, automatización y tecnología.',
   readMore: 'Leer nota',
   sampleLabel: 'EJEMPLO',
-  categoryLabel: 'Categoría',
-  dateLabel: 'FECHA',
-  readingLabel: 'LECTURA',
-  empty: 'Todavía no hay notas en esta categoría.',
+  /** Se marca solo en la nota mas reciente de la lista (sortedNews[0]). */
+  latestLabel: 'Más reciente',
+  empty: 'Todavía no hay notas publicadas.',
   back: 'Volver a noticias',
   relatedTitle: 'Sigue leyendo',
   ctaTitle: '¿Quieres aplicar esto en tu negocio?',
   ctaBody: 'Cuéntanos qué necesitas y te respondemos con los siguientes pasos.',
   ctaButton: 'Hablemos',
+  /** Franja de la vista previa privada de un borrador (enlace que genera el MCP). */
+  previewNotice: 'Borrador · vista previa privada. Esta nota aún no es pública.',
+  previewTitle: 'Vista previa de borrador',
 };

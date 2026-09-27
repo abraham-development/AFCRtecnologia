@@ -2,24 +2,27 @@ import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 
 import CtaBand from '@/components/layout/CtaBand';
-import { formatNewsDate, newsCopy, sortedNews } from '@/content/news';
+import { formatNewsDate, newsCopy } from '@/content/news';
 import type { NewsPost } from '@/types';
 
-/** Dos notas relacionadas: primero de la misma categoria, luego las mas recientes. */
-function relatedTo(post: NewsPost): NewsPost[] {
-  const others = sortedNews.filter((item) => item.slug !== post.slug);
-  const sameCategory = others.filter((item) => item.category === post.category);
-  const rest = others.filter((item) => item.category !== post.category);
-  return [...sameCategory, ...rest].slice(0, 2);
+interface NewsArticleProps {
+  post: NewsPost;
+  related: NewsPost[];
+  /** Vista previa privada de un borrador: franja de aviso y sin CTA final. */
+  preview?: boolean;
 }
 
-export function NewsArticle({ post }: { post: NewsPost }) {
-  const related = relatedTo(post);
+export function NewsArticle({ post, related, preview = false }: NewsArticleProps) {
 
   return (
     <>
       <article className="shell pt-40 pb-20 md:pt-48 md:pb-28">
         <div className="mx-auto max-w-3xl">
+          {preview ? (
+            <p role="status" className="text-micro border-accent-cyan/50 text-accent-cyan mb-8 border px-4 py-3">
+              {newsCopy.previewNotice}
+            </p>
+          ) : null}
           <Link
             href="/#noticias"
             data-cursor="expand"
@@ -53,14 +56,27 @@ export function NewsArticle({ post }: { post: NewsPost }) {
             {post.excerpt}
           </p>
 
+          {post.cover ? (
+            <figure className="border-border-editorial bg-bg-darkest mt-10 aspect-[16/9] overflow-hidden border">
+              {/* eslint-disable-next-line @next/next/no-img-element -- Supabase Storage; sin optimizador en Hostinger */}
+              <img
+                src={post.cover.src}
+                alt={post.cover.alt}
+                fetchPriority="high"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+            </figure>
+          ) : null}
+
           <div className="mt-10 max-w-[68ch] space-y-6 text-[1.0625rem] leading-[1.75]">
-            {post.body.map((paragraph) =>
+            {post.body.map((paragraph, index) =>
               paragraph.startsWith('## ') ? (
-                <h2 key={paragraph} className="text-display-xs pt-6">
+                <h2 key={index} className="text-display-xs pt-6">
                   {paragraph.slice(3)}
                 </h2>
               ) : (
-                <p key={paragraph} className="text-text-primary/90">
+                <p key={index} className="text-text-primary/90">
                   {paragraph}
                 </p>
               ),
@@ -104,7 +120,7 @@ export function NewsArticle({ post }: { post: NewsPost }) {
         </section>
       ) : null}
 
-      <CtaBand title={newsCopy.ctaTitle} body={newsCopy.ctaBody} cta={newsCopy.ctaButton} />
+      {preview ? null : <CtaBand title={newsCopy.ctaTitle} body={newsCopy.ctaBody} cta={newsCopy.ctaButton} />}
     </>
   );
 }

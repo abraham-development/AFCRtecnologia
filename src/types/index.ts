@@ -57,7 +57,9 @@ export interface NavItem {
   meta: string;
 }
 
-export type NewsCategory = 'IA' | 'Automatización' | 'Software' | 'Negocio';
+/** Categorias validas: la base de datos las restringe con el mismo `check`. */
+export const NEWS_CATEGORIES = ['IA', 'Automatización', 'Software', 'Negocio'] as const;
+export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
 
 /** Nota de la seccion Noticias (escrita por AFCR). */
 export interface NewsPost {
@@ -72,6 +74,8 @@ export interface NewsPost {
   body: string[];
   /** ⚠ Nota de ejemplo para ver el diseño: se muestra con etiqueta EJEMPLO. */
   sample?: boolean;
+  /** Foto de portada opcional (Supabase Storage). Sin ella se usa la portada tipografica. */
+  cover?: { src: string; alt: string };
 }
 
 export type SubmitState = 'idle' | 'loading' | 'success' | 'error';

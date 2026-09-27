@@ -1,14 +1,17 @@
 import type { MetadataRoute } from 'next';
 
 import { navItems } from '@/content/agency';
-import { newsPosts } from '@/content/news';
+import { getPublishedNews } from '@/lib/news/repository';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://afcrtecnologia.com';
 
-/** Se genera en tiempo de build: necesario para `output: 'export'`. */
+/**
+ * `force-static` es necesario para `output: 'export'`. En el build Node el
+ * sitemap queda en cache y se regenera al invalidar el tag `news` (MCP).
+ */
 export const dynamic = 'force-static';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = navItems.map((item) => ({
     url: `${siteUrl}${item.href === '/' ? '' : item.href}`,
     lastModified: new Date(),
@@ -16,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: item.href === '/' ? 1 : 0.8,
   }));
 
-  const posts = newsPosts.map((post) => ({
+  const posts = (await getPublishedNews()).map((post) => ({
     url: `${siteUrl}/noticias/${post.slug}`,
     lastModified: new Date(post.date),
     changeFrequency: 'yearly' as const,

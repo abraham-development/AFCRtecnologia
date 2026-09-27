@@ -31,7 +31,7 @@ WebGL atmosférico, microinteracciones magnéticas y atajos de teclado operativo
 
 ```bash
 npm install
-cp .env.example .env.local     # opcional
+# crea .env.local con las variables listadas en AGENTS.md («Variables»)
 npm run dev                    # http://localhost:3000
 ```
 

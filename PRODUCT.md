@@ -48,20 +48,26 @@ Servicios confirmados (2026-09-24):
 
 Estructura del sitio (2026-09-24): una página por ítem del navbar —Home,
 Servicios, Nosotros, Contáctanos— más notas de noticias en `/noticias/<slug>`.
-Las noticias sobre IA y tecnología las escribe AFCR a mano en
-`src/content/news.ts`; las actuales son ejemplos para ver el diseño.
+Las noticias sobre IA y tecnología las redacta AFCR con sus agentes de IA
+(Claude Code, Codex, Cursor) a través del MCP del sitio (`docs/mcp.md`): borrador
+con vista previa privada y publicación solo con aprobación humana. Las cinco
+notas iniciales son ejemplos (`sample`).
 Restricciones técnicas en `AGENTS.md`.
 
 ## Brand Commitments
 
 - Nombre: AFCRtecnologia (marca «AFCR» + «tecnologia»).
+- En la web el logotipo es la imagen oficial «AFCRtecnologia» (placa oscura y
+  letras marfil), servida por `BrandLogo` en header, footer, preloader y la
+  imagen para redes sociales. La placa metálica sigue en
+  `public/brand/afcr-logotipo-plateado.png` y no se muestra en el sitio.
 - Idioma: español de Perú, tuteo.
 - Canal principal de contacto: WhatsApp (número real vía variables de entorno).
 - Redes a mostrar: WhatsApp, Facebook, Instagram, LinkedIn.
 
 ## Evidence on Hand
 
-- No hay casos de clientes, testimonios, logos ni métricas reales.
+- No hay casos de clientes, testimonios ni métricas reales.
   Las métricas antiguas del repositorio eran ilustrativas: no inventar nuevas.
 - URLs de Facebook, Instagram y LinkedIn: aún no confirmadas (marcadores).
 - Correo `contacto@afcrtecnologia.com` y dirección postal: marcadores.

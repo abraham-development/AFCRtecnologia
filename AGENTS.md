@@ -47,13 +47,37 @@ este archivo.
 
 ---
 
-## Estado estable actual — verificado en código el 2026-09-25
+## Estado estable actual — verificado en código el 2026-09-27
 
 - El sitio tiene Home, Servicios, Nosotros, Contáctanos y notas individuales.
-- El header muestra el logotipo textual «AFCRtecnologia», un CTA directo a
-  WhatsApp —solo si existe la variable— y una hamburguesa visible de tres
-  líneas. La frase «ONLINE - LATAM & GLOBAL» se eliminó intencionalmente y no
-  debe reintroducirse.
+- El logotipo oficial es la imagen entregada por la empresa
+  (`recursos_internos/Logotipo.png`, placa oscura y wordmark marfil). `BrandLogo`
+  lo muestra en header, footer y preloader con un `<img srcSet>` sobre
+  `public/brand/afcr-logotipo-{200,300,400,600,900,1200}.webp`; cada consumidor
+  fija la altura con `h-*` y su ancho máximo con `sizes`. Trampa verificada: si
+  el navegador reduce una imagen grande ~6×, con la página quieta los trazos
+  finos quedan grises y desiguales. Por eso las variantes se generan ya al
+  tamaño final con promedio por área (`BOX`) en luz lineal y alfa
+  premultiplicado; Lanczos crea halos y `next/image` no aplicaría ese escalado.
+  Si cambia el logo, regenerar todas las variantes igual.
+- Hover del logotipo (pedido del usuario, en todos sus usos): sobre la imagen
+  va la variante `afcr-logotipo-cian-*.webp` (mismas letras en `#5bc2d8`, placa
+  y borde intactos) y aparece con un fundido de opacidad al pasar el cursor
+  (`group/logo`) o al enfocar con teclado el enlace que lo contiene
+  (`in-focus-visible`). Tailwind v4 aplica `hover:` solo con
+  `@media (hover: hover)`: para probarlo en Chrome headless lanzar con
+  `--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4`.
+  `afcr-logotipo.png` alimenta el `logo` del JSON-LD y
+  `src/app/opengraph-image.png` / `twitter-image.png` lo muestran al compartir.
+  No redibujarlo en CSS. La placa metálica de
+  `public/brand/afcr-logotipo-plateado.png` no se muestra. El header conserva el CTA a WhatsApp —solo si existe la variable— y una
+  hamburguesa visible de tres líneas. La frase «ONLINE - LATAM & GLOBAL» se
+  eliminó intencionalmente y no debe reintroducirse.
+- El header de dos niveles tiene un solo fondo, propio y constante (no
+  transparente sobre el hero): token `--color-bg-header` (`#1a2539`, pizarra
+  algo más clara que el hero, pedido del usuario) al 95 % con grano y blur en
+  todo el `<header>`. La placa del logotipo conserva su propio fondo oscuro. El navbar no lleva fondo propio (el usuario pidió un único color);
+  solo lo delimitan sus líneas `border-editorial` superior e inferior.
 - El texto del CTA es «Contacta con un asesor por WhatsApp» y abre `wa.me` en
   una pestaña nueva. La estructura y el contenido del menú fullscreen no se
   alteran al retocar la hamburguesa.
@@ -64,10 +88,23 @@ este archivo.
 - `RootLayout` usa `suppressHydrationWarning` tanto en `<html>` como en
   `<body>`. El segundo evita falsos positivos cuando una extensión modifica la
   clase del body antes de hidratar (caso observado: `expansion-alids-init`).
-- Home contiene cinco notas de ejemplo. La nota mockup sobre SIRE/SUNAT fue
-  eliminada intencionalmente; no reintroducirla sin pedido. SUNAT sigue siendo
-  un servicio confirmado. La nota más reciente se vuelve destacada de forma
-  automática; actualmente es la de Hermes Agent.
+- Las noticias viven en Supabase (`news_posts`) y se publican con el **MCP del
+  sitio** (`/api/mcp`, guía de conexión en `docs/mcp.md`), no editando código ni
+  con un panel: decisión del usuario. `src/content/news.ts` queda solo como
+  respaldo (sin claves de Supabase: build estático o dev) y fue el seed inicial.
+  Las cinco notas de ejemplo siguen en la tabla con `sample = true`. La nota
+  mockup sobre SIRE/SUNAT fue eliminada intencionalmente; no reintroducirla sin
+  pedido. SUNAT sigue siendo un servicio confirmado.
+- La sección se titula «Noticias relevantes de inteligencia artificial y
+  tecnología». No lleva filtros por categoría (se retiraron a pedido del
+  usuario): todas las notas se listan una por una, de la más reciente a la más
+  antigua, con la misma card: portada a la izquierda y, al costado, fecha
+  publicada bien visible, título, resumen, categoría y lectura. La más reciente
+  (hoy Hermes Agent) lleva la etiqueta «Más reciente».
+- La portada es generada, no fotográfica: la palabra de categoría en Fraunces,
+  gigante y recortada, sobre un panel con grano. Es decisión del usuario; no
+  sustituirla por fotos de stock. Se usa fecha absoluta y no «hace X días»,
+  porque un texto relativo se congelaría en el build y quedaría falso.
 - Las notas restantes llevan `sample: true` y muestran «EJEMPLO»: no deben
   presentarse como publicaciones reales de AFCR.
 
@@ -81,12 +118,15 @@ este archivo.
 | `/servicios` | Directorio de 10 servicios | `src/components/services/` |
 | `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
-| `/noticias/[slug]` | Nota completa con `generateStaticParams` | `src/components/news/` |
+| `/noticias/[slug]` | Nota publicada; las nuevas se generan en su primera visita | `src/components/news/` |
+| `/noticias/vista-previa/[token]` | Borrador privado, `noindex`, solo build Node | `page.node.tsx` |
+| `/api/mcp` | MCP de noticias para agentes, solo build Node | `route.node.ts` |
 
 - Las páginas se prerenderizan y también funcionan con `build:static`.
   `/api/contact` solo existe en el build Node.
 - Cada `page.tsx` exporta `metadata`. `sitemap.ts` deriva rutas desde
-  `navItems` y `newsPosts`.
+  `navItems` y las notas publicadas (`getPublishedNews`). El tiempo de lectura
+  se calcula del cuerpo (~200 palabras/min); no se escribe a mano.
 - La navegación usa `next/link`. Las anclas entre páginas llevan ruta y hash,
   por ejemplo `/servicios#ia`; `SmoothScrollProvider` gestiona inicio/ancla.
 - Copy y datos editables viven en `src/content/*.ts`; contratos en
@@ -101,9 +141,14 @@ este archivo.
 | Header, menú, footer y scroll | `src/components/layout/` |
 | Cursor, preloader, partículas, WebGL | `src/components/effects/` |
 | Microinteracciones compartidas | `src/components/ui/` |
+| Logotipo web | `src/components/ui/BrandLogo.tsx` |
 | Empresa, navegación y contacto | `src/content/agency.ts` |
 | Catálogo de servicios | `src/content/services.ts` |
-| Noticias | `src/content/news.ts` |
+| Noticias: lectura y caché (tag `news`) | `src/lib/news/repository.ts` |
+| MCP: auth por token y herramientas | `src/lib/mcp/` · `src/app/api/mcp/route.node.ts` |
+| Guía editorial que reciben los agentes | `src/content/news-editorial.ts` |
+| Esquema Supabase, RLS y bucket | `supabase/migrations/` · `supabase/seed.sql` |
+| Notas de respaldo | `src/content/news.ts` |
 | Validación compartida | `src/lib/validations.ts` |
 | Endpoint Node | `src/app/api/contact/route.node.ts` |
 | Fallback PHP estático | `public/contact.php` |
@@ -121,6 +166,8 @@ npm run build:hostinger # servidor Node con webpack; producción real
 npm run start           # sirve .next
 npm run build:static    # export alternativo → out/
 npm run package:static  # export + ZIP para hosting sin Node
+npm run mcp:token -- create|list|revoke --name "Agente"  # tokens del MCP
+AFCR_MCP_TOKEN=… node scripts/mcp-smoke.mjs --url http://localhost:3000
 ```
 
 Node local 22 · Node Hostinger 24 · npm. No usar pnpm.
@@ -136,6 +183,8 @@ Node local 22 · Node Hostinger 24 · npm. No usar pnpm.
 | Zod | 4.6.5 | esquema cliente/servidor |
 | React Hook Form | 7.88.0 | resolver 5.9.1 |
 | TypeScript | 5.9.3 | modo estricto |
+| MCP SDK | 1.30.x | transporte web-standard sin estado |
+| supabase-js | 2.117.x | solo servidor, clave secreta |
 
 ---
 
@@ -195,8 +244,9 @@ Reglas críticas:
 `BUILD_TARGET=static` activa `output: 'export'`, genera `out/`, desactiva el
 route handler y usa `/contact.php`. Mantener estas condiciones:
 
-- El handler debe seguir llamándose `route.node.ts`; `pageExtensions` excluye
-  `node.ts` del modo estático.
+- Lo que exige servidor lleva extensión `.node.ts(x)` (`/api/contact`,
+  `/api/mcp`, vista previa de borradores); `pageExtensions` las excluye del modo
+  estático. Ese build muestra las notas publicadas al compilar (o el respaldo).
 - `robots.ts` y `sitemap.ts` conservan `dynamic = 'force-static'`.
 - `headers()` solo se declara en modo Node; Apache usa `public/.htaccess`.
 - `NEXT_PUBLIC_CONTACT_ENDPOINT` vale `/api/contact` por defecto y el script
@@ -218,15 +268,32 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 - `.env.local` y `.env.production` están ignorados por Git. Nunca imprimirlos,
   copiarlos a documentación ni versionar sus valores.
 - WhatsApp llega por `NEXT_PUBLIC_WHATSAPP_NUMBER`. Si falta, ocultar el CTA
-  mediante `hasWhatsApp`; no generar enlaces vacíos. `.env.example` conserva
-  `NEXT_PUBLIC_PHONE_DISPLAY`, pero la interfaz actual no muestra el teléfono.
+  mediante `hasWhatsApp`; no generar enlaces vacíos. `NEXT_PUBLIC_PHONE_DISPLAY`
+  existe, pero la interfaz actual no muestra el teléfono.
+- No hay `.env.example` (el usuario lo retiró a propósito). Variables:
+  `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_PHONE_DISPLAY`,
+  `NEXT_PUBLIC_WHATSAPP_NUMBER`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY` y,
+  opcionales, `CONTACT_WEBHOOK_URL`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
+  `CONTACT_FROM_EMAIL`. En Hostinger se cargan en hPanel; la API de variables
+  hace un reemplazo total y devuelve valores enmascarados.
 - `NEXT_PUBLIC_*` se incrusta en el HTML. Cambiar esas variables exige un build
   nuevo, no solo reiniciar la app.
 - Datos aún marcadores: correo y dirección en `src/content/agency.ts`; URLs de
   Facebook, Instagram y LinkedIn; páginas legales del footer.
-- Todas las noticias actuales son ejemplos. No inventar métricas, clientes,
-  testimonios, precios, plazos ni resultados. Ver `PRODUCT.md` antes de tocar
-  afirmaciones comerciales.
+- `SUPABASE_URL` y `SUPABASE_SECRET_KEY` (o `SUPABASE_SERVICE_ROLE_KEY`) son
+  solo de servidor: nunca `NEXT_PUBLIC_`. `src/lib/supabase/server.ts` importa
+  `server-only`. Hostinger las necesita en build y runtime.
+- MCP de noticias: tokens `afcr_…` por agente; en `agent_tokens` solo se guarda
+  su SHA-256. Las tablas tienen RLS **sin políticas** y sin privilegios para
+  `anon`/`authenticated`: no añadir lectura pública, porque expondría
+  borradores y `preview_token`. El bucket `news-covers` es público de solo
+  lectura (5 MB, JPEG/PNG/WebP).
+- `getPublishedNews()` propaga los errores de Supabase a propósito: devolver
+  `[]` dejaría una Home vacía en caché. Toda escritura del MCP llama a
+  `revalidateTag('news', { expire: 0 })`. No se usa `cacheComponents`.
+- Las notas de ejemplo llevan `sample = true`. No inventar métricas, clientes,
+  testimonios, precios, plazos ni resultados; la guía editorial del MCP lo
+  exige a los agentes. Ver `PRODUCT.md` antes de tocar afirmaciones comerciales.
 
 ---
 

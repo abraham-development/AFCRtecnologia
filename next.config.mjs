@@ -13,9 +13,10 @@
  *  - `npm run build:static`              → export estático para hosting sin Node,
  *                                          con `public/contact.php` como endpoint.
  *
- * El route handler vive en `route.node.ts`: solo se registra como ruta cuando
- * `pageExtensions` incluye `node.ts`, es decir, fuera del modo estático
- * (Next no admite handlers dinámicos con `output: 'export'`).
+ * Lo que solo existe con servidor lleva extensión `.node.ts(x)`: los route
+ * handlers (`/api/contact`, `/api/mcp`) y la vista previa de borradores. Solo
+ * se registran cuando `pageExtensions` las incluye, es decir, fuera del modo
+ * estático (Next no admite rutas dinámicas con `output: 'export'`).
  */
 
 const isStatic = process.env.BUILD_TARGET === 'static';
@@ -32,7 +33,7 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  pageExtensions: isStatic ? ['ts', 'tsx'] : ['ts', 'tsx', 'node.ts'],
+  pageExtensions: isStatic ? ['ts', 'tsx'] : ['ts', 'tsx', 'node.ts', 'node.tsx'],
   images: {
     formats: ['image/avif', 'image/webp'],
     unoptimized: isStatic,
