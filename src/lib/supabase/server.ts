@@ -10,9 +10,31 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 export const NEWS_COVERS_BUCKET = 'news-covers';
 
+/**
+ * `true` si la clave da acceso de servidor: `sb_secret_…` o el JWT legacy con
+ * rol `service_role`. Una clave publica (`sb_publishable_…` / `anon`) no sirve:
+ * las tablas no tienen permisos para roles publicos.
+ */
+function isSecretKey(key: string): boolean {
+  if (key.startsWith('sb_secret_')) return true;
+  const payload = key.split('.')[1];
+  if (!payload) return false;
+  try {
+    return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')).role === 'service_role';
+  } catch {
+    return false;
+  }
+}
+
 function readEnv() {
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // SUPABASE_API_KEY es el nombre que usa la integracion de Supabase del panel
+  // de Hostinger; solo se acepta si contiene una clave secreta.
+  const apiKey = process.env.SUPABASE_API_KEY;
+  const key =
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    (apiKey && isSecretKey(apiKey) ? apiKey : undefined);
   return url && key ? { url, key } : null;
 }
 

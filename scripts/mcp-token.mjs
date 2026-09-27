@@ -19,7 +19,7 @@ import { createClient } from '@supabase/supabase-js';
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
 
 const url = process.env.SUPABASE_URL;
-const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_API_KEY;
 if (!url || !key) {
   console.error('Faltan SUPABASE_URL y SUPABASE_SECRET_KEY en .env.local (o en el entorno).');
   process.exit(1);

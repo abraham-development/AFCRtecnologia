@@ -289,8 +289,10 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   nuevo, no solo reiniciar la app.
 - Datos aún marcadores: correo y dirección en `src/content/agency.ts`; URLs de
   Facebook, Instagram y LinkedIn; páginas legales del footer.
-- `SUPABASE_URL` y `SUPABASE_SECRET_KEY` (o `SUPABASE_SERVICE_ROLE_KEY`) son
-  solo de servidor: nunca `NEXT_PUBLIC_`. `src/lib/supabase/server.ts` importa
+- `SUPABASE_URL` y `SUPABASE_SECRET_KEY` (o `SUPABASE_SERVICE_ROLE_KEY`, o
+  `SUPABASE_API_KEY` si contiene una clave secreta: es el nombre que impone la
+  integración de Supabase de hPanel, que además reemplazó una vez todo el
+  conjunto de variables y borró `SUPABASE_SECRET_KEY`) son solo de servidor: nunca `NEXT_PUBLIC_`. `src/lib/supabase/server.ts` importa
   `server-only`. Hostinger las necesita en build y runtime.
 - MCP de noticias: tokens `afcr_…` por agente; en `agent_tokens` solo se guarda
   su SHA-256. Las tablas tienen RLS **sin políticas** y sin privilegios para
