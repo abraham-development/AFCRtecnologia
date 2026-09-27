@@ -10,6 +10,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://afcrtecnologia.com'
  * sitemap queda en cache y se regenera al invalidar el tag `news` (MCP).
  */
 export const dynamic = 'force-static';
+export const revalidate = 60;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = navItems.map((item) => ({

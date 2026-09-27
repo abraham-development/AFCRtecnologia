@@ -19,7 +19,7 @@ import { NEWS_CATEGORIES } from '@/types';
  * identidad del agente ya autenticada en `src/app/api/mcp/route.node.ts`.
  *
  * Toda escritura invalida el tag `news`: Home, las notas y el sitemap muestran
- * el cambio en la siguiente visita, sin recompilar.
+ * el cambio en menos de un minuto (NEWS_REVALIDATE_SECONDS), sin recompilar.
  */
 
 const COVER_TYPES = {
@@ -267,7 +267,7 @@ export function createNewsMcpServer(agent: AgentIdentity, siteUrl: string): McpS
     {
       title: 'Editar noticia',
       description:
-        'Modifica los campos enviados de una nota (borrador o publicada). Si está publicada, el cambio sale al instante.',
+        'Modifica los campos enviados de una nota (borrador o publicada). Si está publicada, el cambio se ve en el sitio en menos de un minuto.',
       inputSchema: {
         slug: slugSchema,
         title: titleSchema.optional(),

@@ -291,6 +291,11 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 - `getPublishedNews()` propaga los errores de Supabase a propósito: devolver
   `[]` dejaría una Home vacía en caché. Toda escritura del MCP llama a
   `revalidateTag('news', { expire: 0 })`. No se usa `cacheComponents`.
+- Trampa verificada en producción: Hostinger corre **varios procesos Node** y
+  `revalidateTag` solo invalida el que atendió al MCP. Por eso Home, notas y
+  sitemap llevan `export const revalidate = 60` y `unstable_cache` usa
+  `NEWS_REVALIDATE_SECONDS`: un cambio se ve en todo el sitio en ≤ 60 s. No
+  subir ese valor; la alternativa sería un `cacheHandler` compartido (Redis).
 - Las notas de ejemplo llevan `sample = true`. No inventar métricas, clientes,
   testimonios, precios, plazos ni resultados; la guía editorial del MCP lo
   exige a los agentes. Ver `PRODUCT.md` antes de tocar afirmaciones comerciales.

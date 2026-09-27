@@ -13,6 +13,8 @@ interface NewsPageProps {
  * despues se generan en su primera visita (dynamicParams por defecto) y
  * quedan en cache con el tag `news`.
  */
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const posts = await getPublishedNews();
   return posts.map((post) => ({ slug: post.slug }));

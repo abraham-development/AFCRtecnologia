@@ -33,6 +33,19 @@ const html = async (url) => {
   return { status: response.status, text: await response.text() };
 };
 
+/**
+ * Con varios procesos Node (Hostinger) los cambios tardan hasta 60 s en verse
+ * en todos (NEWS_REVALIDATE_SECONDS). Reintenta hasta 90 s antes de fallar.
+ */
+async function eventually(predicate, timeoutMs = 90_000) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    if (await predicate()) return true;
+    if (Date.now() > deadline) return false;
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
+}
+
 // 1. Sin token o con uno falso → 401
 for (const [label, auth] of [['sin token', null], ['token falso', `Bearer afcr_${'x'.repeat(43)}`]]) {
   const response = await fetch(`${base}/api/mcp`, {
@@ -90,12 +103,13 @@ try {
 
   const published = await call('publish_news', { slug });
   check('publicada', published.status === 'published' && Boolean(published.publishedOn));
-  check('aparece en la Home', (await html(`${base}/`)).text.includes(title));
-  check('URL pública 200', (await html(`${base}/noticias/${slug}`)).status === 200);
-  check('en el sitemap', (await html(`${base}/sitemap.xml`)).text.includes(`/noticias/${slug}`));
+  check('aparece en la Home', await eventually(async () => (await html(`${base}/`)).text.includes(title)));
+  check('URL pública 200', await eventually(async () => (await html(`${base}/noticias/${slug}`)).status === 200));
+  check('en el sitemap', await eventually(async () => (await html(`${base}/sitemap.xml`)).text.includes(`/noticias/${slug}`)));
 
   await call('unpublish_news', { slug });
-  check('despublicada: fuera de la Home', !(await html(`${base}/`)).text.includes(title));
+  check('despublicada: fuera de la Home', await eventually(async () => !(await html(`${base}/`)).text.includes(title)));
+  check('despublicada: URL 404', await eventually(async () => (await html(`${base}/noticias/${slug}`)).status === 404));
 } finally {
   if (slug) {
     await call('delete_news', { slug, confirm: true });

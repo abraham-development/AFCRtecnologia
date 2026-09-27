@@ -12,13 +12,16 @@ import type { NewsCategory, NewsPost } from '@/types';
  *
  * Fuente: Supabase (`news_posts`), que el MCP de `/api/mcp` escribe. Las
  * lecturas publicas van en cache con el tag `news`; el MCP lo invalida al
- * publicar o editar, asi que los cambios salen sin recompilar.
+ * publicar o editar, y el resto de procesos se refresca cada 60 s: los cambios
+ * salen sin recompilar.
  *
  * Sin claves de Supabase (build estatico o desarrollo) se usan las notas de
  * ejemplo de `src/content/news.ts`.
  */
 
 export const NEWS_CACHE_TAG = 'news';
+/** Debe coincidir con `export const revalidate = 60` de Home, notas y sitemap. */
+export const NEWS_REVALIDATE_SECONDS = 60;
 
 /** Fila de `news_posts` (ver supabase/migrations/0001_news.sql). */
 export interface NewsRow {
@@ -71,8 +74,10 @@ const fetchPublished = unstable_cache(
     return (data as NewsRow[]).map(rowToPost);
   },
   ['news-published'],
-  // Red de seguridad por si una invalidacion se perdiera: una hora.
-  { tags: [NEWS_CACHE_TAG], revalidate: 3600 },
+  // Hostinger corre varios procesos Node y `revalidateTag` solo invalida el
+  // proceso que atendio al MCP (Next no coordina tags entre instancias). Los
+  // demas se ponen al dia por tiempo: como maximo NEWS_REVALIDATE_SECONDS.
+  { tags: [NEWS_CACHE_TAG], revalidate: NEWS_REVALIDATE_SECONDS },
 );
 
 /**
