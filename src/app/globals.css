@@ -21,6 +21,8 @@
   --color-bg-primary: #0d1828;
   --color-bg-secondary: #101b2d;
   --color-bg-darkest: #080f1c;
+  /* Header: pizarra algo mas clara que el hero, para separarlo sin romper la paleta */
+  --color-bg-header: #1a2539;
 
   /* Tipografia */
   --color-text-primary: #e8e5dd;

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
+import BrandLogo from '@/components/ui/BrandLogo';
 import { agency } from '@/content/agency';
 import { markAppReady } from '@/lib/utils';
 
@@ -96,9 +97,7 @@ export function Preloader() {
             <span className="text-micro text-text-secondary">{agency.tagline}</span>
 
             <div className="flex items-end justify-between gap-6">
-              <p className="font-serif text-2xl leading-none tracking-[-0.03em] md:text-3xl">
-                AFCR<span className="text-text-secondary">tecnologia</span>
-              </p>
+              <BrandLogo priority sizes="296px" className="h-[clamp(2.75rem,9vw,5rem)] min-w-0 shrink" />
 
               <p className="font-mono text-[clamp(3rem,14vw,9rem)] leading-[0.8] font-light tabular-nums">
                 {count.toString().padStart(2, '0')}

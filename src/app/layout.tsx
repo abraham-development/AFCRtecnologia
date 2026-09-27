@@ -121,6 +121,8 @@ const jsonLd = {
   legalName: agency.legalName,
   description: agency.longDescription,
   url: siteUrl,
+  logo: `${siteUrl}/brand/afcr-logotipo.png`,
+  image: `${siteUrl}/brand/afcr-logotipo.png`,
   email: agency.email,
   foundingDate: agency.founded,
   areaServed: ['PE', 'LATAM', 'Global'],

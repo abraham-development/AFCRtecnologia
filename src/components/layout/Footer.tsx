@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import BrandIcon from '@/components/ui/BrandIcon';
+import BrandLogo from '@/components/ui/BrandLogo';
 import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
 import {
   agency,
@@ -89,9 +90,14 @@ export function Footer() {
         <div className="shell grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:gap-10">
           {/* Marca + redes */}
           <div className="sm:col-span-2 lg:col-span-4">
-            <p className="font-serif text-3xl leading-none tracking-[-0.03em]">
-              AFCR<span className="text-text-secondary">tecnologia</span>
-            </p>
+            <Link
+              href="/"
+              data-cursor="expand"
+              aria-label={`${agency.name}, ir al inicio`}
+              className="inline-block max-w-full"
+            >
+              <BrandLogo sizes="178px" className="h-11 md:h-12" />
+            </Link>
             <p className="text-text-secondary mt-5 max-w-sm text-sm leading-relaxed">
               {agency.summary}
             </p>

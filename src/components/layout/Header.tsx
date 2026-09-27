@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import FullscreenMenu from '@/components/layout/FullscreenMenu';
 import BrandIcon from '@/components/ui/BrandIcon';
+import BrandLogo from '@/components/ui/BrandLogo';
 import { agency, CONTACT_FORM_HREF, hasWhatsApp, headerCopy, navItems, whatsappUrl } from '@/content/agency';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
 import { cn } from '@/lib/utils';
@@ -56,8 +57,10 @@ export function Header() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
         className={cn(
-          'fixed top-0 right-0 left-0 z-[120] transition-[background-color,backdrop-filter] duration-500',
-          scrolled ? 'bg-bg-primary/80 backdrop-blur-md' : 'bg-transparent',
+          // Fondo propio y constante, un solo tono para los dos niveles: pizarra
+          // algo mas clara que el hero para separarlo sin salir de la paleta.
+          'noise bg-bg-header/95 fixed top-0 right-0 left-0 z-[120] backdrop-blur-md transition-[background-color] duration-500',
+          scrolled && 'bg-bg-header/98',
         )}
       >
         <div className="shell flex h-16 items-center justify-between gap-4 md:h-20 short:h-14">
@@ -66,13 +69,9 @@ export function Header() {
             href="/"
             data-cursor="expand"
             aria-label={`${agency.name}, ir al inicio`}
-            className="group flex shrink-0 items-baseline py-3 font-serif text-[1.375rem] leading-none tracking-[-0.03em] md:text-[1.625rem]"
+            className="shrink-0 py-2"
           >
-            {/* Mismo logotipo que el footer: una sola palabra, dos tonos */}
-            <span className="text-text-primary font-normal">AFCR</span>
-            <span className="text-text-secondary group-hover:text-accent-cyan font-light transition-colors">
-              tecnologia
-            </span>
+            <BrandLogo priority sizes="193px" className="h-[clamp(2.5rem,3.8vw,3.25rem)] short:h-8" />
           </Link>
 
           <span aria-hidden="true" className="bg-border-editorial hidden h-px flex-1 lg:block" />
@@ -116,8 +115,7 @@ export function Header() {
         <nav
           aria-label="Navegación principal"
           className={cn(
-            'border-y transition-colors duration-500 short:hidden',
-            scrolled ? 'border-border-editorial' : 'border-border-editorial/60',
+            'border-border-editorial border-y short:hidden',
           )}
         >
           <ul className="shell flex h-11 items-center justify-between sm:justify-start sm:gap-10 md:gap-14">

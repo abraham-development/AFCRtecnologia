@@ -8,7 +8,7 @@ export const homeCopy = {
   /** El titular se dibuja con particulas palabra a palabra (una fila por linea). */
   headline: [
     { words: ['Inteligencia', 'artificial'], variant: 'primary' },
-    { words: ['que', 'trabaja.'], variant: 'accent' },
+    { words: ['que', 'trabaja', 'contigo.'], variant: 'accent' },
   ] as const,
   primaryCta: 'Empezar un proyecto',
   primaryCtaLabel: 'Empezar un proyecto: ir al formulario de contacto',
