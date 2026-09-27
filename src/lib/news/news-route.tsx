@@ -4,23 +4,17 @@ import { notFound } from 'next/navigation';
 import NewsArticle from '@/components/news/NewsArticle';
 import { getPublishedNews, getPublishedNewsBySlug, relatedPosts } from '@/lib/news/repository';
 
-interface NewsPageProps {
+/**
+ * Logica comun de `/noticias/[slug]`. La ruta tiene dos archivos, cada uno
+ * solo existe en su build (ver `pageExtensions` en next.config.mjs):
+ * - `page.node.tsx` (Hostinger): dinamica, lee Supabase en cada visita.
+ * - `page.static.tsx` (export): prerenderiza las notas de respaldo.
+ */
+export interface NewsRouteProps {
   params: Promise<{ slug: string }>;
 }
 
-/**
- * Las notas publicadas al compilar se prerenderizan; las que publique el MCP
- * despues se generan en su primera visita (dynamicParams por defecto) y
- * quedan en cache con el tag `news`.
- */
-export const revalidate = 60;
-
-export async function generateStaticParams() {
-  const posts = await getPublishedNews();
-  return posts.map((post) => ({ slug: post.slug }));
-}
-
-export async function generateMetadata({ params }: NewsPageProps): Promise<Metadata> {
+export async function newsRouteMetadata({ params }: NewsRouteProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPublishedNewsBySlug(slug);
   if (!post) return {};
@@ -38,7 +32,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
   };
 }
 
-export default async function NewsPage({ params }: NewsPageProps) {
+export async function NewsRoute({ params }: NewsRouteProps) {
   const { slug } = await params;
   const post = await getPublishedNewsBySlug(slug);
   if (!post) notFound();

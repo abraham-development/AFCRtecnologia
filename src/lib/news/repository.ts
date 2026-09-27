@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { unstable_cache } from 'next/cache';
+import { connection } from 'next/server';
 
 import { getNewsPost, sortedNews } from '@/content/news';
 import { bodyToParagraphs, readingTimeFor } from '@/lib/news/format';
@@ -10,18 +10,22 @@ import type { NewsCategory, NewsPost } from '@/types';
 /**
  * Lectura de noticias para el sitio.
  *
- * Fuente: Supabase (`news_posts`), que el MCP de `/api/mcp` escribe. Las
- * lecturas publicas van en cache con el tag `news`; el MCP lo invalida al
- * publicar o editar, y el resto de procesos se refresca cada 60 s: los cambios
- * salen sin recompilar.
+ * Fuente: Supabase (`news_posts`), que el MCP de `/api/mcp` escribe.
+ *
+ * Trampa verificada en produccion (Hostinger): el sitio corre en varios
+ * procesos Node y el entorno no completa el trabajo que Next deja en segundo
+ * plano, asi que ni `revalidateTag` (solo invalida un proceso) ni la
+ * revalidacion ISR por tiempo (stale-while-revalidate) llegaban a refrescar
+ * la Home: seguia mostrando notas ya borradas. Por eso con Supabase las rutas
+ * de noticias son dinamicas (`connection()`) y cada proceso guarda la lista
+ * solo NEWS_MEMO_MS en memoria: un cambio se ve en todo el sitio en ≤ 10 s.
  *
  * Sin claves de Supabase (build estatico o desarrollo) se usan las notas de
- * ejemplo de `src/content/news.ts`.
+ * ejemplo de `src/content/news.ts` y las rutas siguen siendo estaticas.
  */
 
-export const NEWS_CACHE_TAG = 'news';
-/** Debe coincidir con `export const revalidate = 60` de Home, notas y sitemap. */
-export const NEWS_REVALIDATE_SECONDS = 60;
+/** Memoria por proceso de la lista publicada: absorbe rafagas de trafico. */
+export const NEWS_MEMO_MS = 10_000;
 
 /** Fila de `news_posts` (ver supabase/migrations/0001_news.sql). */
 export interface NewsRow {
@@ -61,35 +65,38 @@ export function rowToPost(row: NewsRow): NewsPost {
 const PUBLIC_COLUMNS =
   'id, slug, title, excerpt, category, body, status, published_on, cover_path, cover_alt, sample, updated_at';
 
-const fetchPublished = unstable_cache(
-  async (): Promise<NewsPost[]> => {
-    const { data, error } = await getSupabaseAdmin()
-      .from('news_posts')
-      .select(PUBLIC_COLUMNS)
-      .eq('status', 'published')
-      .order('published_on', { ascending: false })
-      .order('created_at', { ascending: false });
-    // Lanzar (y no devolver []) evita que un fallo quede guardado en la cache.
-    if (error) throw new Error(`news_posts: ${error.message}`);
-    return (data as NewsRow[]).map(rowToPost);
-  },
-  ['news-published'],
-  // Hostinger corre varios procesos Node y `revalidateTag` solo invalida el
-  // proceso que atendio al MCP (Next no coordina tags entre instancias). Los
-  // demas se ponen al dia por tiempo: como maximo NEWS_REVALIDATE_SECONDS.
-  { tags: [NEWS_CACHE_TAG], revalidate: NEWS_REVALIDATE_SECONDS },
-);
+let memo: { at: number; posts: NewsPost[] } | null = null;
+
+/** El MCP la llama tras cada escritura: el proceso que la atendio se pone al dia al instante. */
+export function invalidateNewsMemo(): void {
+  memo = null;
+}
+
+async function fetchPublished(): Promise<NewsPost[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('news_posts')
+    .select(PUBLIC_COLUMNS)
+    .eq('status', 'published')
+    .order('published_on', { ascending: false })
+    .order('created_at', { ascending: false });
+  if (error) throw new Error(`news_posts: ${error.message}`);
+  return (data as NewsRow[]).map(rowToPost);
+}
 
 /**
  * Notas publicadas, de la mas reciente a la mas antigua.
  *
- * Un fallo de Supabase se propaga a proposito: si devolvieramos [], la pagina
- * vacia quedaria en cache. Al lanzar, Next conserva la ultima version buena de
- * la pagina y un build sin conexion falla de forma visible.
+ * Un fallo de Supabase se propaga a proposito: la pagina muestra el error en
+ * vez de una seccion de noticias vacia que pareceria correcta.
  */
 export async function getPublishedNews(): Promise<NewsPost[]> {
   if (!isSupabaseConfigured()) return sortedNews;
-  return fetchPublished();
+  // Marca la ruta como dinamica: nunca se sirve una copia prerenderizada.
+  await connection();
+  if (memo && Date.now() - memo.at < NEWS_MEMO_MS) return memo.posts;
+  const posts = await fetchPublished();
+  memo = { at: Date.now(), posts };
+  return posts;
 }
 
 export async function getPublishedNewsBySlug(slug: string): Promise<NewsPost | undefined> {

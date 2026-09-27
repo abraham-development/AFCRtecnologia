@@ -214,15 +214,10 @@ export const contactCopy = {
   formHint: 'LOS CAMPOS CON * SON OBLIGATORIOS',
 };
 
-/** Textos del footer. La banda final empuja a WhatsApp: conversar sin formulario. */
+/** Textos del directorio y la barra legal del footer. */
 export const footerCopy = {
-  titleStart: '¿Prefieres ',
-  titleAccent: 'conversar',
-  titleEnd: '?',
-  body: 'WhatsApp es la vía más rápida: escríbenos y conversa directamente con nuestro equipo.',
   whatsappCta: 'Escribir por WhatsApp',
   whatsappShort: 'WhatsApp',
-  fallbackCta: 'Ir al formulario',
   columns: { nav: 'NAVEGACIÓN', services: 'SERVICIOS', contact: 'CONTACTO' },
   labels: { whatsapp: 'WHATSAPP', email: 'CORREO', location: 'UBICACIÓN' },
   backToTop: 'VOLVER ARRIBA',

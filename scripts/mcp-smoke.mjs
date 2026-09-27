@@ -34,8 +34,8 @@ const html = async (url) => {
 };
 
 /**
- * Con varios procesos Node (Hostinger) los cambios tardan hasta 60 s en verse
- * en todos (NEWS_REVALIDATE_SECONDS). Reintenta hasta 90 s antes de fallar.
+ * Con varios procesos Node (Hostinger) cada uno guarda la lista 10 s en
+ * memoria (NEWS_MEMO_MS). Reintenta hasta 90 s antes de fallar.
  */
 async function eventually(predicate, timeoutMs = 90_000) {
   const deadline = Date.now() + timeoutMs;

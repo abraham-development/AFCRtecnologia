@@ -3,7 +3,7 @@
 El sitio expone un servidor MCP en **`https://afcrtecnologia.com/api/mcp`**
 (Streamable HTTP). Un agente conectado puede redactar, revisar, publicar y
 retirar noticias sin tocar código ni desplegar: los cambios aparecen en la Home,
-en `/noticias/<slug>` y en el sitemap en menos de un minuto.
+en `/noticias/<slug>` y en el sitemap en unos segundos (máximo 10).
 
 ## 1. Crear un token por agente
 
@@ -81,7 +81,7 @@ Pídeselo al agente en lenguaje natural, por ejemplo:
 | `get_editorial_guide` | Reglas de voz, veracidad y formato (también es el prompt `redactar_noticia`) |
 | `list_news` / `get_news` | Ver las notas y su estado |
 | `create_draft` | Nueva nota en borrador, con URL de vista previa |
-| `update_news` | Editar campos; si la nota está publicada, el cambio se ve en menos de un minuto |
+| `update_news` | Editar campos; si la nota está publicada, el cambio se ve en unos segundos |
 | `request_cover_upload` | URL firmada + comando `curl` para subir una foto (JPEG, PNG o WebP, hasta 5 MB) |
 | `attach_cover` | Asignar la foto subida (o una en base64 de hasta 2 MB) con su texto `alt` |
 | `remove_cover` | Volver a la portada tipográfica |

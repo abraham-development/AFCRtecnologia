@@ -81,6 +81,9 @@ este archivo.
 - El texto del CTA es «Contacta con un asesor por WhatsApp» y abre `wa.me` en
   una pestaña nueva. La estructura y el contenido del menú fullscreen no se
   alteran al retocar la hamburguesa.
+- El footer compartido comienza con el directorio del sitio y termina en la
+  barra legal. La franja «¿Prefieres conversar?» se retiró por decisión del
+  usuario; WhatsApp y correo siguen disponibles en la columna de contacto.
 - El cursor personalizado es una flecha de alto contraste de 20 × 24 px. Tiene
   halo cian solo sobre controles interactivos, conserva el hotspot exacto,
   vuelve al cursor nativo en campos de texto y se desactiva con puntero táctil
@@ -118,15 +121,17 @@ este archivo.
 | `/servicios` | Directorio de 10 servicios | `src/components/services/` |
 | `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
-| `/noticias/[slug]` | Nota publicada; las nuevas se generan en su primera visita | `src/components/news/` |
+| `/noticias/[slug]` | Nota publicada: `page.node.tsx` (dinámica) / `page.static.tsx` (export) | `src/lib/news/news-route.tsx` |
 | `/noticias/vista-previa/[token]` | Borrador privado, `noindex`, solo build Node | `page.node.tsx` |
 | `/api/mcp` | MCP de noticias para agentes, solo build Node | `route.node.ts` |
 
-- Las páginas se prerenderizan y también funcionan con `build:static`.
-  `/api/contact` solo existe en el build Node.
-- Cada `page.tsx` exporta `metadata`. `sitemap.ts` deriva rutas desde
-  `navItems` y las notas publicadas (`getPublishedNews`). El tiempo de lectura
-  se calcula del cuerpo (~200 palabras/min); no se escribe a mano.
+- Las páginas institucionales se prerenderizan. Con Supabase, Home, cada nota
+  y `sitemap.xml` son dinámicas (leen la base en cada visita); todo funciona
+  también con `build:static`, que prerenderiza las notas de respaldo.
+  `/api/contact` y `/api/mcp` solo existen en el build Node.
+- Cada página exporta `metadata`. El sitemap (`src/lib/seo/sitemap.ts`) deriva
+  rutas desde `navItems` y las notas publicadas. El tiempo de lectura se
+  calcula del cuerpo (~200 palabras/min); no se escribe a mano.
 - La navegación usa `next/link`. Las anclas entre páginas llevan ruta y hash,
   por ejemplo `/servicios#ia`; `SmoothScrollProvider` gestiona inicio/ancla.
 - Copy y datos editables viven en `src/content/*.ts`; contratos en
@@ -247,7 +252,11 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 - Lo que exige servidor lleva extensión `.node.ts(x)` (`/api/contact`,
   `/api/mcp`, vista previa de borradores); `pageExtensions` las excluye del modo
   estático. Ese build muestra las notas publicadas al compilar (o el respaldo).
-- `robots.ts` y `sitemap.ts` conservan `dynamic = 'force-static'`.
+- `robots.ts` conserva `dynamic = 'force-static'`. El sitemap y la página de
+  cada nota tienen dos archivos: `.node.ts(x)` (dinámico) y `.static.ts(x)`
+  (`force-static` / `generateStaticParams`); `pageExtensions` elige uno por
+  build. Next no acepta estas extensiones en el archivo de metadatos
+  `sitemap.ts`, por eso el sitemap es un route handler en `sitemap.xml/`.
 - `headers()` solo se declara en modo Node; Apache usa `public/.htaccess`.
 - `NEXT_PUBLIC_CONTACT_ENDPOINT` vale `/api/contact` por defecto y el script
   estático lo fija en `/contact.php`.
@@ -288,14 +297,17 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   `anon`/`authenticated`: no añadir lectura pública, porque expondría
   borradores y `preview_token`. El bucket `news-covers` es público de solo
   lectura (5 MB, JPEG/PNG/WebP).
-- `getPublishedNews()` propaga los errores de Supabase a propósito: devolver
-  `[]` dejaría una Home vacía en caché. Toda escritura del MCP llama a
-  `revalidateTag('news', { expire: 0 })`. No se usa `cacheComponents`.
+- `getPublishedNews()` propaga los errores de Supabase a propósito: mejor un
+  error visible que una sección de noticias vacía que parezca correcta.
 - Trampa verificada en producción: Hostinger corre **varios procesos Node** y
-  `revalidateTag` solo invalida el que atendió al MCP. Por eso Home, notas y
-  sitemap llevan `export const revalidate = 60` y `unstable_cache` usa
-  `NEWS_REVALIDATE_SECONDS`: un cambio se ve en todo el sitio en ≤ 60 s. No
-  subir ese valor; la alternativa sería un `cacheHandler` compartido (Redis).
+  no completa el trabajo que Next deja en segundo plano. Resultado probado:
+  `revalidateTag` solo refrescaba un proceso y el ISR por tiempo
+  (stale-while-revalidate) se quedaba en `STALE` sirviendo notas ya borradas.
+  Por eso las rutas de noticias no usan caché de Next: `getPublishedNews()`
+  llama a `connection()` (ruta dinámica) y guarda la lista 10 s por proceso
+  (`NEWS_MEMO_MS`); el MCP limpia esa memoria con `invalidateNewsMemo()`. Un
+  cambio se ve en todo el sitio en ≤ 10 s. No volver a `unstable_cache`, ISR
+  ni `revalidateTag` para noticias sin un `cacheHandler` compartido (Redis).
 - Las notas de ejemplo llevan `sample = true`. No inventar métricas, clientes,
   testimonios, precios, plazos ni resultados; la guía editorial del MCP lo
   exige a los agentes. Ver `PRODUCT.md` antes de tocar afirmaciones comerciales.

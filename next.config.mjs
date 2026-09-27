@@ -16,7 +16,9 @@
  * Lo que solo existe con servidor lleva extensión `.node.ts(x)`: los route
  * handlers (`/api/contact`, `/api/mcp`) y la vista previa de borradores. Solo
  * se registran cuando `pageExtensions` las incluye, es decir, fuera del modo
- * estático (Next no admite rutas dinámicas con `output: 'export'`).
+ * estático (Next no admite rutas dinámicas con `output: 'export'`). A la
+ * inversa, `.static.ts(x)` solo existe en el export (hoy, el sitemap y la
+ * página de cada nota).
  */
 
 const isStatic = process.env.BUILD_TARGET === 'static';
@@ -33,7 +35,7 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  pageExtensions: isStatic ? ['ts', 'tsx'] : ['ts', 'tsx', 'node.ts', 'node.tsx'],
+  pageExtensions: isStatic ? ['ts', 'tsx', 'static.ts', 'static.tsx'] : ['ts', 'tsx', 'node.ts', 'node.tsx'],
   images: {
     formats: ['image/avif', 'image/webp'],
     unoptimized: isStatic,

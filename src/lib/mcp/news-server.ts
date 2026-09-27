@@ -4,13 +4,12 @@ import { randomBytes } from 'node:crypto';
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
 
 import { editorialGuide, NEWS_LIMITS } from '@/content/news-editorial';
 import type { AgentIdentity } from '@/lib/mcp/auth';
 import { readingTimeFor, slugify, todayInLima } from '@/lib/news/format';
-import { NEWS_CACHE_TAG, type NewsRow } from '@/lib/news/repository';
+import { invalidateNewsMemo, type NewsRow } from '@/lib/news/repository';
 import { coverPublicUrl, getSupabaseAdmin, NEWS_COVERS_BUCKET } from '@/lib/supabase/server';
 import { NEWS_CATEGORIES } from '@/types';
 
@@ -18,8 +17,8 @@ import { NEWS_CATEGORIES } from '@/types';
  * Servidor MCP de noticias. Se crea uno por request (modo sin estado) con la
  * identidad del agente ya autenticada en `src/app/api/mcp/route.node.ts`.
  *
- * Toda escritura invalida el tag `news`: Home, las notas y el sitemap muestran
- * el cambio en menos de un minuto (NEWS_REVALIDATE_SECONDS), sin recompilar.
+ * Las rutas de noticias leen Supabase en cada visita (ver repository.ts), asi
+ * que Home, notas y sitemap muestran el cambio en ≤ 10 s, sin recompilar.
  */
 
 const COVER_TYPES = {
@@ -71,8 +70,9 @@ function run<A>(handler: (args: A) => Promise<CallToolResult>) {
   };
 }
 
+/** Este proceso se pone al dia al instante; los demas, en ≤ NEWS_MEMO_MS. */
 function invalidateNews() {
-  revalidateTag(NEWS_CACHE_TAG, { expire: 0 });
+  invalidateNewsMemo();
 }
 
 function newPreviewToken(): string {
@@ -267,7 +267,7 @@ export function createNewsMcpServer(agent: AgentIdentity, siteUrl: string): McpS
     {
       title: 'Editar noticia',
       description:
-        'Modifica los campos enviados de una nota (borrador o publicada). Si está publicada, el cambio se ve en el sitio en menos de un minuto.',
+        'Modifica los campos enviados de una nota (borrador o publicada). Si está publicada, el cambio se ve en el sitio en unos segundos.',
       inputSchema: {
         slug: slugSchema,
         title: titleSchema.optional(),
