@@ -63,14 +63,24 @@ async function handle(request: Request): Promise<Response> {
   });
   await server.connect(transport);
 
+  const isGet = request.method === 'GET';
   try {
-    return await transport.handleRequest(request, {
+    const response = await transport.handleRequest(request, {
       authInfo: { token: agent.tokenId, clientId: agent.name, scopes: ['news:write'] },
     });
+    if (isGet) {
+      request.signal.addEventListener('abort', () => {
+        void transport.close();
+        void server.close();
+      });
+    }
+    return response;
   } finally {
-    // Con respuestas JSON el cuerpo ya esta completo: se puede cerrar el par.
-    void transport.close();
-    void server.close();
+    if (!isGet) {
+      // Con respuestas JSON el cuerpo ya esta completo: se puede cerrar el par.
+      void transport.close();
+      void server.close();
+    }
   }
 }
 

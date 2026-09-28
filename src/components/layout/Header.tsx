@@ -65,8 +65,12 @@ export function Header() {
       >
         <div className="shell flex h-16 items-center justify-between gap-4 md:h-20 short:h-14">
           {/* Marca */}
+          {/* Home es dinamica (noticias de Supabase) y Next no la precarga por
+              defecto: cada vuelta al inicio esperaba al servidor. Este enlace,
+              visible en todas las paginas, la precarga completa. */}
           <Link
             href="/"
+            prefetch={pathname !== '/'}
             data-cursor="expand"
             aria-label={`${agency.name}, ir al inicio`}
             className="shrink-0 py-2"

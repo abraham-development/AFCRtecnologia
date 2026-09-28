@@ -333,6 +333,12 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   (`NEWS_MEMO_MS`); el MCP limpia esa memoria con `invalidateNewsMemo()`. Un
   cambio se ve en todo el sitio en ≤ 10 s. No volver a `unstable_cache`, ISR
   ni `revalidateTag` para noticias sin un `cacheHandler` compartido (Redis).
+- Consecuencia verificada: al ser dinámica, Next no precarga Home y cada vuelta
+  al inicio esperaba al servidor (lento en celular). Por eso el `<Link>` del
+  logotipo del header lleva `prefetch` (precarga completa, caché cliente de
+  5 min) y `page.tsx` deja solo las noticias dentro de `<Suspense>`, para que
+  el hero no espere a Supabase. No quitar ninguno de los dos. Recargar la
+  página siempre trae la lista actual.
 - Las notas de ejemplo llevan `sample = true`. No inventar métricas, clientes,
   testimonios, precios, plazos ni resultados; la guía editorial del MCP lo
   exige a los agentes. Ver `PRODUCT.md` antes de tocar afirmaciones comerciales.

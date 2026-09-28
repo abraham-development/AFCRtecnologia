@@ -1,4 +1,4 @@
-# MCP de noticias — publicar con Claude Code, Codex o Cursor
+# MCP de noticias — publicar con Claude Code, Codex, Cursor o Antigravity
 
 El sitio expone un servidor MCP en **`https://afcrtecnologia.com/api/mcp`**
 (Streamable HTTP). Un agente conectado puede redactar, revisar, publicar y
@@ -14,6 +14,7 @@ desde el repositorio, con las claves de Supabase en `.env.local`:
 npm run mcp:token -- create --name "Claude Code"
 npm run mcp:token -- create --name "Codex"
 npm run mcp:token -- create --name "Cursor"
+npm run mcp:token -- create --name "Antigravity"
 npm run mcp:token -- list                      # agentes, último uso, estado
 npm run mcp:token -- revoke --name "Cursor"    # corta el acceso al instante
 ```
@@ -59,6 +60,20 @@ bearer_token_env_var = "AFCR_MCP_TOKEN"
   }
 }
 ```
+
+### Antigravity CLI (`agy`, `~/.gemini/config/mcp_config.json`)
+
+`agy` no expande `${AFCR_MCP_TOKEN}` dentro del encabezado: hay que pasar el
+token en claro al añadirlo. El comando lo guarda solo en ese archivo del
+usuario, fuera del repositorio.
+
+```bash
+agy mcp add --header "Authorization: Bearer $AFCR_MCP_TOKEN" afcr https://afcrtecnologia.com/api/mcp
+agy mcp list
+```
+
+Una sesión ya abierta no recarga el archivo: hay que abrir `agy` de nuevo.
+`agy mcp list` debe mostrar `afcr` en `https://afcrtecnologia.com/api/mcp`.
 
 ## 3. Flujo de trabajo
 
