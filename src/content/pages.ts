@@ -10,16 +10,9 @@ export const homeCopy = {
     { words: ['Inteligencia', 'artificial'], variant: 'primary' },
     { words: ['que', 'trabaja', 'contigo.'], variant: 'accent' },
   ] as const,
-  primaryCta: 'Empezar un proyecto',
-  primaryCtaLabel: 'Empezar un proyecto: ir al formulario de contacto',
-  secondaryCta: 'Ver servicios',
-  facts: [
-    { label: 'BASE', value: 'Lima, Perú' },
-    { label: 'ENFOQUE', value: 'Agentes · Automatización · Software' },
-    { label: 'RESPUESTA', value: '< 24 horas hábiles' },
-  ],
-  scroll: 'NOTICIAS',
-  scrollLabel: 'Bajar a las noticias',
+  primaryCta: 'Empieza un proyecto con nosotros',
+  primaryCtaLabel: 'Empieza un proyecto con nosotros: ir al formulario de contacto',
+  secondaryCta: 'Ver Servicios',
 };
 
 /** Cabeceras de las paginas interiores. */

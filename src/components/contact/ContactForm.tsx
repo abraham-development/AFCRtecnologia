@@ -104,7 +104,7 @@ export function ContactForm() {
     }
   };
 
-  /* Llegada desde «Empezar un proyecto» o el atajo E: foco en el primer campo */
+  /* Llegada desde «Empieza un proyecto con nosotros» o el atajo E: foco en el primer campo */
   useEffect(() => {
     if (window.location.hash !== '#formulario') return;
     const timer = window.setTimeout(

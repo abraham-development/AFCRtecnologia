@@ -12,29 +12,42 @@ este archivo.
 
 ## Protocolo de memoria entre sesiones
 
+Un hilo nuevo no ve los chats anteriores. Este archivo es la única memoria que
+cruza sesiones: Cursor lo inyecta al empezar. No buscar el contexto en
+transcripciones, en `CLAUDE.md` ni en el hilo previo.
+
 ### Al comenzar
 
-1. Leer `AGENTS.md` y después `PRODUCT.md`.
-2. Ejecutar `git status --short` y revisar los diffs relacionados antes de
+1. Tratar lo escrito aquí como vigente hasta que el código lo desmienta.
+2. Leer `PRODUCT.md` después de este archivo.
+3. Ejecutar `git status --short` y revisar los diffs relacionados antes de
    editar. El worktree puede contener cambios del usuario: no sobrescribirlos,
    revertirlos ni incluirlos en un commit ajeno.
-3. Verificar en el código cualquier dato que pueda haber cambiado. Este archivo
-   orienta; el código, `package.json`, `package-lock.json` y Git confirman.
-4. Para tareas de Next.js, leer primero la guía relevante de
+4. Si el código, `package.json`, `package-lock.json` o Git contradicen una
+   frase de aquí, manda el código y se corrige esta frase en el mismo cambio.
+5. Para tareas de Next.js, leer primero la guía relevante de
    `node_modules/next/dist/docs/`; esta versión tiene cambios incompatibles con
    conocimiento histórico de Next.
 
-### Qué conservar aquí
+### Qué escribir antes de cerrar el hilo
 
-- Arquitectura, invariantes, decisiones explícitas del usuario, trampas ya
-  verificadas y procedimientos de build/despliegue.
-- Actualizar este archivo en el mismo cambio cuando una decisión persistente
-  deje de ser cierta. No usarlo como changelog ni diario de tareas.
-- No guardar secretos, valores de `.env*`, teléfonos, tokens, PIDs, URLs de
-  preview temporales ni estados efímeros de servidores.
-- `.agents/`, `.claude/`, `.codex/`, `.cursor/`, `.impeccable/` y
-  `skills-lock.json` son artefactos de herramientas. No agregarlos a commits de
-  producto salvo petición explícita.
+Actualizar la sección afectada en el mismo cambio, sustituyendo la frase que
+dejó de ser cierta. No añadir una bitácora ni un diario de tareas. Entra aquí
+solo lo que otro hilo repetiría mal si no lo lee:
+
+- Decisiones explícitas del usuario sobre copy visible, logo, navegación,
+  contacto y qué no debe reintroducirse.
+- Arquitectura, invariantes, trampas ya verificadas y el procedimiento de
+  build o despliegue.
+- La fecha de «Estado estable actual» solo cuando ese bloque se recontrasta
+  con el código.
+
+No guardar secretos, valores de `.env*`, teléfonos, tokens, PIDs, URLs de
+preview temporales ni si un servidor local sigue encendido.
+
+`.agents/`, `.claude/`, `.codex/`, `.cursor/`, `.impeccable/` y
+`skills-lock.json` son artefactos de herramientas. No agregarlos a commits de
+producto salvo petición explícita.
 
 ### Antes de entregar
 
@@ -47,7 +60,7 @@ este archivo.
 
 ---
 
-## Estado estable actual — verificado en código el 2026-09-27
+## Estado estable actual — verificado en código el 2026-09-28
 
 - El sitio tiene Home, Servicios, Nosotros, Contáctanos y notas individuales.
 - El logotipo oficial es la imagen entregada por la empresa
@@ -78,9 +91,13 @@ este archivo.
   algo más clara que el hero, pedido del usuario) al 95 % con grano y blur en
   todo el `<header>`. La placa del logotipo conserva su propio fondo oscuro. El navbar no lleva fondo propio (el usuario pidió un único color);
   solo lo delimitan sus líneas `border-editorial` superior e inferior.
-- El texto del CTA es «Contacta con un asesor por WhatsApp» y abre `wa.me` en
-  una pestaña nueva. La estructura y el contenido del menú fullscreen no se
-  alteran al retocar la hamburguesa.
+- El texto del CTA del header es «Contacta con un asesor por WhatsApp» y abre
+  `wa.me` en una pestaña nueva. La estructura y el contenido del menú
+  fullscreen no se alteran al retocar la hamburguesa.
+- En el hero, el botón principal dice «Empieza un proyecto con nosotros» y el
+  secundario «Ver Servicios». Ninguno muestra la tecla de atajo. `E` y `S`
+  siguen funcionando; la insignia `E` solo permanece en el envío del
+  formulario de contacto.
 - El footer compartido comienza con el directorio del sitio y termina en la
   barra legal. La franja «¿Prefieres conversar?» se retiró por decisión del
   usuario; WhatsApp y correo siguen disponibles en la columna de contacto.
@@ -99,11 +116,14 @@ este archivo.
   mockup sobre SIRE/SUNAT fue eliminada intencionalmente; no reintroducirla sin
   pedido. SUNAT sigue siendo un servicio confirmado.
 - La sección se titula «Noticias relevantes de inteligencia artificial y
-  tecnología». No lleva filtros por categoría (se retiraron a pedido del
-  usuario): todas las notas se listan una por una, de la más reciente a la más
+  tecnología». Ese título está al pie del hero, entre dos líneas editoriales,
+  en el lugar de la franja BASE / ENFOQUE / RESPUESTA y del salto «NOTICIAS»,
+  que se retiraron: no reintroducirlos. No lleva bajada ni filtros por
+  categoría. Las notas siguen
+  justo debajo, una por una, de la más reciente a la más
   antigua, con la misma card: portada a la izquierda y, al costado, fecha
   publicada bien visible, título, resumen, categoría y lectura. La más reciente
-  (hoy Hermes Agent) lleva la etiqueta «Más reciente».
+  lleva la etiqueta «Más reciente».
 - La portada es generada, no fotográfica: la palabra de categoría en Fraunces,
   gigante y recortada, sobre un panel con grano. Es decisión del usuario; no
   sustituirla por fotos de stock. Se usa fecha absoluta y no «hace X días»,
@@ -118,7 +138,7 @@ este archivo.
 | Ruta | Contenido | Implementación principal |
 | --- | --- | --- |
 | `/` | Hero de partículas + Noticias | `src/components/home/` |
-| `/servicios` | Directorio de 10 servicios | `src/components/services/` |
+| `/servicios` | Directorio de 10 servicios, sin conteo junto a cada categoría | `src/components/services/` |
 | `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
 | `/noticias/[slug]` | Nota publicada: `page.node.tsx` (dinámica) / `page.static.tsx` (export) | `src/lib/news/news-route.tsx` |
@@ -341,6 +361,8 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 
 - `E` → `/contacto#formulario` y foco en `#contact-name`.
 - `S` → `/servicios`.
+- Esos atajos no se anuncian en los botones del hero. La insignia `E` solo va
+  en el botón de envío del formulario.
 - Nunca se activan dentro de `input`, `textarea`, `select` o
   `contenteditable`; lógica en `src/hooks/useKeyboardShortcut.ts`.
 

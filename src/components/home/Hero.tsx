@@ -1,16 +1,15 @@
 'use client';
 
-import { ArrowDown } from 'lucide-react';
 import { motion } from 'motion/react';
 import dynamic from 'next/dynamic';
 import { useEffect, useSyncExternalStore } from 'react';
 
 import ParticleText from '@/components/effects/ParticleText';
 import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
-import KeyBadge from '@/components/ui/KeyBadge';
 import { agency, CONTACT_FORM_HREF } from '@/content/agency';
+import { newsCopy } from '@/content/news';
 import { homeCopy } from '@/content/pages';
-import { HEADER_OFFSET, isAppReady, markAppReady, scrollToSection, subscribeAppReady } from '@/lib/utils';
+import { isAppReady, markAppReady, subscribeAppReady } from '@/lib/utils';
 
 /** Three.js solo en cliente: fuera del bundle inicial y del HTML del servidor. */
 const WebGLHeroBackground = dynamic(() => import('@/components/effects/WebGLHeroBackground'), {
@@ -115,47 +114,30 @@ export function Hero() {
         >
           <ButtonMagnetic variant="solid" href={CONTACT_FORM_HREF} aria-label={homeCopy.primaryCtaLabel}>
             {homeCopy.primaryCta}
-            <KeyBadge keyLabel="E" tone="dark" />
           </ButtonMagnetic>
 
           <ButtonMagnetic variant="ghost" href="/servicios" aria-label={homeCopy.secondaryCta}>
             {homeCopy.secondaryCta}
-            <KeyBadge keyLabel="S" />
           </ButtonMagnetic>
         </motion.div>
       </div>
 
-      {/* Pie del hero: datos duros + invitacion a bajar a las noticias */}
+      {/* Pie del hero: el titulo de noticias ocupa el lugar de la franja de datos. */}
       <motion.div
+        id="noticias"
         initial="hidden"
         animate={animate}
         variants={rise}
         custom={0.8}
-        className="shell relative z-10"
+        className="shell relative z-10 scroll-mt-28"
       >
-        <div className="border-border-editorial grid grid-cols-2 gap-x-6 gap-y-6 border-t pt-6 md:grid-cols-4">
-          {homeCopy.facts.map((fact) => (
-            <div key={fact.label}>
-              <p className="text-micro text-text-secondary">{fact.label}</p>
-              <p className="text-data text-text-primary mt-2">{fact.value}</p>
-            </div>
-          ))}
-          <div className="flex items-end md:justify-end">
-            <button
-              type="button"
-              data-cursor="expand"
-              onClick={() => scrollToSection('noticias', HEADER_OFFSET)}
-              className="text-micro text-text-secondary hover:text-accent-cyan group flex min-h-11 items-center gap-2 transition-colors"
-              aria-label={homeCopy.scrollLabel}
-            >
-              {homeCopy.scroll}
-              <ArrowDown
-                size={14}
-                strokeWidth={1.5}
-                className="transition-transform duration-500 group-hover:translate-y-1"
-              />
-            </button>
-          </div>
+        <div className="border-border-editorial border-y py-6">
+          <h2
+            id="noticias-title"
+            className="max-w-2xl font-serif text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08] font-light tracking-[-0.03em] text-balance"
+          >
+            {newsCopy.sectionTitle}
+          </h2>
         </div>
       </motion.div>
     </section>

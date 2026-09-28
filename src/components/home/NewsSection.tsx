@@ -117,22 +117,10 @@ function NewsCard({ post, isLatest }: { post: NewsPost; isLatest: boolean }) {
 
 export function NewsSection({ posts }: { posts: NewsPost[] }) {
   return (
-    <section id="noticias" aria-labelledby="noticias-title" className="hairline-t py-chapter scroll-mt-28">
+    <section aria-labelledby="noticias-title" className="pb-chapter">
       <div className="shell">
-        <div className="max-w-2xl">
-          <h2
-            id="noticias-title"
-            className="font-serif text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08] font-light tracking-[-0.03em] text-balance"
-          >
-            {newsCopy.sectionTitle}
-          </h2>
-          <p className="text-text-secondary mt-5 max-w-[40ch] text-lg leading-relaxed md:mt-6 md:text-xl">
-            {newsCopy.sectionLede}
-          </p>
-        </div>
-
         {posts.length > 0 ? (
-          <ul className="mt-12 space-y-6 md:mt-16 md:space-y-8">
+          <ul className="mt-8 space-y-6 md:mt-10 md:space-y-8">
             {posts.map((post, index) => (
               <motion.li
                 key={post.slug}
@@ -146,7 +134,7 @@ export function NewsSection({ posts }: { posts: NewsPost[] }) {
             ))}
           </ul>
         ) : (
-          <p className="text-text-secondary mt-12">{newsCopy.empty}</p>
+          <p className="text-text-secondary mt-10">{newsCopy.empty}</p>
         )}
       </div>
     </section>

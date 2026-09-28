@@ -115,8 +115,6 @@ export function formatNewsDate(iso: string): string {
 /** Textos de la seccion Noticias (Home) y de cada nota. */
 export const newsCopy = {
   sectionTitle: 'Noticias relevantes de inteligencia artificial y tecnología.',
-  sectionLede:
-    'Notas breves de nuestro equipo sobre inteligencia artificial, automatización y tecnología.',
   readMore: 'Leer nota',
   sampleLabel: 'EJEMPLO',
   /** Se marca solo en la nota mas reciente de la lista (sortedNews[0]). */

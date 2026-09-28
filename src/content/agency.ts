@@ -109,7 +109,7 @@ export const headerCopy = {
   advisorCta: 'Contacta con un asesor por WhatsApp',
 };
 
-/** Destino del atajo E y de los CTA «Empezar un proyecto». */
+/** Destino del atajo E y del CTA «Empieza un proyecto con nosotros». */
 export const CONTACT_FORM_HREF = '/contacto#formulario';
 
 /** Seccion Nosotros: para quien trabajamos. */
