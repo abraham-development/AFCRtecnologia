@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowUpRight } from 'lucide-react';
-import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -54,6 +54,21 @@ function InquiryLink({ service }: { service: Service }) {
   );
 }
 
+function FallbackContact({ className }: { className?: string }) {
+  return (
+    <ButtonMagnetic
+      variant="ghost"
+      href={whatsappUrl}
+      external
+      className={className}
+      aria-label="Escribir por WhatsApp si no encuentras el servicio que buscas"
+    >
+      <BrandIcon network="whatsapp" size={15} />
+      {servicesCopy.fallbackCta}
+    </ButtonMagnetic>
+  );
+}
+
 const VALID_IDS = new Set(serviceGroups.map((group) => group.id));
 
 export function ServicesDirectory() {
@@ -82,90 +97,48 @@ export function ServicesDirectory() {
 
   return (
     <section aria-labelledby="catalogo-title" className="hairline-t py-chapter">
-      <h2 id="catalogo-title" className="sr-only">
+      <h2 id="catalogo-title" className="shell text-display-sm mb-10 md:mb-14">
         {servicesCopy.directoryTitle}
       </h2>
 
-      <div className="shell grid gap-14 lg:grid-cols-12 lg:gap-16">
-        {/* Columna fija: filtro de categorias y salida directa */}
+      <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
+        {/* Las cuatro categorias son el indice principal en todos los anchos. */}
         <div className="lg:sticky lg:top-40 lg:col-span-4 lg:self-start">
-          <LayoutGroup id="services-tabs">
-            {/* Movil y tablet: cuadricula de categorias */}
-            <div role="group" aria-label={servicesCopy.indexLabel} className="lg:hidden">
-              <ul className="border-border-editorial grid grid-cols-2 border-y">
-                {serviceGroups.map((group) => {
-                  const isActive = group.id === activeId;
-                  return (
-                    <li
-                      key={group.id}
-                      className="border-border-editorial border-l odd:border-l-0 nth-[n+3]:border-t"
+          <nav aria-label={servicesCopy.indexLabel}>
+            <ul className="border-border-editorial border-y">
+              {serviceGroups.map((group) => {
+                const isActive = group.id === activeId;
+                return (
+                  <li key={group.id} className="border-border-editorial border-b last:border-b-0">
+                    <button
+                      type="button"
+                      data-cursor="expand"
+                      aria-pressed={isActive}
+                      aria-controls="services-panel"
+                      onClick={() => select(group.id)}
+                      className={cn(
+                        'flex min-h-20 w-full items-center gap-4 px-4 py-4 text-left font-serif text-[1.375rem] leading-tight font-light tracking-[-0.02em] transition-colors duration-300 lg:px-3',
+                        isActive
+                          ? 'bg-accent-cyan-glow text-accent-cyan'
+                          : 'text-text-primary hover:text-accent-cyan',
+                      )}
                     >
-                      <button
-                        type="button"
-                        aria-pressed={isActive}
-                        onClick={() => select(group.id)}
-                        className={cn(
-                          'flex h-full min-h-16 w-full items-center px-2.5 py-3 text-left text-[0.8125rem] leading-snug hyphens-auto transition-colors',
-                          isActive ? 'text-accent-cyan' : 'hover:text-accent-cyan',
-                        )}
-                      >
-                        {group.title}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            {/* Escritorio: lista de categorias con subrayado deslizante */}
-            <nav aria-label={servicesCopy.indexLabel} className="hidden lg:block">
-              <ul className="border-border-editorial border-t">
-                {serviceGroups.map((group) => {
-                  const isActive = group.id === activeId;
-                  return (
-                    <li key={group.id} className="border-border-editorial border-b">
-                      <button
-                        type="button"
-                        data-cursor="expand"
-                        aria-pressed={isActive}
-                        onClick={() => select(group.id)}
-                        className={cn(
-                          'flex w-full items-center gap-4 py-5 text-left transition-colors duration-300',
-                          isActive ? 'text-accent-cyan' : 'text-text-secondary hover:text-text-primary',
-                        )}
-                      >
-                        <span className="flex items-center gap-3">
-                          {isActive ? (
-                            <motion.span
-                              layoutId="services-tab-underline"
-                              aria-hidden="true"
-                              transition={{ duration: 0.45, ease: EASE }}
-                              className="bg-accent-cyan block h-px w-8"
-                            />
-                          ) : (
-                            <span aria-hidden="true" className="block h-px w-0" />
-                          )}
-                          {group.title}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
-          </LayoutGroup>
+                      <span
+                        aria-hidden="true"
+                        className={cn('h-px w-6 shrink-0', isActive ? 'bg-accent-cyan' : 'bg-border-editorial')}
+                      />
+                      <span>{group.title}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
           {hasWhatsApp ? (
-            <ButtonMagnetic
-              variant="ghost"
-              href={whatsappUrl}
-              external
-              className="mt-10 w-full sm:w-auto"
-              aria-label="Escribir por WhatsApp si no encuentras el servicio que buscas"
-            >
-              <BrandIcon network="whatsapp" size={15} />
-              {servicesCopy.fallbackCta}
-            </ButtonMagnetic>
+            <div className="mt-10 hidden lg:block">
+              <FallbackContact />
+            </div>
           ) : null}
         </div>
 
@@ -173,6 +146,7 @@ export function ServicesDirectory() {
         <div className="lg:col-span-8">
           <AnimatePresence mode="wait">
             <motion.div
+              id="services-panel"
               key={active.id}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -231,6 +205,12 @@ export function ServicesDirectory() {
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {hasWhatsApp ? (
+          <div className="lg:hidden">
+            <FallbackContact className="w-full" />
+          </div>
+        ) : null}
       </div>
     </section>
   );

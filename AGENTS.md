@@ -101,6 +101,9 @@ producto salvo petición explícita.
 - El footer compartido comienza con el directorio del sitio y termina en la
   barra legal. La franja «¿Prefieres conversar?» se retiró por decisión del
   usuario; WhatsApp y correo siguen disponibles en la columna de contacto.
+- En Servicios, las cuatro categorías principales forman un índice vertical:
+  una categoría por fila a cualquier ancho. No volver a presentarlas en grilla
+  ni añadir conteos junto a sus nombres.
 - El cursor personalizado es una flecha de alto contraste de 20 × 24 px. Tiene
   halo cian solo sobre controles interactivos, conserva el hotspot exacto,
   vuelve al cursor nativo en campos de texto y se desactiva con puntero táctil
