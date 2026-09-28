@@ -62,6 +62,14 @@ export const NEWS_CATEGORIES = ['IA', 'Automatización', 'Software', 'Negocio'] 
 export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
 
 /** Nota de la seccion Noticias (escrita por AFCR). */
+/** Un mes del archivo de noticias: «2026-09» → «Septiembre 2026». */
+export interface NewsMonth {
+  /** AAAA-MM; tambien es el segmento de `/noticias/mes/[month]`. */
+  key: string;
+  label: string;
+  count: number;
+}
+
 export interface NewsPost {
   slug: string;
   title: string;

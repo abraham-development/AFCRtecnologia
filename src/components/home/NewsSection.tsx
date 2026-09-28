@@ -4,10 +4,11 @@ import { ArrowUpRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 
+import NewsMonthNav from '@/components/news/NewsMonthNav';
 import ScrambleText from '@/components/ui/ScrambleText';
 import TiltCard from '@/components/ui/TiltCard';
 import { formatNewsDate, newsCopy } from '@/content/news';
-import type { NewsPost } from '@/types';
+import type { NewsMonth, NewsPost } from '@/types';
 import { cn } from '@/lib/utils';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -123,27 +124,45 @@ function NewsCard({ post, isLatest }: { post: NewsPost; isLatest: boolean }) {
   );
 }
 
-export function NewsSection({ posts }: { posts: NewsPost[] }) {
+/**
+ * Lista de notas, una card por fila. La etiqueta «Más reciente» solo va en la
+ * nota mas nueva del sitio (`latestSlug`), no en la primera de cada mes.
+ */
+export function NewsList({ posts, latestSlug }: { posts: NewsPost[]; latestSlug?: string }) {
+  return (
+    <ul className="space-y-6 md:space-y-8">
+      {posts.map((post, index) => (
+        <motion.li
+          key={post.slug}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: EASE, delay: Math.min(index, 3) * 0.06 }}
+        >
+          <NewsCard post={post} isLatest={post.slug === latestSlug} />
+        </motion.li>
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * Seccion de la Home: las ultimas NEWS_HOME_LIMIT notas y el archivo por mes con
+ * todas las demas (columna derecha en escritorio, desplegable arriba en movil).
+ */
+export function NewsSection({ posts, months }: { posts: NewsPost[]; months: NewsMonth[] }) {
   return (
     <section aria-labelledby="noticias-title" className="pb-chapter">
-      <div className="shell">
-        {posts.length > 0 ? (
-          <ul className="mt-8 space-y-6 md:mt-10 md:space-y-8">
-            {posts.map((post, index) => (
-              <motion.li
-                key={post.slug}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.5, ease: EASE, delay: Math.min(index, 3) * 0.06 }}
-              >
-                <NewsCard post={post} isLatest={index === 0} />
-              </motion.li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-text-secondary mt-10">{newsCopy.empty}</p>
-        )}
+      <div className="shell mt-8 grid gap-6 md:mt-10 lg:grid-cols-12 lg:gap-10">
+        {/* Primero en el DOM: en movil el selector va antes de las notas. */}
+        <NewsMonthNav months={months} className="lg:sticky lg:top-44 lg:order-2 lg:col-span-3 lg:self-start" />
+        <div className="lg:order-1 lg:col-span-9">
+          {posts.length > 0 ? (
+            <NewsList posts={posts} latestSlug={posts[0]?.slug} />
+          ) : (
+            <p className="text-text-secondary">{newsCopy.empty}</p>
+          )}
+        </div>
       </div>
     </section>
   );

@@ -112,6 +112,25 @@ export function formatNewsDate(iso: string): string {
   return `${day} ${months[(month ?? 1) - 1]} ${year}`;
 }
 
+/** Nombres de mes del archivo de noticias (indice 0 = enero). */
+export const newsMonthNames = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
+
+/** Notas que muestra la Home; las anteriores se encuentran en el archivo por mes. */
+export const NEWS_HOME_LIMIT = 5;
+
 /** Textos de la seccion Noticias (Home) y de cada nota. */
 export const newsCopy = {
   sectionTitle: 'Información relevante y actualizada de inteligencia artificial y tecnología.',
@@ -123,6 +142,12 @@ export const newsCopy = {
   latestLabel: 'Más reciente',
   empty: 'Todavía no hay notas publicadas.',
   back: 'Volver a noticias',
+  /** Columna derecha de la seccion y de cada pagina de mes. */
+  archiveTitle: 'Noticias por mes',
+  archiveCount: (count: number) => (count === 1 ? '1 nota' : `${count} notas`),
+  monthTitle: (label: string) => `Noticias de ${label.toLowerCase()}`,
+  monthDescription: (label: string) =>
+    `Notas de AFCRtecnologia sobre inteligencia artificial y tecnología publicadas en ${label.toLowerCase()}.`,
   relatedTitle: 'Sigue leyendo',
   ctaTitle: '¿Quieres aplicar esto en tu negocio?',
   ctaBody: 'Cuéntanos qué necesitas y te respondemos con los siguientes pasos.',

@@ -122,9 +122,13 @@ producto salvo petición explícita.
   artificial y tecnología». Ese título está al pie del hero, entre dos líneas editoriales,
   en el lugar de la franja BASE / ENFOQUE / RESPUESTA y del salto «NOTICIAS»,
   que se retiraron: no reintroducirlos. No lleva bajada ni filtros por
-  categoría. Las notas siguen
-  justo debajo, una por una, de la más reciente a la más
-  antigua, con la misma card: portada sola a la izquierda y, al costado, la
+  categoría. Justo debajo van solo las últimas `NEWS_HOME_LIMIT` (5) notas,
+  una por una, de la más reciente a la más antigua; «Noticias por mes»
+  (pedido del usuario) enlaza cada mes con notas a `/noticias/mes/AAAA-MM`, que
+  lista todas las de ese mes con el mismo archivo. Desde `lg` es una columna
+  derecha fija; por debajo es un botón desplegable con flecha **antes** de las
+  notas (al final nadie lo veía), que en una página de mes muestra ese mes. No
+  usar icono de hamburguesa ahí: se confunde con el menú principal. Las notas usan la misma card: portada sola a la izquierda y, al costado, la
   metadata de la nota (fecha y, debajo, el autor «El equipo de AFCRtecnologia»
   en todas las notas de ahora), título, resumen, categoría y lectura. La más reciente
   lleva la etiqueta «Más reciente».
@@ -146,15 +150,18 @@ producto salvo petición explícita.
 | `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
 | `/noticias/[slug]` | Nota publicada: `page.node.tsx` (dinámica) / `page.static.tsx` (export) | `src/lib/news/news-route.tsx` |
+| `/noticias/mes/[month]` | Archivo de un mes (`AAAA-MM`); mismo par `.node`/`.static` y `loading.tsx` | `src/lib/news/news-month-route.tsx` |
 | `/noticias/vista-previa/[token]` | Borrador privado, `noindex`, solo build Node | `page.node.tsx` |
 | `/api/mcp` | MCP de noticias para agentes, solo build Node | `route.node.ts` |
 
-- Las páginas institucionales se prerenderizan. Con Supabase, Home, cada nota
-  y `sitemap.xml` son dinámicas (leen la base en cada visita); todo funciona
+- Las páginas institucionales se prerenderizan. Con Supabase, Home, cada nota,
+  cada mes del archivo y `sitemap.xml` son dinámicas (leen la base en cada visita); todo funciona
   también con `build:static`, que prerenderiza las notas de respaldo.
   `/api/contact` y `/api/mcp` solo existen en el build Node.
 - Cada página exporta `metadata`. El sitemap (`src/lib/seo/sitemap.ts`) deriva
-  rutas desde `navItems` y las notas publicadas. El tiempo de lectura se
+  rutas desde `navItems`, las notas publicadas y sus meses. Un mes inválido o
+  sin notas es un 404 «suave» (HTTP 200 + `noindex`): `loading.tsx` ya empezó
+  el streaming; es el precio de que la navegación al mes sea instantánea. El tiempo de lectura se
   calcula del cuerpo (~200 palabras/min); no se escribe a mano.
 - La navegación usa `next/link`. Las anclas entre páginas llevan ruta y hash,
   por ejemplo `/servicios#ia`; `SmoothScrollProvider` gestiona inicio/ancla.
