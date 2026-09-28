@@ -131,10 +131,10 @@ export function Hero() {
         custom={0.8}
         className="shell relative z-10 scroll-mt-28"
       >
-        <div className="border-border-editorial border-y py-6">
+        <div className="border-border-editorial border-y py-8 md:py-9">
           <h2
             id="noticias-title"
-            className="max-w-2xl font-serif text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08] font-light tracking-[-0.03em] text-balance"
+            className="mx-auto max-w-5xl font-serif text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08] font-light tracking-[-0.03em] text-balance text-center"
           >
             {newsCopy.sectionTitle}
           </h2>
