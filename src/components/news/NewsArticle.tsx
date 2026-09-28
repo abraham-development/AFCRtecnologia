@@ -37,11 +37,18 @@ export function NewsArticle({ post, related, preview = false }: NewsArticleProps
             {newsCopy.back}
           </Link>
 
-          <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="mt-8">
+            <time dateTime={post.date} className="text-data text-text-primary">
+              {formatNewsDate(post.date)}
+            </time>
+            <p className="text-data text-text-secondary mt-1">
+              <span className="sr-only">Autor: </span>
+              {newsCopy.author}
+            </p>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="text-micro text-accent-cyan">{post.category.toUpperCase()}</span>
-            <span className="text-data text-text-secondary">
-              <time dateTime={post.date}>{formatNewsDate(post.date)}</time> · {post.readingTime}
-            </span>
+            <span className="text-data text-text-secondary">{post.readingTime}</span>
             {post.sample ? (
               <span className="text-micro border-border-editorial text-text-secondary border px-2 py-1">
                 {newsCopy.sampleLabel}

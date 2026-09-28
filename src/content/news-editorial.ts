@@ -15,7 +15,7 @@ export const NEWS_LIMITS = {
 export const editorialGuide = `# Guía editorial — Noticias de AFCRtecnologia
 
 AFCRtecnologia es una agencia de tecnología e IA de Lima, Perú. La sección
-«Noticias relevantes de inteligencia artificial y tecnología» publica notas
+«Información relevante y actualizada de inteligencia artificial y tecnología» publica notas
 breves para pymes, empresas e instituciones educativas del Perú.
 
 ## Voz

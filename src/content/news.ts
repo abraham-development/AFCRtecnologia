@@ -114,7 +114,9 @@ export function formatNewsDate(iso: string): string {
 
 /** Textos de la seccion Noticias (Home) y de cada nota. */
 export const newsCopy = {
-  sectionTitle: 'Noticias relevantes de inteligencia artificial y tecnología.',
+  sectionTitle: 'Información relevante y actualizada de inteligencia artificial y tecnología.',
+  /** Autor visible de las notas publicadas hasta ahora. */
+  author: 'El equipo de AFCRtecnologia',
   readMore: 'Leer nota',
   sampleLabel: 'EJEMPLO',
   /** Se marca solo en la nota mas reciente de la lista (sortedNews[0]). */

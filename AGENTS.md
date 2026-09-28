@@ -118,14 +118,15 @@ producto salvo petición explícita.
   Las cinco notas de ejemplo siguen en la tabla con `sample = true`. La nota
   mockup sobre SIRE/SUNAT fue eliminada intencionalmente; no reintroducirla sin
   pedido. SUNAT sigue siendo un servicio confirmado.
-- La sección se titula «Noticias relevantes de inteligencia artificial y
-  tecnología». Ese título está al pie del hero, entre dos líneas editoriales,
+- La sección se titula «Información relevante y actualizada de inteligencia
+  artificial y tecnología». Ese título está al pie del hero, entre dos líneas editoriales,
   en el lugar de la franja BASE / ENFOQUE / RESPUESTA y del salto «NOTICIAS»,
   que se retiraron: no reintroducirlos. No lleva bajada ni filtros por
   categoría. Las notas siguen
   justo debajo, una por una, de la más reciente a la más
-  antigua, con la misma card: portada a la izquierda y, al costado, fecha
-  publicada bien visible, título, resumen, categoría y lectura. La más reciente
+  antigua, con la misma card: portada sola a la izquierda y, al costado, la
+  metadata de la nota (fecha y, debajo, el autor «El equipo de AFCRtecnologia»
+  en todas las notas de ahora), título, resumen, categoría y lectura. La más reciente
   lleva la etiqueta «Más reciente».
 - La portada es generada, no fotográfica: la palabra de categoría en Fraunces,
   gigante y recortada, sobre un panel con grano. Es decisión del usuario; no

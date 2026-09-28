@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRight, Calendar } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 
@@ -29,9 +29,13 @@ function SampleTag({ post }: { post: NewsPost }) {
  * de Tailwind v4).
  */
 function NewsCover({ post, className }: { post: NewsPost; className?: string }) {
+  // En móvil la portada conserva su proporción. Desde sm el cuadro se estira
+  // a la altura de la nota: si no, el texto deja un vacío debajo de la imagen.
+  const frame = 'border-border-editorial bg-bg-darkest relative aspect-[4/3] overflow-hidden border sm:absolute sm:inset-0 sm:aspect-auto';
+
   if (post.cover) {
     return (
-      <div className={cn('border-border-editorial bg-bg-darkest relative aspect-[4/3] overflow-hidden border', className)}>
+      <div className={cn(frame, className)}>
         {/* eslint-disable-next-line @next/next/no-img-element -- Supabase Storage; sin optimizador en Hostinger */}
         <img
           src={post.cover.src}
@@ -47,10 +51,7 @@ function NewsCover({ post, className }: { post: NewsPost; className?: string }) 
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        'bg-bg-darkest noise border-border-editorial relative aspect-[4/3] overflow-hidden border',
-        className,
-      )}
+      className={cn('noise', frame, className)}
     >
       <span className="text-accent-cyan/25 absolute top-3 left-4 font-serif text-[3.75rem] leading-[0.9] font-light tracking-tighter whitespace-nowrap sm:text-[3rem] lg:text-[4.5rem]">
         {post.category}
@@ -60,7 +61,7 @@ function NewsCover({ post, className }: { post: NewsPost; className?: string }) 
   );
 }
 
-/** Card uniforme: portada a la izquierda, fecha bien visible y nota al costado. */
+/** Card uniforme: la portada sola; fecha y autor en la metadata de la nota. */
 function NewsCard({ post, isLatest }: { post: NewsPost; isLatest: boolean }) {
   return (
     <TiltCard
@@ -72,20 +73,27 @@ function NewsCard({ post, isLatest }: { post: NewsPost; isLatest: boolean }) {
         data-cursor="expand"
         className="group grid gap-[1.2rem] px-6 py-[1.2rem] sm:grid-cols-12 sm:gap-8 md:px-8 md:py-6"
       >
-        <NewsCover post={post} className="sm:col-span-4" />
+        <div className="relative sm:col-span-4">
+          <NewsCover post={post} />
+        </div>
 
         <div className="flex flex-col sm:col-span-8">
-          <div className="flex flex-wrap items-center gap-3">
-            <Calendar size={13} strokeWidth={1.5} aria-hidden="true" className="text-accent-cyan shrink-0" />
-            <time dateTime={post.date} className="text-data text-text-primary">
-              {formatNewsDate(post.date)}
-            </time>
-            {isLatest ? (
-              <span className="text-micro border-accent-cyan/50 text-accent-cyan border px-2 py-1">
-                {newsCopy.latestLabel}
-              </span>
-            ) : null}
-            <SampleTag post={post} />
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <time dateTime={post.date} className="text-data text-text-primary">
+                {formatNewsDate(post.date)}
+              </time>
+              {isLatest ? (
+                <span className="text-micro border-accent-cyan/50 text-accent-cyan border px-2 py-1">
+                  {newsCopy.latestLabel}
+                </span>
+              ) : null}
+              <SampleTag post={post} />
+            </div>
+            <p className="text-data text-text-secondary mt-1">
+              <span className="sr-only">Autor: </span>
+              {newsCopy.author}
+            </p>
           </div>
 
           <h3 className="mt-[0.8rem] font-serif text-2xl leading-[1.15] font-light tracking-[-0.02em] text-balance transition-colors duration-300 group-hover:text-accent-cyan md:text-[1.65rem]">
