@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
-import KeyBadge from '@/components/ui/KeyBadge';
 import Toast from '@/components/ui/Toast';
 import { agency, contactCopy } from '@/content/agency';
 import { contactSchema, type ContactInput, type ContactResponse } from '@/lib/validations';
@@ -104,7 +103,7 @@ export function ContactForm() {
     }
   };
 
-  /* Llegada desde «Empieza un proyecto con nosotros» o el atajo E: foco en el primer campo */
+  /* Llegada desde «Empieza un proyecto con nosotros»: foco en el primer campo */
   useEffect(() => {
     if (window.location.hash !== '#formulario') return;
     const timer = window.setTimeout(
@@ -296,7 +295,6 @@ export function ContactForm() {
                     <>
                       <Send size={15} strokeWidth={1.5} aria-hidden="true" />
                       Enviar solicitud
-                      <KeyBadge keyLabel="E" tone="dark" />
                     </>
                   )}
                 </ButtonMagnetic>

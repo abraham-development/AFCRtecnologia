@@ -95,9 +95,8 @@ producto salvo petición explícita.
   `wa.me` en una pestaña nueva. La estructura y el contenido del menú
   fullscreen no se alteran al retocar la hamburguesa.
 - En el hero, el botón principal dice «Empieza un proyecto con nosotros» y el
-  secundario «Ver Servicios». Ninguno muestra la tecla de atajo. `E` y `S`
-  siguen funcionando; la insignia `E` solo permanece en el envío del
-  formulario de contacto.
+  secundario «Ver Servicios». No hay atajos de una sola letra: el usuario los
+  retiró porque una pulsación accidental cambiaba de página.
 - El footer compartido comienza con el directorio del sitio y termina en la
   barra legal. La franja «¿Prefieres conversar?» se retiró por decisión del
   usuario; WhatsApp y correo siguen disponibles en la columna de contacto.
@@ -321,14 +320,13 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 - Para contener el ancho usar `overflow-x: clip`, no `hidden`, porque este
   último rompe `position: sticky`.
 
-### Atajos
+### Teclado
 
-- `E` → `/contacto#formulario` y foco en `#contact-name`.
-- `S` → `/servicios`.
-- Esos atajos no se anuncian en los botones del hero. La insignia `E` solo va
-  en el botón de envío del formulario.
-- Nunca se activan dentro de `input`, `textarea`, `select` o
-  `contenteditable`; lógica en `src/hooks/useKeyboardShortcut.ts`.
+- No hay atajos de una sola letra. `E` y `S` se retiraron a pedido del usuario
+  (2026-09-29): una pulsación casual llevaba a Contacto o Servicios. No
+  reintroducirlos.
+- Con el menú fullscreen abierto, Escape lo cierra y Tab recorre sus enlaces.
+  Eso es el comportamiento del diálogo, no un atajo de navegación.
 
 ---
 

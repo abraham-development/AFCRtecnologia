@@ -5,7 +5,7 @@ artificial y automatización avanzada con base en Lima, Perú.
 
 Estética editorial tecnológica: fondo azul medianoche, acento cian, contraste
 tipográfico radical (serif de gran formato + microtipografía monoespaciada),
-WebGL atmosférico, microinteracciones magnéticas y atajos de teclado operativos.
+WebGL atmosférico y microinteracciones magnéticas.
 
 ---
 
@@ -79,10 +79,10 @@ src/
 │   ├── effects/             Preloader, CustomCursor, WebGLHeroBackground,
 │   │                        ParticleText, ReadingProgress
 │   ├── sections/            01-Hero … 09-Contact
-│   └── ui/                  ButtonMagnetic, SectionBadge, KeyBadge,
+│   └── ui/                  ButtonMagnetic, SectionBadge,
 │                            HorizontalMarquee, Toast
 ├── content/                 todo el copy y los datos (sin texto en los componentes)
-├── hooks/                   useKeyboardShortcut, useScrollProgress,
+├── hooks/                   useScrollProgress,
 │                            useMediaQuery, useMousePosition
 ├── lib/                     utils (scroll, lerp, WebGL) y validations (Zod)
 └── types/                   contratos de datos

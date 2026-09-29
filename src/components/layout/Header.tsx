@@ -2,21 +2,19 @@
 
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import FullscreenMenu from '@/components/layout/FullscreenMenu';
 import BrandIcon from '@/components/ui/BrandIcon';
 import BrandLogo from '@/components/ui/BrandLogo';
-import { agency, CONTACT_FORM_HREF, hasWhatsApp, headerCopy, navItems, whatsappUrl } from '@/content/agency';
-import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
+import { agency, hasWhatsApp, headerCopy, navItems, whatsappUrl } from '@/content/agency';
 import { cn } from '@/lib/utils';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const toggleRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -25,22 +23,6 @@ export function Header() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  /* Atajos globales: E -> formulario de contacto (con foco), S -> servicios */
-  useKeyboardShortcut('e', () => {
-    setMenuOpen(false);
-    if (pathname === '/contacto') {
-      document.getElementById('formulario')?.scrollIntoView({ behavior: 'smooth' });
-      document.getElementById('contact-name')?.focus({ preventScroll: true });
-      return;
-    }
-    router.push(CONTACT_FORM_HREF);
-  });
-
-  useKeyboardShortcut('s', () => {
-    setMenuOpen(false);
-    router.push('/servicios');
-  });
 
   /** Una ruta esta activa si coincide exacta (Home) o es su prefijo. */
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));

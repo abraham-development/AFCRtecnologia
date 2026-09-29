@@ -9,7 +9,7 @@ import { HEADER_OFFSET, scrollToSection, scrollToTop } from '@/lib/utils';
 
 /**
  * Scroll suave global (Lenis). Se expone en `window.__afcrLenis`
- * para que el menu y los atajos de teclado puedan controlarlo.
+ * para que el menu pueda controlarlo.
  * Con `prefers-reduced-motion` no se instancia: scroll nativo.
  */
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
