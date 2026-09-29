@@ -11,13 +11,10 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "build:static": "BUILD_TARGET=static NEXT_PUBLIC_CONTACT_ENDPOINT=/contact.php next build",
-    "package:static": "npm run build:static && node scripts/package-static.mjs",
-    "mcp:token": "node scripts/mcp-token.mjs"
+    "package:static": "npm run build:static && node scripts/package-static.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
-    "@modelcontextprotocol/sdk": "^1.30.1",
-    "@supabase/supabase-js": "^2.117.2",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
@@ -30,7 +27,6 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-hook-form": "^7.88.0",
-    "server-only": "^0.0.1",
     "tailwindcss": "^4.3.3",
     "three": "^0.186.0",
     "typescript": "^5.9.0",

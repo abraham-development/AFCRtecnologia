@@ -57,33 +57,22 @@ export interface NavItem {
   meta: string;
 }
 
-/** Categorias validas: la base de datos las restringe con el mismo `check`. */
-export const NEWS_CATEGORIES = ['IA', 'Automatización', 'Software', 'Negocio'] as const;
-export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
+/** Tipos de recurso de la seccion Recursos (Home). */
+export const RESOURCE_KINDS = ['Software', 'Agente de IA', 'Recurso'] as const;
+export type ResourceKind = (typeof RESOURCE_KINDS)[number];
 
-/** Nota de la seccion Noticias (escrita por AFCR). */
-/** Un mes del archivo de noticias: «2026-09» → «Septiembre 2026». */
-export interface NewsMonth {
-  /** AAAA-MM; tambien es el segmento de `/noticias/mes/[month]`. */
-  key: string;
-  label: string;
-  count: number;
-}
-
-export interface NewsPost {
+/** Un desarrollo propio de AFCR: software, agente de IA u otro recurso. */
+export interface Resource {
   slug: string;
-  title: string;
-  excerpt: string;
-  category: NewsCategory;
-  /** Fecha ISO (AAAA-MM-DD). */
-  date: string;
-  readingTime: string;
-  /** Parrafos del cuerpo; los que empiezan por «## » se muestran como subtitulo. */
-  body: string[];
-  /** ⚠ Nota de ejemplo para ver el diseño: se muestra con etiqueta EJEMPLO. */
+  kind: ResourceKind;
+  name: string;
+  description: string;
+  /** Enlace externo (demo, repositorio, descarga). Sin el, la ficha lleva al formulario de contacto. */
+  href?: string;
+  /** Texto del enlace; por defecto `resourcesCopy.contactCta`. */
+  cta?: string;
+  /** ⚠ Ficha de ejemplo para ver el diseño: se muestra con etiqueta EJEMPLO. */
   sample?: boolean;
-  /** Foto de portada opcional (Supabase Storage). Sin ella se usa la portada tipografica. */
-  cover?: { src: string; alt: string };
 }
 
 export type SubmitState = 'idle' | 'loading' | 'success' | 'error';

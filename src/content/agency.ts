@@ -98,7 +98,7 @@ export const socialLinks: SocialLink[] = [
 
 /** Navegacion principal: navbar, menu fullscreen y footer (una ruta por item). */
 export const navItems: NavItem[] = [
-  { index: '01', label: 'Home', href: '/', meta: 'Inicio y noticias' },
+  { index: '01', label: 'Home', href: '/', meta: 'Inicio y recursos' },
   { index: '02', label: 'Servicios', href: '/servicios', meta: 'Diez servicios' },
   { index: '03', label: 'Nosotros', href: '/nosotros', meta: 'Quiénes somos' },
   { index: '04', label: 'Contáctanos', href: '/contacto', meta: 'Respuesta < 24 h' },

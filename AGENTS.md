@@ -62,7 +62,7 @@ producto salvo petición explícita.
 
 ## Estado estable actual — verificado en código el 2026-09-28
 
-- El sitio tiene Home, Servicios, Nosotros, Contáctanos y notas individuales.
+- El sitio tiene Home, Servicios, Nosotros y Contáctanos; todas son estáticas.
 - El logotipo oficial es la imagen entregada por la empresa
   (`recursos_internos/Logotipo.png`, placa oscura y wordmark marfil). `BrandLogo`
   lo muestra en header, footer y preloader con un `<img srcSet>` sobre
@@ -111,33 +111,22 @@ producto salvo petición explícita.
 - `RootLayout` usa `suppressHydrationWarning` tanto en `<html>` como en
   `<body>`. El segundo evita falsos positivos cuando una extensión modifica la
   clase del body antes de hidratar (caso observado: `expansion-alids-init`).
-- Las noticias viven en Supabase (`news_posts`) y se publican con el **MCP del
-  sitio** (`/api/mcp`, guía de conexión en `docs/mcp.md`), no editando código ni
-  con un panel: decisión del usuario. `src/content/news.ts` queda solo como
-  respaldo (sin claves de Supabase: build estático o dev) y fue el seed inicial.
-  Las cinco notas de ejemplo siguen en la tabla con `sample = true`. La nota
-  mockup sobre SIRE/SUNAT fue eliminada intencionalmente; no reintroducirla sin
-  pedido. SUNAT sigue siendo un servicio confirmado.
-- La sección se titula «Información relevante y actualizada de inteligencia
-  artificial y tecnología». Ese título está al pie del hero, entre dos líneas editoriales,
-  en el lugar de la franja BASE / ENFOQUE / RESPUESTA y del salto «NOTICIAS»,
-  que se retiraron: no reintroducirlos. No lleva bajada ni filtros por
-  categoría. Justo debajo van solo las últimas `NEWS_HOME_LIMIT` (5) notas,
-  una por una, de la más reciente a la más antigua; «Noticias por mes»
-  (pedido del usuario) enlaza cada mes con notas a `/noticias/mes/AAAA-MM`, que
-  lista todas las de ese mes con el mismo archivo. Desde `lg` es una columna
-  derecha fija; por debajo es un botón desplegable con flecha **antes** de las
-  notas (al final nadie lo veía), que en una página de mes muestra ese mes. No
-  usar icono de hamburguesa ahí: se confunde con el menú principal. Las notas usan la misma card: portada sola a la izquierda y, al costado, la
-  metadata de la nota (fecha y, debajo, el autor «El equipo de AFCRtecnologia»
-  en todas las notas de ahora), título, resumen, categoría y lectura. La más reciente
-  lleva la etiqueta «Más reciente».
-- La portada es generada, no fotográfica: la palabra de categoría en Fraunces,
-  gigante y recortada, sobre un panel con grano. Es decisión del usuario; no
-  sustituirla por fotos de stock. Se usa fecha absoluta y no «hace X días»,
-  porque un texto relativo se congelaría en el build y quedaría falso.
-- Las notas restantes llevan `sample: true` y muestran «EJEMPLO»: no deben
-  presentarse como publicaciones reales de AFCR.
+- Noticias y MCP eliminados por decisión del usuario (2026-09-29): no existen
+  `/noticias/*`, `/api/mcp`, ni el código de Supabase del sitio, y los tokens
+  `afcr_…` quedaron revocados en `agent_tokens`. Las tablas (`news_posts`,
+  `agent_tokens`) y el bucket `news-covers` siguen en Supabase sin uso; las
+  migraciones de `supabase/` documentan ese esquema. No reintroducir noticias
+  ni el MCP sin pedido.
+- En su lugar, la Home muestra «RECURSOS»: desarrollos propios (software,
+  agentes de IA y otros recursos). El título va al pie del hero, entre dos
+  líneas editoriales, en mayúsculas por CSS y con una bajada; la franja BASE /
+  ENFOQUE / RESPUESTA no se reintroduce. Debajo, fichas en grilla (1/2/3
+  columnas): tipo, nombre, descripción y enlace. Sin página propia por recurso
+  (decisión del usuario): con `href` la ficha abre el enlace externo; sin él,
+  lleva al formulario de contacto. Contenido en `src/content/resources.ts`.
+- Las tres fichas actuales son ejemplos (`sample: true`, etiqueta «EJEMPLO»)
+  hasta que el usuario entregue sus desarrollos reales: no presentarlas como
+  productos reales ni inventar reemplazos.
 
 ---
 
@@ -145,24 +134,15 @@ producto salvo petición explícita.
 
 | Ruta | Contenido | Implementación principal |
 | --- | --- | --- |
-| `/` | Hero de partículas + Noticias | `src/components/home/` |
+| `/` | Hero de partículas + Recursos | `src/components/home/` |
 | `/servicios` | Directorio de 10 servicios, sin conteo junto a cada categoría | `src/components/services/` |
 | `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
-| `/noticias/[slug]` | Nota publicada: `page.node.tsx` (dinámica) / `page.static.tsx` (export) | `src/lib/news/news-route.tsx` |
-| `/noticias/mes/[month]` | Archivo de un mes (`AAAA-MM`); mismo par `.node`/`.static` y `loading.tsx` | `src/lib/news/news-month-route.tsx` |
-| `/noticias/vista-previa/[token]` | Borrador privado, `noindex`, solo build Node | `page.node.tsx` |
-| `/api/mcp` | MCP de noticias para agentes, solo build Node | `route.node.ts` |
 
-- Las páginas institucionales se prerenderizan. Con Supabase, Home, cada nota,
-  cada mes del archivo y `sitemap.xml` son dinámicas (leen la base en cada visita); todo funciona
-  también con `build:static`, que prerenderiza las notas de respaldo.
-  `/api/contact` y `/api/mcp` solo existen en el build Node.
+- Todas las páginas y `sitemap.xml` se prerenderizan. `/api/contact` solo
+  existe en el build Node.
 - Cada página exporta `metadata`. El sitemap (`src/lib/seo/sitemap.ts`) deriva
-  rutas desde `navItems`, las notas publicadas y sus meses. Un mes inválido o
-  sin notas es un 404 «suave» (HTTP 200 + `noindex`): `loading.tsx` ya empezó
-  el streaming; es el precio de que la navegación al mes sea instantánea. El tiempo de lectura se
-  calcula del cuerpo (~200 palabras/min); no se escribe a mano.
+  sus rutas de `navItems`.
 - La navegación usa `next/link`. Las anclas entre páginas llevan ruta y hash,
   por ejemplo `/servicios#ia`; `SmoothScrollProvider` gestiona inicio/ancla.
 - Copy y datos editables viven en `src/content/*.ts`; contratos en
@@ -180,11 +160,8 @@ producto salvo petición explícita.
 | Logotipo web | `src/components/ui/BrandLogo.tsx` |
 | Empresa, navegación y contacto | `src/content/agency.ts` |
 | Catálogo de servicios | `src/content/services.ts` |
-| Noticias: lectura y caché (tag `news`) | `src/lib/news/repository.ts` |
-| MCP: auth por token y herramientas | `src/lib/mcp/` · `src/app/api/mcp/route.node.ts` |
-| Guía editorial que reciben los agentes | `src/content/news-editorial.ts` |
-| Esquema Supabase, RLS y bucket | `supabase/migrations/` · `supabase/seed.sql` |
-| Notas de respaldo | `src/content/news.ts` |
+| Recursos (Home) | `src/content/resources.ts` · `src/components/home/ResourcesSection.tsx` |
+| Esquema Supabase sin uso (noticias/MCP retirados) | `supabase/migrations/` · `supabase/seed.sql` |
 | Validación compartida | `src/lib/validations.ts` |
 | Endpoint Node | `src/app/api/contact/route.node.ts` |
 | Fallback PHP estático | `public/contact.php` |
@@ -202,8 +179,6 @@ npm run build:hostinger # servidor Node con webpack; producción real
 npm run start           # sirve .next
 npm run build:static    # export alternativo → out/
 npm run package:static  # export + ZIP para hosting sin Node
-npm run mcp:token -- create|list|revoke --name "Agente"  # tokens del MCP
-AFCR_MCP_TOKEN=… node scripts/mcp-smoke.mjs --url http://localhost:3000
 ```
 
 Node local 22 · Node Hostinger 24 · npm. No usar pnpm.
@@ -219,8 +194,6 @@ Node local 22 · Node Hostinger 24 · npm. No usar pnpm.
 | Zod | 4.6.5 | esquema cliente/servidor |
 | React Hook Form | 7.88.0 | resolver 5.9.1 |
 | TypeScript | 5.9.3 | modo estricto |
-| MCP SDK | 1.30.x | transporte web-standard sin estado |
-| supabase-js | 2.117.x | solo servidor, clave secreta |
 
 ---
 
@@ -280,14 +253,10 @@ Reglas críticas:
 `BUILD_TARGET=static` activa `output: 'export'`, genera `out/`, desactiva el
 route handler y usa `/contact.php`. Mantener estas condiciones:
 
-- Lo que exige servidor lleva extensión `.node.ts(x)` (`/api/contact`,
-  `/api/mcp`, vista previa de borradores); `pageExtensions` las excluye del modo
-  estático. Ese build muestra las notas publicadas al compilar (o el respaldo).
-- `robots.ts` conserva `dynamic = 'force-static'`. El sitemap y la página de
-  cada nota tienen dos archivos: `.node.ts(x)` (dinámico) y `.static.ts(x)`
-  (`force-static` / `generateStaticParams`); `pageExtensions` elige uno por
-  build. Next no acepta estas extensiones en el archivo de metadatos
-  `sitemap.ts`, por eso el sitemap es un route handler en `sitemap.xml/`.
+- Lo que exige servidor lleva extensión `.node.ts(x)` (hoy solo
+  `/api/contact`); `pageExtensions` la excluye del modo estático.
+- `robots.ts` y `sitemap.xml/route.ts` conservan `dynamic = 'force-static'`,
+  que exige `output: 'export'`.
 - `headers()` solo se declara en modo Node; Apache usa `public/.htaccess`.
 - `NEXT_PUBLIC_CONTACT_ENDPOINT` vale `/api/contact` por defecto y el script
   estático lo fija en `/contact.php`.
@@ -312,44 +281,22 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   existe, pero la interfaz actual no muestra el teléfono.
 - No hay `.env.example` (el usuario lo retiró a propósito). Variables:
   `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_PHONE_DISPLAY`,
-  `NEXT_PUBLIC_WHATSAPP_NUMBER`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY` y,
-  opcionales, `CONTACT_WEBHOOK_URL`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
+  `NEXT_PUBLIC_WHATSAPP_NUMBER` y, opcionales, `CONTACT_WEBHOOK_URL`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
   `CONTACT_FROM_EMAIL`. En Hostinger se cargan en hPanel; la API de variables
   hace un reemplazo total y devuelve valores enmascarados.
 - `NEXT_PUBLIC_*` se incrusta en el HTML. Cambiar esas variables exige un build
   nuevo, no solo reiniciar la app.
 - Datos aún marcadores: correo y dirección en `src/content/agency.ts`; URLs de
   Facebook, Instagram y LinkedIn; páginas legales del footer.
-- `SUPABASE_URL` y `SUPABASE_SECRET_KEY` (o `SUPABASE_SERVICE_ROLE_KEY`, o
-  `SUPABASE_API_KEY` si contiene una clave secreta: es el nombre que impone la
-  integración de Supabase de hPanel, que además reemplazó una vez todo el
-  conjunto de variables y borró `SUPABASE_SECRET_KEY`) son solo de servidor: nunca `NEXT_PUBLIC_`. `src/lib/supabase/server.ts` importa
-  `server-only`. Hostinger las necesita en build y runtime.
-- MCP de noticias: tokens `afcr_…` por agente; en `agent_tokens` solo se guarda
-  su SHA-256. Las tablas tienen RLS **sin políticas** y sin privilegios para
-  `anon`/`authenticated`: no añadir lectura pública, porque expondría
-  borradores y `preview_token`. El bucket `news-covers` es público de solo
-  lectura (5 MB, JPEG/PNG/WebP).
-- `getPublishedNews()` propaga los errores de Supabase a propósito: mejor un
-  error visible que una sección de noticias vacía que parezca correcta.
-- Trampa verificada en producción: Hostinger corre **varios procesos Node** y
-  no completa el trabajo que Next deja en segundo plano. Resultado probado:
-  `revalidateTag` solo refrescaba un proceso y el ISR por tiempo
-  (stale-while-revalidate) se quedaba en `STALE` sirviendo notas ya borradas.
-  Por eso las rutas de noticias no usan caché de Next: `getPublishedNews()`
-  llama a `connection()` (ruta dinámica) y guarda la lista 10 s por proceso
-  (`NEWS_MEMO_MS`); el MCP limpia esa memoria con `invalidateNewsMemo()`. Un
-  cambio se ve en todo el sitio en ≤ 10 s. No volver a `unstable_cache`, ISR
-  ni `revalidateTag` para noticias sin un `cacheHandler` compartido (Redis).
-- Consecuencia verificada: al ser dinámica, Next no precarga Home y cada vuelta
-  al inicio esperaba al servidor (lento en celular). Por eso el `<Link>` del
-  logotipo del header lleva `prefetch` (precarga completa, caché cliente de
-  5 min) y `page.tsx` deja solo las noticias dentro de `<Suspense>`, para que
-  el hero no espere a Supabase. No quitar ninguno de los dos. Recargar la
-  página siempre trae la lista actual.
-- Las notas de ejemplo llevan `sample = true`. No inventar métricas, clientes,
-  testimonios, precios, plazos ni resultados; la guía editorial del MCP lo
-  exige a los agentes. Ver `PRODUCT.md` antes de tocar afirmaciones comerciales.
+- Las variables `SUPABASE_*` de hPanel ya no las usa el sitio; pueden
+  retirarse allí (recordar que la API de variables reemplaza el conjunto).
+- Trampa verificada en producción, útil si vuelve algún contenido dinámico:
+  Hostinger corre **varios procesos Node** y no completa el trabajo que Next
+  deja en segundo plano: `revalidateTag` solo refrescaba un proceso y el ISR
+  por tiempo se quedaba en `STALE`. Además, Next no precarga una página
+  dinámica sin `loading.tsx`, así que navegar a ella espera al servidor.
+- No inventar métricas, clientes, testimonios, precios, plazos ni resultados.
+  Ver `PRODUCT.md` antes de tocar afirmaciones comerciales.
 
 ---
 

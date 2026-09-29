@@ -7,8 +7,8 @@ import { useEffect, useSyncExternalStore } from 'react';
 import ParticleText from '@/components/effects/ParticleText';
 import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
 import { agency, CONTACT_FORM_HREF } from '@/content/agency';
-import { newsCopy } from '@/content/news';
 import { homeCopy } from '@/content/pages';
+import { resourcesCopy } from '@/content/resources';
 import { isAppReady, markAppReady, subscribeAppReady } from '@/lib/utils';
 
 /** Three.js solo en cliente: fuera del bundle inicial y del HTML del servidor. */
@@ -122,22 +122,23 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Pie del hero: el titulo de noticias ocupa el lugar de la franja de datos. */}
+      {/* Pie del hero: el titulo de Recursos ocupa el lugar de la franja de datos. */}
       <motion.div
-        id="noticias"
+        id="recursos"
         initial="hidden"
         animate={animate}
         variants={rise}
         custom={0.8}
         className="shell relative z-10 scroll-mt-28"
       >
-        <div className="border-border-editorial border-y py-8 md:py-9">
+        <div className="border-border-editorial border-y py-8 text-center md:py-9">
           <h2
-            id="noticias-title"
-            className="mx-auto max-w-5xl font-serif text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08] font-light tracking-[-0.03em] text-balance text-center"
+            id="recursos-title"
+            className="font-serif text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08] font-light tracking-[0.04em] uppercase"
           >
-            {newsCopy.sectionTitle}
+            {resourcesCopy.sectionTitle}
           </h2>
+          <p className="text-text-secondary mx-auto mt-3 max-w-xl text-balance">{resourcesCopy.lede}</p>
         </div>
       </motion.div>
     </section>

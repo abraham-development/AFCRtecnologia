@@ -1,9 +1,9 @@
 /**
  * Textos propios de cada pagina (cabeceras, metadatos y CTA).
- * El contenido de catalogo vive en `services.ts`, `news.ts` y `agency.ts`.
+ * El contenido de catalogo vive en `services.ts`, `resources.ts` y `agency.ts`.
  */
 
-/** Home: hero + noticias. */
+/** Home: hero + recursos. */
 export const homeCopy = {
   /** El titular se dibuja con particulas palabra a palabra (una fila por linea). */
   headline: [
@@ -36,9 +36,6 @@ export const pageIntros = {
     metaTitle: 'Contáctanos',
     metaDescription:
       'Escríbenos por WhatsApp o déjanos tu mensaje: te respondemos en menos de 24 horas hábiles.',
-  },
-  news: {
-    metaTitle: 'Noticias',
   },
 };
 

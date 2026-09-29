@@ -47,11 +47,10 @@ Servicios confirmados (2026-09-24):
 10. Venta de dispositivos tecnológicos
 
 Estructura del sitio (2026-09-24): una página por ítem del navbar —Home,
-Servicios, Nosotros, Contáctanos— más notas de noticias en `/noticias/<slug>`.
-Las noticias sobre IA y tecnología las redacta AFCR con sus agentes de IA
-(Claude Code, Codex, Cursor, Antigravity) a través del MCP del sitio (`docs/mcp.md`): borrador
-con vista previa privada y publicación solo con aprobación humana. Las cinco
-notas iniciales son ejemplos (`sample`).
+Servicios, Nosotros, Contáctanos. La Home muestra «Recursos»: desarrollos
+propios de AFCR (software, agentes de IA y otros recursos). Las fichas actuales
+son ejemplos (`sample`) hasta tener los desarrollos reales. La sección de
+noticias y su MCP se retiraron el 2026-09-29.
 Restricciones técnicas en `AGENTS.md`.
 
 ## Brand Commitments

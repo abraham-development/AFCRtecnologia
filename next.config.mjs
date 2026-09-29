@@ -13,12 +13,10 @@
  *  - `npm run build:static`              → export estático para hosting sin Node,
  *                                          con `public/contact.php` como endpoint.
  *
- * Lo que solo existe con servidor lleva extensión `.node.ts(x)`: los route
- * handlers (`/api/contact`, `/api/mcp`) y la vista previa de borradores. Solo
- * se registran cuando `pageExtensions` las incluye, es decir, fuera del modo
- * estático (Next no admite rutas dinámicas con `output: 'export'`). A la
- * inversa, `.static.ts(x)` solo existe en el export (hoy, el sitemap y la
- * página de cada nota).
+ * Lo que solo existe con servidor lleva extensión `.node.ts(x)` (hoy, el route
+ * handler `/api/contact`). Solo se registra cuando `pageExtensions` la incluye,
+ * es decir, fuera del modo estático. A la inversa, `.static.ts(x)` solo existe
+ * en el export.
  */
 
 const isStatic = process.env.BUILD_TARGET === 'static';
