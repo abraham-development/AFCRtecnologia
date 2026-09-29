@@ -4,7 +4,6 @@ import localFont from 'next/font/local';
 
 import './globals.css';
 
-import CustomCursor from '@/components/effects/CustomCursor';
 import Preloader from '@/components/effects/Preloader';
 import ReadingProgress from '@/components/effects/ReadingProgress';
 import Footer from '@/components/layout/Footer';
@@ -168,7 +167,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
 
         <Preloader />
-        <CustomCursor />
         <ReadingProgress />
 
         <SmoothScrollProvider>

@@ -105,10 +105,16 @@ producto salvo petición explícita.
 - En Servicios, las cuatro categorías principales forman un índice vertical:
   una categoría por fila a cualquier ancho. No volver a presentarlas en grilla
   ni añadir conteos junto a sus nombres.
-- El cursor personalizado es una flecha de alto contraste de 20 × 24 px. Tiene
-  halo cian solo sobre controles interactivos, conserva el hotspot exacto,
-  vuelve al cursor nativo en campos de texto y se desactiva con puntero táctil
-  o `prefers-reduced-motion`.
+- El cursor personalizado es una flecha de alto contraste de 20 × 24 px (negra
+  con borde claro); sobre enlaces, botones y `[data-cursor="expand"]` pasa a
+  verde con halo. Es una **imagen de cursor nativa** en CSS (`globals.css`,
+  `@layer base`), no un elemento movido con JavaScript: el usuario lo notaba
+  pesado porque un cursor pintado por JS siempre va 1–2 cuadros detrás del
+  sistema y compite con el WebGL. No volver a un cursor JS. Fuentes SVG en
+  `public/cursors/`; si cambian, regenerar los PNG 1x/2x (Chrome headless) y
+  los hotspots (punta: 3 3 y 7 7). El de enlace no debe pasar de 32 × 32 px:
+  Chrome descarta cursores mayores cerca de la interfaz del navegador. En
+  campos de texto vuelve el cursor de sistema.
 - `RootLayout` usa `suppressHydrationWarning` tanto en `<html>` como en
   `<body>`. El segundo evita falsos positivos cuando una extensión modifica la
   clase del body antes de hidratar (caso observado: `expansion-alids-init`).
@@ -156,7 +162,7 @@ producto salvo petición explícita.
 | Layout, metadata y JSON-LD | `src/app/layout.tsx` |
 | Tokens, Tailwind y estilos globales | `src/app/globals.css` |
 | Header, menú, footer y scroll | `src/components/layout/` |
-| Cursor, preloader, partículas, WebGL | `src/components/effects/` |
+| Preloader, partículas, WebGL | `src/components/effects/` |
 | Microinteracciones compartidas | `src/components/ui/` |
 | Logotipo web | `src/components/ui/BrandLogo.tsx` |
 | Empresa, navegación y contacto | `src/content/agency.ts` |
@@ -318,7 +324,8 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 - Canvas y WebGL se pausan con `document.hidden` e `IntersectionObserver`.
 - `WebGLHeroBackground` apaga niebla y reduce partículas si no sostiene
   aproximadamente 40 FPS. No retirar esa degradación.
-- `prefers-reduced-motion` desactiva Lenis, cursor, partículas y preloader.
+- `prefers-reduced-motion` desactiva Lenis, partículas y preloader (el cursor
+  es una imagen estática y se mantiene).
 - Para contener el ancho usar `overflow-x: clip`, no `hidden`, porque este
   último rompe `position: sticky`.
 
@@ -336,9 +343,9 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 
 ### Tailwind v4
 
-- `scale-*` y `translate-*` usan propiedades CSS independientes. En
-  `CustomCursor`, el wrapper posee `translate3d(...)` y el hijo recibe escala o
-  rotación; no unir ambas responsabilidades.
+- `scale-*` y `translate-*` usan propiedades CSS independientes: un elemento
+  que se mueve con `transform` y además escala o rota necesita un wrapper para
+  cada responsabilidad.
 - Una `@utility` propia nunca declara `position`. `noise` solo pinta grano en
   `::after`; el consumidor aporta su posición.
 - Las carpetas de agentes están excluidas con `@source not` para impedir que

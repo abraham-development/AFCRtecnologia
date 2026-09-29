@@ -146,21 +146,37 @@ html.lenis body {
   pointer-events: none;
 }
 
-/* Cursor propio: ocultamos el nativo solo cuando el custom esta activo.
-   En campos de texto vuelve el cursor de sistema para poder editar. */
-html.afcr-cursor,
-html.afcr-cursor * {
-  cursor: none !important;
-}
+/* Cursor propio como imagen de cursor NATIVA: lo dibuja el sistema operativo,
+   asi que no tiene el retraso de uno pintado con JavaScript (se sentia pesado).
+   Flecha de 20 x 24 px con borde claro; sobre controles interactivos, flecha
+   verde con halo. Hotspot = la punta. Fuentes SVG en `public/cursors/`; los PNG
+   1x/2x se rasterizan desde ellos. Van en `base` para que utilidades como
+   `disabled:cursor-not-allowed` sigan ganando. */
+@layer base {
+  html,
+  html * {
+    cursor: url('/cursors/arrow.png') 3 3, default;
+    cursor: -webkit-image-set(url('/cursors/arrow.png') 1x, url('/cursors/arrow@2x.png') 2x) 3 3, default;
+    cursor: image-set(url('/cursors/arrow.png') 1x, url('/cursors/arrow@2x.png') 2x) 3 3, default;
+  }
 
-html.afcr-cursor :is(input, textarea, [contenteditable='true']),
-html.afcr-cursor :is(input, textarea, [contenteditable='true']) * {
-  cursor: text !important;
-}
+  :is(a[href], button:not(:disabled), summary, [data-cursor='expand']),
+  :is(a[href], button:not(:disabled), summary, [data-cursor='expand']) * {
+    cursor: url('/cursors/arrow-link.png') 7 7, pointer;
+    cursor: -webkit-image-set(url('/cursors/arrow-link.png') 1x, url('/cursors/arrow-link@2x.png') 2x) 7 7, pointer;
+    cursor: image-set(url('/cursors/arrow-link.png') 1x, url('/cursors/arrow-link@2x.png') 2x) 7 7, pointer;
+  }
 
-html.afcr-cursor select,
-html.afcr-cursor select * {
-  cursor: auto !important;
+  /* En campos de texto vuelve el cursor de sistema para poder editar. */
+  :is(input, textarea, [contenteditable='true']),
+  :is(input, textarea, [contenteditable='true']) * {
+    cursor: text;
+  }
+
+  :is(input[type='checkbox'], input[type='radio'], input[type='submit'], input[type='button'], select),
+  select * {
+    cursor: auto;
+  }
 }
 
 /* ========================================================================== */
