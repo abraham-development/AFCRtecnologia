@@ -90,7 +90,9 @@ producto salvo petición explícita.
   transparente sobre el hero): token `--color-bg-header` (`#1a2539`, pizarra
   algo más clara que el hero, pedido del usuario) al 95 % con grano y blur en
   todo el `<header>`. La placa del logotipo conserva su propio fondo oscuro. El navbar no lleva fondo propio (el usuario pidió un único color);
-  solo lo delimitan sus líneas `border-editorial` superior e inferior.
+  solo lo delimitan sus líneas `border-editorial` superior e inferior. La
+  página activa se marca con un contorno cian alrededor de su nombre, sin
+  subrayado.
 - El texto del CTA del header es «Contacta con un asesor por WhatsApp» y abre
   `wa.me` en una pestaña nueva. La estructura y el contenido del menú
   fullscreen no se alteran al retocar la hamburguesa.

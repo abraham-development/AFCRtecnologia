@@ -115,14 +115,12 @@ export function Header() {
                     )}
                   >
                     {link.label}
-                    {/* Pagina actual: barra cian apoyada sobre la linea inferior del navbar */}
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        'bg-accent-cyan absolute right-0 -bottom-px left-0 h-0.5 origin-left transition-[scale,opacity] duration-500 ease-(--ease-editorial)',
-                        active ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-60 group-hover:scale-x-100',
-                      )}
-                    />
+                    {active ? (
+                      <span
+                        aria-hidden="true"
+                        className="border-accent-cyan pointer-events-none absolute -inset-x-1 inset-y-1.5 border"
+                      />
+                    ) : null}
                   </Link>
                 </li>
               );
