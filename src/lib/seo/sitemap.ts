@@ -1,6 +1,6 @@
 import { navItems } from '@/content/agency';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://afcrtecnologia.com';
+import { resourceArticles, resourceHref } from '@/content/resources';
+import { siteUrl } from '@/lib/seo/site-url';
 
 const escapeXml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -12,12 +12,20 @@ const escapeXml = (value: string) =>
  */
 export function sitemapResponse(): Response {
   const today = new Date().toISOString().slice(0, 10);
-  const entries = navItems.map((item) => ({
-    loc: `${siteUrl}${item.href === '/' ? '' : item.href}`,
-    lastmod: today,
-    changefreq: 'monthly',
-    priority: item.href === '/' ? '1' : '0.8',
-  }));
+  const entries = [
+    ...navItems.map((item) => ({
+      loc: `${siteUrl}${item.href === '/' ? '' : item.href}`,
+      lastmod: today,
+      changefreq: 'monthly',
+      priority: item.href === '/' ? '1' : '0.8',
+    })),
+    ...resourceArticles.map((article) => ({
+      loc: `${siteUrl}${resourceHref(article.slug)}`,
+      lastmod: today,
+      changefreq: 'yearly',
+      priority: '0.6',
+    })),
+  ];
 
   const xml = [
     '<?xml version="1.0" encoding="UTF-8"?>',

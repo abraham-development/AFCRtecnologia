@@ -62,7 +62,8 @@ producto salvo petición explícita.
 
 ## Estado estable actual — verificado en código el 2026-09-28
 
-- El sitio tiene Home, Servicios, Nosotros y Contáctanos; todas son estáticas.
+- El sitio tiene Home, Servicios, Nosotros, Contáctanos y 8 artículos en
+  `/recursos/[slug]`; todas las páginas son estáticas.
 - El logotipo oficial es la imagen entregada por la empresa
   (`recursos_internos/Logotipo.png`, placa oscura y wordmark marfil). `BrandLogo`
   lo muestra en header, footer y preloader con un `<img srcSet>` sobre
@@ -124,16 +125,31 @@ producto salvo petición explícita.
   `agent_tokens`) y el bucket `news-covers` siguen en Supabase sin uso; las
   migraciones de `supabase/` documentan ese esquema. No reintroducir noticias
   ni el MCP sin pedido.
-- En su lugar, la Home muestra «RECURSOS»: desarrollos propios (software,
-  agentes de IA y otros recursos). El título va al pie del hero, entre dos
-  líneas editoriales, en mayúsculas por CSS y con una bajada; la franja BASE /
-  ENFOQUE / RESPUESTA no se reintroduce. Debajo, fichas en grilla (1/2/3
-  columnas): tipo, nombre, descripción y enlace. Sin página propia por recurso
-  (decisión del usuario): con `href` la ficha abre el enlace externo; sin él,
-  lleva al formulario de contacto. Contenido en `src/content/resources.ts`.
-- Las tres fichas actuales son ejemplos (`sample: true`, etiqueta «EJEMPLO»)
-  hasta que el usuario entregue sus desarrollos reales: no presentarlas como
-  productos reales ni inventar reemplazos.
+- En su lugar, la Home muestra «RECURSOS» (pedido del usuario, 2026-10-01):
+  8 artículos, uno por servicio, que explican el problema y la solución y solo
+  invitan a contactar en el cierre (promoción indirecta). Temas, en este orden:
+  RAG, agente de IA para WhatsApp, automatizaciones, agentes de IA
+  personalizados, páginas web, capacitaciones, software a medida y venta de
+  dispositivos (mini PC y cámaras de seguridad). El título va al pie del hero,
+  entre dos líneas editoriales, en mayúsculas por CSS y con una bajada.
+  Debajo, un artículo por fila con la card editorial: portada a la izquierda
+  (alto fijo de 240 px, `h-60`, pedido del usuario; no volver a 4:3) y
+  autor «Equipo de AFCRtecnologia», título, resumen, tema y lectura. **Sin
+  fecha** (decisión del usuario: son atemporales). Cada card abre
+  `/recursos/[slug]` con el texto completo, «Sigue leyendo» y `CtaBand`.
+- El artículo de RAG es texto del usuario (2026-10-01): no reescribirlo sin
+  pedido. Su cuerpo usa la sintaxis completa de `ResourceArticle.body`
+  (`##`, `###`, `- `, `1. `, tabla con `| ` y `**negrita**`); la tabla se
+  muestra apilada por fila en celular y completa desde `sm`.
+- Portadas: las entrega el usuario. Se exportan desde el original con PIL a
+  `public/recursos/<name>-{800,1600,<ancho original>}.webp` (q 84, compuestas
+  sobre blanco si traen alfa) y `<name>-og.jpg` de 1200 px para redes; en el
+  artículo se añade `cover: { name, alt, width, height }`. En la card se
+  recortan al centro (240 px de alto, imagen decorativa); en el artículo van
+  enteras con su proporción y un enlace a tamaño completo. Sin portada,
+  `ResourceCover` muestra la tipográfica (tema en Fraunces, recortado, con
+  grano). No usar fotos de stock.
+- Los artículos no inventan clientes, métricas, precios ni plazos.
 
 ---
 
@@ -141,15 +157,18 @@ producto salvo petición explícita.
 
 | Ruta | Contenido | Implementación principal |
 | --- | --- | --- |
-| `/` | Hero de partículas + Recursos | `src/components/home/` |
+| `/` | Hero de partículas + Recursos (8 artículos) | `src/components/home/` |
+| `/recursos/[slug]` | Artículo completo; `generateStaticParams` en ambos builds | `src/app/recursos/[slug]/page.tsx` · `src/components/resources/` |
 | `/servicios` | Directorio de 10 servicios, sin conteo junto a cada categoría | `src/components/services/` |
 | `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
 
 - Todas las páginas y `sitemap.xml` se prerenderizan. `/api/contact` solo
   existe en el build Node.
-- Cada página exporta `metadata`. El sitemap (`src/lib/seo/sitemap.ts`) deriva
-  sus rutas de `navItems`.
+- Cada página exporta `metadata`; cada artículo además publica JSON-LD
+  `Article`. El sitemap (`src/lib/seo/sitemap.ts`) deriva sus rutas de
+  `navItems` y de los artículos. `siteUrl` vive en `src/lib/seo/site-url.ts`.
+  El tiempo de lectura se calcula del cuerpo (~200 palabras/min).
 - La navegación usa `next/link`. Las anclas entre páginas llevan ruta y hash,
   por ejemplo `/servicios#ia`; `SmoothScrollProvider` gestiona inicio/ancla.
 - Copy y datos editables viven en `src/content/*.ts`; contratos en
@@ -167,7 +186,8 @@ producto salvo petición explícita.
 | Logotipo web | `src/components/ui/BrandLogo.tsx` |
 | Empresa, navegación y contacto | `src/content/agency.ts` |
 | Catálogo de servicios | `src/content/services.ts` |
-| Recursos (Home) | `src/content/resources.ts` · `src/components/home/ResourcesSection.tsx` |
+| Recursos: artículos y copy | `src/content/resources.ts` |
+| Recursos: lista, portada y artículo | `src/components/home/ResourcesSection.tsx` · `src/components/resources/` |
 | Esquema Supabase sin uso (noticias/MCP retirados) | `supabase/migrations/` · `supabase/seed.sql` |
 | Validación compartida | `src/lib/validations.ts` |
 | Endpoint Node | `src/app/api/contact/route.node.ts` |

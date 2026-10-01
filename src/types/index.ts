@@ -57,22 +57,32 @@ export interface NavItem {
   meta: string;
 }
 
-/** Tipos de recurso de la seccion Recursos (Home). */
-export const RESOURCE_KINDS = ['Software', 'Agente de IA', 'Recurso'] as const;
-export type ResourceKind = (typeof RESOURCE_KINDS)[number];
-
-/** Un desarrollo propio de AFCR: software, agente de IA u otro recurso. */
-export interface Resource {
+/** Articulo de la seccion Recursos: uno por servicio, escrito por el equipo de AFCR. */
+export interface ResourceArticle {
   slug: string;
-  kind: ResourceKind;
+  /** Tema corto: etiqueta de la ficha y palabra de la portada tipografica. */
+  topic: string;
+  title: string;
+  excerpt: string;
+  /**
+   * Bloques del cuerpo: «## » y «### » abren subtitulos; las lineas seguidas que
+   * empiezan por «- » o «1. » forman una lista; las que empiezan por «| » forman
+   * una tabla (la primera fila es la cabecera). «**texto**» va en negrita.
+   */
+  body: string[];
+  /** Portada en `public/recursos/`. Sin ella se muestra la portada tipografica. */
+  cover?: ResourceCoverImage;
+}
+
+/**
+ * Portada exportada como `public/recursos/<name>-{800,1600,<width>}.webp` y
+ * `<name>-og.jpg` (redes sociales). `width`/`height` son los del original.
+ */
+export interface ResourceCoverImage {
   name: string;
-  description: string;
-  /** Enlace externo (demo, repositorio, descarga). Sin el, la ficha lleva al formulario de contacto. */
-  href?: string;
-  /** Texto del enlace; por defecto `resourcesCopy.contactCta`. */
-  cta?: string;
-  /** ⚠ Ficha de ejemplo para ver el diseño: se muestra con etiqueta EJEMPLO. */
-  sample?: boolean;
+  alt: string;
+  width: number;
+  height: number;
 }
 
 export type SubmitState = 'idle' | 'loading' | 'success' | 'error';

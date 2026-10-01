@@ -11,6 +11,7 @@ import Header from '@/components/layout/Header';
 import SmoothScrollProvider from '@/components/layout/SmoothScrollProvider';
 import { agency } from '@/content/agency';
 import { allServices } from '@/content/services';
+import { siteUrl } from '@/lib/seo/site-url';
 
 /* -------------------------------------------------------------------------- */
 /*  Tipografia                                                                 */
@@ -52,8 +53,6 @@ const plexMono = IBM_Plex_Mono({
 /* -------------------------------------------------------------------------- */
 /*  Metadata                                                                   */
 /* -------------------------------------------------------------------------- */
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://afcrtecnologia.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

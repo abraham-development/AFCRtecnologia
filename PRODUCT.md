@@ -44,13 +44,16 @@ Servicios confirmados (2026-09-24):
 7. Agentes de IA con Hermes (Hermes Agent de Nous Research)
 8. Desarrollo local (on-premise) con inteligencia artificial
 9. Capacitaciones y charlas sobre el manejo adecuado de la IA
-10. Venta de dispositivos tecnológicos
+10. Venta de dispositivos tecnológicos (mini PC y cámaras de seguridad)
+11. Sistemas RAG: IA que responde con los documentos de la empresa (confirmado 2026-10-01)
 
 Estructura del sitio (2026-09-24): una página por ítem del navbar —Home,
-Servicios, Nosotros, Contáctanos. La Home muestra «Recursos»: desarrollos
-propios de AFCR (software, agentes de IA y otros recursos). Las fichas actuales
-son ejemplos (`sample`) hasta tener los desarrollos reales. La sección de
-noticias y su MCP se retiraron el 2026-09-29.
+Servicios, Nosotros, Contáctanos. La Home muestra «Recursos»: 8 artículos del
+«Equipo de AFCRtecnologia», uno por servicio (RAG, agente de IA para WhatsApp,
+automatizaciones, agentes de IA personalizados, páginas web, capacitaciones,
+software a medida y venta de mini PC y cámaras de seguridad), cada uno con su
+página en `/recursos/<slug>`. La sección de noticias y su MCP se retiraron el
+2026-09-29.
 Restricciones técnicas en `AGENTS.md`.
 
 ## Brand Commitments
