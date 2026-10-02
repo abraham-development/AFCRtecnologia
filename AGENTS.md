@@ -141,14 +141,16 @@ producto salvo petición explícita.
   pedido. Su cuerpo usa la sintaxis completa de `ResourceArticle.body`
   (`##`, `###`, `- `, `1. `, tabla con `| ` y `**negrita**`); la tabla se
   muestra apilada por fila en celular y completa desde `sm`.
-- Portadas: las entrega el usuario. Se exportan desde el original con PIL a
-  `public/recursos/<name>-{800,1600,<ancho original>}.webp` (q 84, compuestas
-  sobre blanco si traen alfa) y `<name>-og.jpg` de 1200 px para redes; en el
-  artículo se añade `cover: { name, alt, width, height }`. En la card se
-  recortan al centro (240 px de alto, imagen decorativa); en el artículo van
-  enteras con su proporción y un enlace a tamaño completo. Sin portada,
-  `ResourceCover` muestra la tipográfica (tema en Fraunces, recortado, con
-  grano). No usar fotos de stock.
+- Portadas: una infografía por artículo en `public/recursos/`, exportada con
+  PIL a `<name>-{800,1600,<ancho original>}.webp` (q 84, compuesta sobre blanco
+  si trae alfa) y `<name>-og.jpg` de 1200 px para redes; en el artículo,
+  `cover: { name, alt, width, height }`. La de RAG la entregó el usuario. Las
+  otras siete son láminas del contenido de cada artículo (papel marfil,
+  paneles en ámbar, verde, teal y coral, no un solo azul; no foto de stock
+  ni viñeta). En la card se recortan al centro (240 px
+  de alto, imagen decorativa); en el artículo van enteras, con su proporción y
+  un enlace a tamaño completo. Sin portada, `ResourceCover` muestra la
+  tipográfica (tema en Fraunces, recortado, con grano). No usar fotos de stock.
 - Los artículos no inventan clientes, métricas, precios ni plazos.
 
 ---

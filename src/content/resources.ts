@@ -9,9 +9,9 @@ import type { ResourceArticle, ResourceCoverImage } from '@/types';
  *
  * El articulo de RAG es texto del usuario: no reescribirlo sin pedido.
  *
- * Portadas: las entrega el usuario. Exportarlas a `public/recursos/` como
- * `<name>-{800,1600,<ancho original>}.webp` y `<name>-og.jpg` (ver
- * `ResourceCoverImage`). Sin portada se muestra la tipografica con el `topic`.
+ * Portadas en `public/recursos/` como `<name>-{800,1600,<ancho>}.webp` y
+ * `<name>-og.jpg` (ver `ResourceCoverImage`). Sin portada se muestra la
+ * tipografica con el `topic`.
  */
 export const resourceArticles: ResourceArticle[] = [
   {
@@ -98,6 +98,12 @@ export const resourceArticles: ResourceArticle[] = [
     title: 'Atención por WhatsApp a cualquier hora: qué puede hacer un agente de IA por tu negocio',
     excerpt:
       'Tus clientes escriben por WhatsApp a toda hora y esperan una respuesta rápida. Un agente de IA atiende, cotiza y agenda, y deriva a una persona cuando hace falta.',
+    cover: {
+      name: 'whatsapp',
+      alt: 'Lámina «Atención por mensajería a cualquier hora»: los mensajes llegan de noche y en fin de semana; un bot de menú con solo tres opciones corta la conversación; un agente de IA responde con datos del negocio, cotiza, agenda y registra al cliente; y deriva a una persona con el historial completo.',
+      width: 1280,
+      height: 720,
+    },
     body: [
       'Para muchos negocios en el Perú, WhatsApp es el canal principal de ventas. Por ahí llegan las preguntas por precios, horarios, stock y formas de pago. El problema es que los mensajes no respetan el horario de oficina: llegan de noche, los fines de semana o todos al mismo tiempo. Y cada mensaje que se queda sin respuesta es un cliente que puede escribirle a la competencia.',
       '## Chatbot de menú o agente de IA',
@@ -125,6 +131,12 @@ export const resourceArticles: ResourceArticle[] = [
     title: 'Las tareas repetitivas que tu equipo podría dejar de hacer a mano',
     excerpt:
       'Copiar datos entre sistemas, enviar recordatorios, armar reportes. Cuando estas tareas se automatizan, tu equipo recupera tiempo para el trabajo que sí requiere criterio.',
+    cover: {
+      name: 'automatizacion',
+      alt: 'Lámina «De la tarea manual al flujo»: el ciclo de copiar un formulario, reenviar un correo y armar el reporte del lunes; el flujo en que llega un formulario, se crea el contacto y se avisa al vendedor, con factura, recordatorio y reporte semanal; y las tareas con IA de clasificar correos, extraer datos y resumir.',
+      width: 1280,
+      height: 720,
+    },
     body: [
       'En casi todas las empresas hay tareas que nadie disfruta: copiar los datos de un formulario a una hoja de cálculo, reenviar correos al área correcta, armar el mismo reporte cada lunes o recordarle a un cliente que tiene un pago pendiente. Cada una toma pocos minutos, pero sumadas a lo largo de la semana consumen horas valiosas. Y como se hacen a mano, también son una fuente constante de errores.',
       '## Qué significa automatizar',
@@ -152,6 +164,12 @@ export const resourceArticles: ResourceArticle[] = [
     title: 'Agentes de IA personalizados: cuando un chatbot genérico ya no es suficiente',
     excerpt:
       'Un agente de IA no solo conversa: consulta tus sistemas, sigue tus reglas y ejecuta tareas. Así se diferencia de un asistente genérico y así se diseña uno para tu empresa.',
+    cover: {
+      name: 'agentes',
+      alt: 'Lámina «Del chatbot al agente que actúa»: un chatbot genérico que solo conversa; un agente unido al CRM, al correo, a documentos y a tickets que prepara una propuesta con las plantillas del negocio; y una compuerta de aprobación humana para enviar, borrar o hablar con un cliente importante.',
+      width: 1280,
+      height: 720,
+    },
     body: [
       'Muchas empresas ya probaron asistentes de IA genéricos: ayudan a redactar un correo o a resumir un documento, pero se quedan cortos cuando el trabajo depende de los sistemas, los datos y las reglas propias del negocio. Ahí es donde entran los agentes de IA personalizados.',
       '## De responder a actuar',
@@ -176,6 +194,12 @@ export const resourceArticles: ResourceArticle[] = [
     title: 'Tu página web es tu primera impresión: lo que un cliente decide en pocos segundos',
     excerpt:
       'Antes de escribirte, un cliente revisa tu web. La velocidad, la claridad y la confianza deciden si te contacta o vuelve a Google a buscar otra opción.',
+    cover: {
+      name: 'web',
+      alt: 'Lámina «La web como primera impresión»: las tres preguntas de qué haces, si es para el visitante y cómo contactarte; un celular que tarda frente a una página clara; y las señales de dominio propio, candado, contacto real e información al día, con el camino del formulario al correo o al CRM.',
+      width: 1280,
+      height: 720,
+    },
     body: [
       'Las redes sociales son útiles para darte a conocer, pero no son tu casa: no controlas el algoritmo, el formato ni las reglas, que pueden cambiar en cualquier momento. Tu página web es el único espacio digital que es completamente tuyo. Y en la mayoría de los casos es lo primero que revisa un cliente antes de decidir si te escribe.',
       '## Lo que el visitante necesita encontrar',
@@ -200,6 +224,12 @@ export const resourceArticles: ResourceArticle[] = [
     title: 'Usar la IA bien en tu equipo: por qué la capacitación va antes que la herramienta',
     excerpt:
       'Es probable que tu equipo ya use IA, con o sin permiso. Capacitarlo convierte ese uso improvisado en productividad real y evita riesgos con información sensible.',
+    cover: {
+      name: 'capacitacion',
+      alt: 'Lámina «Capacitar antes que comprar la herramienta»: el uso improvisado que mete un contrato y una lista de clientes en una herramienta pública; qué aprender, incluidos los límites, las instrucciones, la verificación y qué no se comparte; y la práctica con el informe mensual y una guía interna.',
+      width: 1280,
+      height: 720,
+    },
     body: [
       'Aunque tu empresa no haya adoptado oficialmente la inteligencia artificial, es muy probable que tu equipo ya la esté usando: para redactar correos, resumir documentos o resolver dudas. Eso no es malo en sí mismo, pero cuando el uso es improvisado aparecen riesgos que muchas organizaciones no ven hasta que es tarde.',
       '## Los riesgos del uso improvisado',
@@ -224,6 +254,12 @@ export const resourceArticles: ResourceArticle[] = [
     title: 'Software a medida o solución de paquete: cómo saber qué necesita tu empresa',
     excerpt:
       'Un sistema estándar sirve hasta que tu operación empieza a adaptarse a él. Estas son las señales de que conviene desarrollar software propio y cómo hacerlo con menos riesgo.',
+    cover: {
+      name: 'software',
+      alt: 'Lámina «Paquete o software a medida»: contabilidad y correo como procesos que ya cubre un paquete; el mismo registro copiado en varios lugares cuando hace falta algo propio; aplicación web desde el navegador y aplicación móvil con cámara, ubicación o sin conexión; y el camino de una primera versión, entregas por etapas y código y datos propios.',
+      width: 1280,
+      height: 720,
+    },
     body: [
       'Muchas empresas funcionan con una mezcla de hojas de cálculo, aplicaciones sueltas y un sistema comprado que cubre parte del trabajo. Al inicio basta. Con el crecimiento aparecen los parches: datos que se copian a mano de un lugar a otro, procesos que dependen de una sola persona y reportes que toman horas en armarse.',
       '## Cuándo basta una solución estándar',
@@ -249,6 +285,12 @@ export const resourceArticles: ResourceArticle[] = [
     title: 'Mini PCs y cámaras de seguridad: tecnología compacta que ordena y protege tu negocio',
     excerpt:
       'Un mini PC ocupa poco espacio y suele consumir menos energía que una torre; las cámaras te dejan ver tu local desde el celular. Bien elegidos e instalados, simplifican el día a día.',
+    cover: {
+      name: 'dispositivos',
+      alt: 'Lámina «Mini PC y cámaras para el local»: un mini PC en caja o recepción, silencioso y de poco espacio; el plano de una tienda con cámaras en caja, estanterías, almacén y entrada, y la vista desde el celular; y el cartel de zona de videovigilancia, con aviso, contraseña de fábrica e instalación.',
+      width: 1280,
+      height: 720,
+    },
     body: [
       'No toda la tecnología de una empresa es software. Los equipos donde trabaja tu equipo y los dispositivos que protegen tu local también influyen en la productividad y en la tranquilidad del día a día. Dos opciones que se han vuelto muy populares son los mini PC y los sistemas de cámaras de seguridad.',
       '## Qué es un mini PC y dónde encaja',
