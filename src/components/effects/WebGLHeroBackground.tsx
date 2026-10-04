@@ -161,6 +161,7 @@ interface WebGLHeroBackgroundProps {
  *
  * - Se pausa con `document.hidden` y fuera del viewport.
  * - Degrada la calidad sola si el dispositivo no sostiene 40 FPS.
+ * - En celular (<= 768 px): sin niebla, 700 particulas y ~30 fps.
  * - Si WebGL falla, queda el degradado CSS + grano del contenedor.
  */
 export function WebGLHeroBackground({ className }: WebGLHeroBackgroundProps) {
@@ -225,10 +226,14 @@ export function WebGLHeroBackground({ className }: WebGLHeroBackgroundProps) {
     const fogGeometry = new PlaneGeometry(1, 1);
     const fog = new Mesh(fogGeometry, fogMaterial);
     fog.position.z = -6;
+    // En celular la niebla (fbm por cada pixel de pantalla) es lo mas caro del
+    // fondo: se apaga desde el inicio y la atmosfera la pone el degradado CSS
+    // `webgl-fallback` del contenedor, visible a traves del lienzo transparente.
+    fog.visible = !isMobile;
     scene.add(fog);
 
     /* ----- Campo de particulas -------------------------------------------- */
-    const count = isMobile ? 1100 : 2600;
+    const count = isMobile ? 700 : 2600;
     const positions = new Float32Array(count * 3);
     const scales = new Float32Array(count);
     const speeds = new Float32Array(count);
@@ -306,13 +311,23 @@ export function WebGLHeroBackground({ className }: WebGLHeroBackgroundProps) {
     let frame = 0;
     let elapsed = 0;
     let last = performance.now();
+    /** En celular se renderiza a ~30 fps: las particulas derivan lento y no se nota. */
+    const minFrameMs = isMobile ? 33 : 0;
+    /** Promedio de cuadro que dispara la degradacion: ~40 fps escritorio, ~22 fps movil. */
+    const degradeMs = isMobile ? 45 : 26;
     let sampled = 0;
     let accumulated = 0;
     let quality = 2;
     let inView = true;
 
     const render = (now: number) => {
-      const delta = Math.min((now - last) / 1000, 0.05);
+      if (now - last < minFrameMs) {
+        frame = requestAnimationFrame(render);
+        return;
+      }
+      // Tope por cuadro (pestana recien vuelta); en movil mas alto para que
+      // el salto de 30 fps no frene el paso de las particulas
+      const delta = Math.min((now - last) / 1000, isMobile ? 0.08 : 0.05);
       last = now;
       elapsed += delta;
 
@@ -332,8 +347,9 @@ export function WebGLHeroBackground({ className }: WebGLHeroBackgroundProps) {
         accumulated += delta * 1000;
         if (sampled >= 90) {
           const average = accumulated / sampled;
-          if (average > 26) {
+          if (average > degradeMs) {
             quality -= 1;
+            // En movil la niebla ya va apagada: este escalon no cambia nada alli
             if (quality === 1) fog.visible = false;
             if (quality === 0) particleGeometry.setDrawRange(0, Math.floor(count / 2));
           } else {

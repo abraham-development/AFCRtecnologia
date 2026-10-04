@@ -106,8 +106,8 @@ producto salvo petición explícita.
   se parta en 4 líneas a 1024); debajo, va bajo la bajada. Por su contorno
   corren en loop dos haces de luz tipo cometa (cian→verde y coral→ámbar, con
   cabeza casi blanca) sobre un borde base cian tenue, más su halo difuso.
-  Ritmo pedido por el usuario (2026-10-03): una vuelta cada 7,06 s y
-  respiración del halo de 3,76 s, igual en la card del hero y en Servicios.
+  Ritmo pedido por el usuario (2026-10-03): una vuelta cada 8,31 s y
+  respiración del halo de 4,42 s, igual en la card del hero y en Servicios.
   Un conic-gradient con todos los colores a la vez se leía como borde arcoíris
   quieto: el usuario no veía movimiento. CSS puro en `globals.css`
   (`.glow-card-*`, `@property --glow-angle`); la superficie es opaca para que
@@ -380,6 +380,21 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
 - Canvas y WebGL se pausan con `document.hidden` e `IntersectionObserver`.
 - `WebGLHeroBackground` apaga niebla y reduce partículas si no sostiene
   aproximadamente 40 FPS. No retirar esa degradación.
+- Hero en celular (pedido del usuario, 2026-10-03: notaba latencia):
+  - En ≤ 768 px el fondo WebGL va sin niebla desde el inicio (la atmósfera
+    la pone el degradado `webgl-fallback` a través del lienzo transparente),
+    con 700 partículas, ~30 fps y umbral de degradación de 45 ms.
+  - Las palabras de `ParticleText` apagan su bucle al quedar en reposo y solo
+    las despierta un mouse cercano (`(hover: hover) and (pointer: fine)`).
+    En táctil se arman una vez y quedan quietas. En ≤ 768 px usan el 60 % del
+    presupuesto de partículas.
+  - Para probar el despertar en Chrome headless hay que lanzar con los
+    `--blink-settings` de puntero fino (ver el hover del logotipo): sin ellos
+    no hay puntero fino y el listener no se registra.
+  - Medido en móvil emulado (CPU 4×): las letras pasan de redibujarse en cada
+    cuadro a 0 cuadros tras armarse, y el script baja de ~35 a ~20 ms/s.
+  - Los cometas de la card son el mayor costo restante. El usuario decidió
+    no tocarlos: no optimizarlos sin pedido.
 - `prefers-reduced-motion` desactiva Lenis, partículas y preloader (el cursor
   es una imagen estática y se mantiene).
 - Para contener el ancho usar `overflow-x: clip`, no `hidden`, porque este

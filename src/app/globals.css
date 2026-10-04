@@ -322,7 +322,7 @@ html.lenis body {
   position: absolute;
   pointer-events: none;
   border-radius: var(--radius-xs);
-  animation: afcr-glow-spin 7.06s linear infinite;
+  animation: afcr-glow-spin 8.31s linear infinite;
 }
 
 /* Halo: los mismos haces difuminados detras de la superficie (se pinta antes
@@ -332,8 +332,8 @@ html.lenis body {
   background: var(--glow-beams);
   filter: blur(16px);
   animation:
-    afcr-glow-spin 7.06s linear infinite,
-    afcr-glow-breathe 3.76s ease-in-out infinite alternate;
+    afcr-glow-spin 8.31s linear infinite,
+    afcr-glow-breathe 4.42s ease-in-out infinite alternate;
 }
 
 /* Anillo nitido de 2px: haces encima de un borde base cian tenue, recortados
@@ -357,9 +357,9 @@ html.lenis body {
    `--beam-t` (0-100, % del perimetro) se hereda a cada trazo, que calcula su
    dashoffset alineado por la cabeza. Al montarse, los cometas nacen 25 %
    atras, salen disparados y se asientan (encendido, 0.9 s); luego corren en
-   loop a velocidad constante. El ritmo (7.06 s por vuelta, halo 3.76 s) es el
+   loop a velocidad constante. El ritmo (8.31 s por vuelta, halo 4.42 s) es el
    mismo de la card del hero. La curva del encendido termina con pendiente
-   0.5 = velocidad del loop (100 / 7.06 * 0.9 / 25): sin tiron al empalmar.
+   0.433 = velocidad del loop (100 / 8.31 * 0.9 / 25): sin tiron al empalmar.
    Si cambia la duracion del loop, recalcular esa pendiente.
    Las animaciones con retraso no aplican mientras esperan: no chocan. */
 @property --beam-t {
@@ -387,8 +387,8 @@ html.lenis body {
 .glow-beams-ring {
   overflow: hidden;
   animation:
-    afcr-beam-ignite 0.9s cubic-bezier(0.2, 0.7, 0.6, 0.8),
-    afcr-beam-run 7.06s linear 0.9s infinite,
+    afcr-beam-ignite 0.9s cubic-bezier(0.2, 0.7, 0.6, 0.827),
+    afcr-beam-run 8.31s linear 0.9s infinite,
     afcr-glow-in 0.5s ease-out;
 }
 
@@ -404,10 +404,10 @@ html.lenis body {
   --glow-halo-min: 0.6;
   --glow-halo-max: 0.95;
   animation:
-    afcr-beam-ignite 0.9s cubic-bezier(0.2, 0.7, 0.6, 0.8),
-    afcr-beam-run 7.06s linear 0.9s infinite,
+    afcr-beam-ignite 0.9s cubic-bezier(0.2, 0.7, 0.6, 0.827),
+    afcr-beam-run 8.31s linear 0.9s infinite,
     afcr-glow-flash 0.9s ease-out,
-    afcr-glow-breathe 3.76s ease-in-out 0.9s infinite alternate;
+    afcr-glow-breathe 4.42s ease-in-out 0.9s infinite alternate;
 }
 
 .glow-beams-halo .glow-beams-segment {

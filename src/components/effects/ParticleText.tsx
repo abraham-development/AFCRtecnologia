@@ -44,11 +44,18 @@ const REPEL_FORCE = 620;
 const SPRING = 0.085;
 const DAMPING = 0.8;
 const DEFAULT_MAX_PARTICLES = 7000;
+/** En pantallas chicas el titular mide menos: basta con 60 % del presupuesto. */
+const SMALL_SCREEN_BUDGET = 0.6;
+/** Reposo: todas las particulas en casa (px) y casi quietas (px/cuadro). */
+const REST_DISTANCE = 0.35;
+const REST_SPEED = 0.05;
 
 /**
  * Texto compuesto por particulas cian que se dispersan al paso del cursor
  * y vuelven a agruparse. El texto real permanece en el DOM (invisible pero
  * accesible); si el canvas no puede montarse, se muestra con acento cian.
+ * Cuando todo queda en reposo el bucle se apaga y solo lo despierta un mouse
+ * cercano; en tactil las letras se arman una vez y quedan quietas.
  */
 export function ParticleText({
   text,
@@ -89,6 +96,15 @@ export function ParticleText({
     let disposed = false;
 
     const pointer = { x: -9999, y: -9999 };
+
+    // Solo un mouse real dispersa las letras. En tactil se arman una vez y
+    // quedan quietas: el arrastre del scroll no debe despertar el bucle.
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const budget = window.matchMedia('(max-width: 768px)').matches
+      ? Math.round(maxParticles * SMALL_SCREEN_BUDGET)
+      : maxParticles;
+    /** Bucle detenido porque todo esta en reposo (el lienzo conserva el ultimo cuadro). */
+    let sleeping = false;
 
     /* ----- Muestreo del texto -------------------------------------------- */
     const build = () => {
@@ -172,11 +188,12 @@ export function ParticleText({
           }
         }
 
-        if (sampled.length <= maxParticles) break;
+        if (sampled.length <= budget) break;
         step += 1;
       }
 
       particles = sampled;
+      sleeping = false;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       rectDirty = true;
       setSampled(particles.length > 0);
@@ -195,6 +212,7 @@ export function ParticleText({
 
       ctx.clearRect(0, 0, cssWidth, cssHeight);
 
+      let restless = false;
       for (const particle of particles) {
         const dx = particle.x - px;
         const dy = particle.y - py;
@@ -211,6 +229,28 @@ export function ParticleText({
         particle.vy = (particle.vy + (particle.hy - particle.y) * SPRING) * DAMPING;
         particle.x += particle.vx;
         particle.y += particle.vy;
+
+        if (
+          !restless &&
+          (Math.abs(particle.hx - particle.x) > REST_DISTANCE ||
+            Math.abs(particle.hy - particle.y) > REST_DISTANCE ||
+            Math.abs(particle.vx) > REST_SPEED ||
+            Math.abs(particle.vy) > REST_SPEED)
+        ) {
+          restless = true;
+        }
+      }
+
+      // Todo en casa y el cursor lejos: se fija la forma exacta, se dibuja
+      // este ultimo cuadro y el bucle se apaga hasta que algo lo despierte.
+      const settle = !restless && !pointerNear();
+      if (settle) {
+        for (const particle of particles) {
+          particle.x = particle.hx;
+          particle.y = particle.hy;
+          particle.vx = 0;
+          particle.vy = 0;
+        }
       }
 
       // Dos pasadas: una por tono, para no cambiar fillStyle por particula
@@ -224,12 +264,23 @@ export function ParticleText({
         if (particle.tone === 1) ctx.fillRect(particle.x, particle.y, 1.7, 1.7);
       }
 
+      if (settle) {
+        sleeping = true;
+        frame = 0;
+        return;
+      }
+
       frame = requestAnimationFrame(draw);
     };
 
     const start = () => {
-      if (frame || !inView || document.hidden || particles.length === 0) return;
+      if (frame || sleeping || !inView || document.hidden || particles.length === 0) return;
       frame = requestAnimationFrame(draw);
+    };
+
+    const wake = () => {
+      sleeping = false;
+      start();
     };
 
     const stop = () => {
@@ -239,9 +290,27 @@ export function ParticleText({
     };
 
     /* ----- Eventos -------------------------------------------------------- */
+    /** El cursor esta dentro del lienzo o a un radio de repulsion de el. */
+    function pointerNear() {
+      const px = pointer.x - rect.left;
+      const py = pointer.y - rect.top;
+      return (
+        px > -REPEL_RADIUS &&
+        px < cssWidth + REPEL_RADIUS &&
+        py > -REPEL_RADIUS &&
+        py < cssHeight + REPEL_RADIUS
+      );
+    }
+
     const onPointerMove = (event: PointerEvent) => {
       pointer.x = event.clientX;
       pointer.y = event.clientY;
+      if (!sleeping) return;
+      if (rectDirty) {
+        rect = canvas.getBoundingClientRect();
+        rectDirty = false;
+      }
+      if (pointerNear()) wake();
     };
 
     const onPointerLeave = () => {
@@ -273,8 +342,10 @@ export function ParticleText({
       { threshold: 0 },
     );
 
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-    document.addEventListener('mouseleave', onPointerLeave);
+    if (finePointer) {
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      document.addEventListener('mouseleave', onPointerLeave);
+    }
     window.addEventListener('scroll', invalidateRect, { passive: true });
     window.addEventListener('resize', invalidateRect, { passive: true });
     document.addEventListener('visibilitychange', onVisibility);
