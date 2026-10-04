@@ -5,8 +5,8 @@ import dynamic from 'next/dynamic';
 import { useEffect, useSyncExternalStore } from 'react';
 
 import ParticleText from '@/components/effects/ParticleText';
-import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
-import { agency, CONTACT_FORM_HREF } from '@/content/agency';
+import HeroActionCard from '@/components/home/HeroActionCard';
+import { agency } from '@/content/agency';
 import { homeCopy } from '@/content/pages';
 import { resourcesCopy } from '@/content/resources';
 import { isAppReady, markAppReady, subscribeAppReady } from '@/lib/utils';
@@ -62,63 +62,61 @@ export function Hero() {
         className="from-bg-primary via-bg-primary/45 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent"
       />
 
-      <div className="shell relative z-10 flex flex-1 flex-col justify-center py-12 md:py-16">
-        {/* Todo el titular es de particulas: cada palabra es un lienzo propio
-            para que el texto pueda partirse en lineas en pantallas estrechas.
-            Usa la Fraunces estatica (font-hero): Canvas 2D no admite ejes
-            variables y asi particulas y texto real miden y dibujan lo mismo. */}
-        <h1 className="text-display font-hero max-w-[16ch]">
-          {homeCopy.headline.map((line, lineIndex) => (
-            <motion.span
-              key={line.words.join(' ')}
-              className="block"
-              initial={{ opacity: 0, y: 34, filter: 'blur(10px)' }}
-              animate={
-                ready
-                  ? { opacity: 1, y: 0, filter: 'blur(0px)' }
-                  : { opacity: 0, y: 34, filter: 'blur(10px)' }
-              }
-              transition={{ duration: 1.1, ease: EASE, delay: 0.15 + lineIndex * 0.17 }}
-            >
-              {line.words.map((word, wordIndex) => (
-                <span key={word}>
-                  {wordIndex > 0 ? ' ' : null}
-                  <ParticleText
-                    text={word}
-                    active={ready}
-                    variant={line.variant}
-                    maxParticles={Math.round((PARTICLE_BUDGET * word.length) / TOTAL_LETTERS)}
-                  />
-                </span>
-              ))}
-            </motion.span>
-          ))}
-        </h1>
+      {/* En escritorio, titular a la izquierda y card de accion a la derecha;
+          en celular y tablet, una sola columna con la card bajo la bajada. */}
+      <div className="shell relative z-10 grid flex-1 content-center items-center gap-x-12 py-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_21rem] xl:grid-cols-[minmax(0,1fr)_25rem] xl:gap-x-20">
+        <div className="min-w-0">
+          {/* Todo el titular es de particulas: cada palabra es un lienzo propio
+              para que el texto pueda partirse en lineas en pantallas estrechas.
+              Usa la Fraunces estatica (font-hero): Canvas 2D no admite ejes
+              variables y asi particulas y texto real miden y dibujan lo mismo. */}
+          <h1 className="text-display font-hero max-w-[16ch]">
+            {homeCopy.headline.map((line, lineIndex) => (
+              <motion.span
+                key={line.words.join(' ')}
+                className="block"
+                initial={{ opacity: 0, y: 34, filter: 'blur(10px)' }}
+                animate={
+                  ready
+                    ? { opacity: 1, y: 0, filter: 'blur(0px)' }
+                    : { opacity: 0, y: 34, filter: 'blur(10px)' }
+                }
+                transition={{ duration: 1.1, ease: EASE, delay: 0.15 + lineIndex * 0.17 }}
+              >
+                {line.words.map((word, wordIndex) => (
+                  <span key={word}>
+                    {wordIndex > 0 ? ' ' : null}
+                    <ParticleText
+                      text={word}
+                      active={ready}
+                      variant={line.variant}
+                      maxParticles={Math.round((PARTICLE_BUDGET * word.length) / TOTAL_LETTERS)}
+                    />
+                  </span>
+                ))}
+              </motion.span>
+            ))}
+          </h1>
 
-        <motion.p
-          initial="hidden"
-          animate={animate}
-          variants={rise}
-          custom={0.5}
-          className="text-text-secondary mt-8 max-w-xl text-base leading-relaxed md:mt-10 md:text-lg"
-        >
-          {agency.description}
-        </motion.p>
+          <motion.p
+            initial="hidden"
+            animate={animate}
+            variants={rise}
+            custom={0.5}
+            className="text-text-secondary mt-8 max-w-xl text-base leading-relaxed md:mt-10 md:text-lg"
+          >
+            {agency.description}
+          </motion.p>
+        </div>
 
         <motion.div
           initial="hidden"
           animate={animate}
           variants={rise}
           custom={0.62}
-          className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-12"
+          className="mt-10 sm:max-w-md md:mt-12 lg:mt-0 lg:max-w-none"
         >
-          <ButtonMagnetic variant="solid" href={CONTACT_FORM_HREF} aria-label={homeCopy.primaryCtaLabel}>
-            {homeCopy.primaryCta}
-          </ButtonMagnetic>
-
-          <ButtonMagnetic variant="ghost" href="/servicios" aria-label={homeCopy.secondaryCta}>
-            {homeCopy.secondaryCta}
-          </ButtonMagnetic>
+          <HeroActionCard />
         </motion.div>
       </div>
 

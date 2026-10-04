@@ -288,6 +288,225 @@ html.lenis body {
   }
 }
 
+/* Card de accion del hero: dos haces de luz recorren el contorno en loop.
+   `--glow-angle` registrado como <angle> permite girar el conic-gradient.
+   Cada haz es un cometa: cola de color que crece hasta una cabeza casi blanca
+   y se corta en seco, asi el ojo lee una luz que avanza (no un borde arcoiris
+   fijo). Paleta de las portadas de Recursos: cian y verde en un haz, coral y
+   ambar en el otro; todos contrastan con el navy. Sin @property los haces
+   quedan quietos, sin roturas. */
+@property --glow-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* El gradiente se declara en cada capa: `--glow-angle` no se hereda y una
+   variable intermedia en el contenedor congelaria el angulo en 0deg. */
+.glow-card-halo,
+.glow-card-ring {
+  --glow-beams: conic-gradient(
+    from var(--glow-angle),
+    transparent 0deg 95deg,
+    rgba(255, 122, 107, 0.15) 110deg,
+    #ff7a6b 150deg,
+    #f4b860 172deg,
+    #fff4dc 179deg,
+    transparent 180deg 275deg,
+    rgba(91, 194, 216, 0.15) 290deg,
+    #5bc2d8 330deg,
+    #8deb7e 352deg,
+    #effff0 359deg,
+    transparent 360deg
+  );
+  position: absolute;
+  pointer-events: none;
+  border-radius: var(--radius-xs);
+  animation: afcr-glow-spin 7.06s linear infinite;
+}
+
+/* Halo: los mismos haces difuminados detras de la superficie (se pinta antes
+   en el DOM), asi la luz irradia justo donde pasa el cometa. */
+.glow-card-halo {
+  inset: -4px;
+  background: var(--glow-beams);
+  filter: blur(16px);
+  animation:
+    afcr-glow-spin 7.06s linear infinite,
+    afcr-glow-breathe 3.76s ease-in-out infinite alternate;
+}
+
+/* Anillo nitido de 2px: haces encima de un borde base cian tenue, recortados
+   al contorno con la mascara. */
+.glow-card-ring {
+  inset: 0;
+  padding: 2px;
+  background:
+    var(--glow-beams),
+    linear-gradient(rgba(91, 194, 216, 0.28), rgba(91, 194, 216, 0.28));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* Haces por perimetro (GlowBeams): filas del indice de Servicios.
+   `--beam-t` (0-100, % del perimetro) se hereda a cada trazo, que calcula su
+   dashoffset alineado por la cabeza. Al montarse, los cometas nacen 25 %
+   atras, salen disparados y se asientan (encendido, 0.9 s); luego corren en
+   loop a velocidad constante. El ritmo (7.06 s por vuelta, halo 3.76 s) es el
+   mismo de la card del hero. La curva del encendido termina con pendiente
+   0.5 = velocidad del loop (100 / 7.06 * 0.9 / 25): sin tiron al empalmar.
+   Si cambia la duracion del loop, recalcular esa pendiente.
+   Las animaciones con retraso no aplican mientras esperan: no chocan. */
+@property --beam-t {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.glow-beams {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  fill: none;
+}
+
+.glow-beams-segment {
+  fill: none;
+  stroke-width: 3;
+  stroke-dashoffset: calc(var(--beam-len) - var(--beam-t) - var(--beam-phase));
+}
+
+/* Borde de 1.5px visible: el trazo va centrado y el svg recorta la mitad */
+.glow-beams-ring {
+  overflow: hidden;
+  animation:
+    afcr-beam-ignite 0.9s cubic-bezier(0.2, 0.7, 0.6, 0.8),
+    afcr-beam-run 7.06s linear 0.9s infinite,
+    afcr-glow-in 0.5s ease-out;
+}
+
+.glow-beams-base {
+  fill: none;
+  stroke: rgba(91, 194, 216, 0.28);
+  stroke-width: 3;
+}
+
+/* Halo: los mismos cometas difuminados, con destello al encender */
+.glow-beams-halo {
+  overflow: visible;
+  --glow-halo-min: 0.6;
+  --glow-halo-max: 0.95;
+  animation:
+    afcr-beam-ignite 0.9s cubic-bezier(0.2, 0.7, 0.6, 0.8),
+    afcr-beam-run 7.06s linear 0.9s infinite,
+    afcr-glow-flash 0.9s ease-out,
+    afcr-glow-breathe 3.76s ease-in-out 0.9s infinite alternate;
+}
+
+.glow-beams-halo .glow-beams-segment {
+  stroke-width: 10;
+}
+
+@keyframes afcr-beam-ignite {
+  from {
+    --beam-t: -25;
+  }
+  to {
+    --beam-t: 0;
+  }
+}
+
+@keyframes afcr-beam-run {
+  to {
+    --beam-t: 100;
+  }
+}
+
+/* Lineas divisorias con los colores de la luz de Home (franja de
+   herramientas en Nosotros): degradado fijo, sin animacion. Los cometas que
+   corrian aqui se retiraron a pedido del usuario: mareaban. */
+.glow-divider {
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, #5bc2d8, #8deb7e, #f4b860, #ff7a6b);
+}
+
+/* El atributo lo escribe useGlowPause en cualquier ancestro (card o indice) */
+[data-paused='true'] :is(.glow-card-halo, .glow-card-ring, .glow-beams) {
+  animation-play-state: paused;
+}
+
+/* En celular y tablet el halo es mas contenido: no invade el gutter */
+@media (max-width: 1023px) {
+  .glow-card-halo {
+    inset: -2px;
+    filter: blur(11px);
+    --glow-halo-min: 0.6;
+    --glow-halo-max: 0.85;
+  }
+}
+
+@keyframes afcr-glow-spin {
+  to {
+    --glow-angle: 360deg;
+  }
+}
+
+@keyframes afcr-glow-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes afcr-glow-flash {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: var(--glow-halo-min, 0.7);
+  }
+}
+
+@keyframes afcr-glow-breathe {
+  from {
+    opacity: var(--glow-halo-min, 0.7);
+  }
+  to {
+    opacity: var(--glow-halo-max, 1);
+  }
+}
+
+/* Movimiento reducido: los haces conservan su color, pero quietos (sin
+   loop ni encendido). `.glow-card` delante sube la especificidad por encima
+   de `.glow-beams-ring/halo`, que declaran el encendido. */
+@media (prefers-reduced-motion: reduce) {
+  .glow-card :is(.glow-card-halo, .glow-card-ring) {
+    animation: none;
+    --glow-angle: 135deg;
+  }
+
+  .glow-card .glow-beams {
+    animation: none;
+    --beam-t: 30;
+  }
+
+  .glow-card .glow-card-halo {
+    opacity: 0.75;
+  }
+}
+
 /* Oculta la barra de scroll en carruseles horizontales */
 .no-scrollbar {
   scrollbar-width: none;

@@ -13,6 +13,11 @@ export const homeCopy = {
   primaryCta: 'Empieza un proyecto con nosotros',
   primaryCtaLabel: 'Empieza un proyecto con nosotros: ir al formulario de contacto',
   secondaryCta: 'Ver Servicios',
+  /** Card de accion del hero: agrupa los dos CTA (a la derecha en escritorio). */
+  actionCard: {
+    eyebrow: 'Empecemos',
+    title: 'Cuéntanos qué quieres resolver.',
+  },
 };
 
 /** Cabeceras de las paginas interiores. */

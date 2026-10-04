@@ -3,10 +3,11 @@
 import { ArrowUpRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import BrandIcon from '@/components/ui/BrandIcon';
 import ButtonMagnetic from '@/components/ui/ButtonMagnetic';
+import GlowBeams from '@/components/ui/GlowBeams';
 import {
   CONTACT_FORM_HREF,
   hasWhatsApp,
@@ -15,8 +16,9 @@ import {
   whatsappUrl,
 } from '@/content/agency';
 import { serviceGroups, servicesCopy } from '@/content/services';
-import type { Service } from '@/types';
+import { useGlowPause } from '@/hooks/useGlowPause';
 import { cn } from '@/lib/utils';
+import type { Service } from '@/types';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -74,6 +76,8 @@ const VALID_IDS = new Set(serviceGroups.map((group) => group.id));
 export function ServicesDirectory() {
   // Arranca en la primera categoria (coincide con el HTML del servidor).
   const [activeId, setActiveId] = useState(serviceGroups[0]!.id);
+  const indexRef = useRef<HTMLElement>(null);
+  useGlowPause(indexRef);
 
   // Tras hidratar: si la URL trae un ancla valida (/servicios#ia, enlazada
   // desde Nosotros o el footer), abre esa categoria en vez de la primera.
@@ -104,31 +108,42 @@ export function ServicesDirectory() {
       <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
         {/* Las cuatro categorias son el indice principal en todos los anchos. */}
         <div className="lg:sticky lg:top-40 lg:col-span-4 lg:self-start">
-          <nav aria-label={servicesCopy.indexLabel}>
+          <nav ref={indexRef} aria-label={servicesCopy.indexLabel} className="isolate">
             <ul className="border-border-editorial border-y">
               {serviceGroups.map((group) => {
                 const isActive = group.id === activeId;
                 return (
                   <li key={group.id} className="border-border-editorial border-b last:border-b-0">
-                    <button
-                      type="button"
-                      data-cursor="expand"
-                      aria-pressed={isActive}
-                      aria-controls="services-panel"
-                      onClick={() => select(group.id)}
-                      className={cn(
-                        'flex min-h-20 w-full items-center gap-4 px-4 py-4 text-left font-serif text-[1.375rem] leading-tight font-light tracking-[-0.02em] transition-colors duration-300 lg:px-3',
-                        isActive
-                          ? 'bg-accent-cyan-glow text-accent-cyan'
-                          : 'text-text-primary hover:text-accent-cyan',
-                      )}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className={cn('h-px w-6 shrink-0', isActive ? 'bg-accent-cyan' : 'bg-border-editorial')}
-                      />
-                      <span>{group.title}</span>
-                    </button>
+                    {/* La categoria activa lleva la luz de contorno de Home (GlowBeams,
+                        por perimetro): el halo va detras de todas las filas (-z-10
+                        dentro del nav aislado) y el anillo encima del boton opaco.
+                        Las capas se montan con la fila activa, asi el encendido
+                        arranca en cada cambio. */}
+                    <div className="glow-card relative">
+                      {isActive ? <GlowBeams layer="halo" className="-z-10" /> : null}
+
+                      <button
+                        type="button"
+                        data-cursor="expand"
+                        aria-pressed={isActive}
+                        aria-controls="services-panel"
+                        onClick={() => select(group.id)}
+                        className={cn(
+                          'relative flex min-h-20 w-full items-center gap-4 rounded-xs px-4 py-4 text-left font-serif text-[1.375rem] leading-tight font-light tracking-[-0.02em] transition-colors duration-300 lg:px-3',
+                          isActive
+                            ? 'bg-bg-darkest text-accent-cyan'
+                            : 'text-text-primary hover:text-accent-cyan',
+                        )}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={cn('h-px w-6 shrink-0', isActive ? 'bg-accent-cyan' : 'bg-border-editorial')}
+                        />
+                        <span>{group.title}</span>
+                      </button>
+
+                      {isActive ? <GlowBeams layer="ring" /> : null}
+                    </div>
                   </li>
                 );
               })}

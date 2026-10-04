@@ -193,6 +193,8 @@ export const aboutCopy = {
   audienceLink: 'Ver sus servicios',
   processTitle: 'Cómo trabajamos',
   principlesTitle: 'Lo que no negociamos',
+  /** Nombre accesible de la franja de herramientas (segunda seccion). */
+  techLabel: 'Herramientas con las que trabajamos',
 };
 
 /** Textos de la seccion Contacto (encabezado). */

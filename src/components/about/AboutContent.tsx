@@ -145,18 +145,29 @@ function Principles() {
   );
 }
 
+/** Franja de herramientas: la luz de Home recorre sus dos lineas divisorias. */
+/** Franja de herramientas entre dos lineas con los colores de la luz de Home. */
+function TechStrip() {
+  return (
+    <section aria-label={aboutCopy.techLabel} className="relative py-6">
+      <span aria-hidden="true" className="glow-divider top-0" />
+      <HorizontalMarquee items={techStack} duration={46} />
+      <span aria-hidden="true" className="glow-divider bottom-0" />
+    </section>
+  );
+}
+
 export function AboutContent() {
   return (
-    <div className="hairline-t space-y-24 pt-20 md:space-y-32 md:pt-28">
-      <Audiences />
-      <Process />
-      <Principles />
+    <>
+      <TechStrip />
 
-      {/* Herramientas con las que trabajamos */}
-      <div className="border-border-editorial border-t py-6">
-        <HorizontalMarquee items={techStack} duration={46} />
+      <div className="space-y-24 pt-20 md:space-y-32 md:pt-28">
+        <Audiences />
+        <Process />
+        <Principles />
       </div>
-    </div>
+    </>
   );
 }
 

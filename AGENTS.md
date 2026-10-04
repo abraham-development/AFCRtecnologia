@@ -100,12 +100,46 @@ producto salvo petición explícita.
 - En el hero, el botón principal dice «Empieza un proyecto con nosotros» y el
   secundario «Ver Servicios». No hay atajos de una sola letra: el usuario los
   retiró porque una pulsación accidental cambiaba de página.
+- Ambos botones viven en `HeroActionCard` (pedido del usuario, 2026-10-03),
+  con «Empecemos» y «Cuéntanos qué quieres resolver.» encima: desde `lg` es
+  la columna derecha del hero (21rem; 25rem desde `xl`, para que el titular no
+  se parta en 4 líneas a 1024); debajo, va bajo la bajada. Por su contorno
+  corren en loop dos haces de luz tipo cometa (cian→verde y coral→ámbar, con
+  cabeza casi blanca) sobre un borde base cian tenue, más su halo difuso.
+  Ritmo pedido por el usuario (2026-10-03): una vuelta cada 7,06 s y
+  respiración del halo de 3,76 s, igual en la card del hero y en Servicios.
+  Un conic-gradient con todos los colores a la vez se leía como borde arcoíris
+  quieto: el usuario no veía movimiento. CSS puro en `globals.css`
+  (`.glow-card-*`, `@property --glow-angle`); la superficie es opaca para que
+  el halo no manche los botones. Corre siempre que
+  la card se ve —también en celular, donde no hay hover—, se pausa fuera de
+  pantalla o con la pestaña oculta y queda fijo con movimiento reducido. El
+  gradiente se declara en cada capa: `--glow-angle` no se hereda.
 - El footer compartido comienza con el directorio del sitio y termina en la
   barra legal. La franja «¿Prefieres conversar?» se retiró por decisión del
   usuario; WhatsApp y correo siguen disponibles en la columna de contacto.
 - En Servicios, las cuatro categorías principales forman un índice vertical:
   una categoría por fila a cualquier ancho. No volver a presentarlas en grilla
   ni añadir conteos junto a sus nombres.
+- La categoría activa del índice lleva la luz de Home (pedido del usuario,
+  2026-10-03): mismos dos cometas y colores, con fondo opaco `bg-bg-darkest`
+  (no volver a `bg-accent-cyan-glow`). Al seleccionarla, la luz se enciende:
+  los cometas salen disparados, destellan y se asientan en 0,9 s (el usuario
+  pidió no alargarlo), y luego corren en loop al ritmo de la card del hero. Se hace con
+  `GlowBeams` (`src/components/ui/`, SVG con `pathLength` y `--beam-t`), no
+  con conic-gradient. Trampa verificada: en una fila tan apaisada el giro por
+  ángulo se arrastra por el centro de los lados largos y se dispara en los
+  extremos; por perímetro la velocidad es constante. El halo va con `-z-10`
+  dentro del `nav` `isolate`: si no, pinta sobre las filas vecinas. La pausa
+  por visibilidad es `useGlowPause` (`src/hooks/`), compartida con la card
+  del hero.
+- En Nosotros, la franja de herramientas (marquesina) es la segunda sección,
+  justo bajo la cabecera (pedido del usuario, 2026-10-03). Sus dos líneas
+  divisorias llevan los colores de la luz de Home como degradado fijo
+  (`.glow-divider`: cian → verde → ámbar → coral). Sin cometas: se probaron
+  en ambos sentidos y a la velocidad de la marquesina, y el usuario los
+  retiró porque mareaban y tapaban las herramientas. No reintroducirlos. La
+  línea inferior hace de divisor: el contenido que sigue no lleva `hairline-t`.
 - El cursor personalizado es una flecha de alto contraste de 20 × 24 px (negra
   con borde claro); sobre enlaces, botones y `[data-cursor="expand"]` pasa a
   verde con halo. Es una **imagen de cursor nativa** en CSS (`globals.css`,
@@ -162,7 +196,7 @@ producto salvo petición explícita.
 | `/` | Hero de partículas + Recursos (8 artículos) | `src/components/home/` |
 | `/recursos/[slug]` | Artículo completo; `generateStaticParams` en ambos builds | `src/app/recursos/[slug]/page.tsx` · `src/components/resources/` |
 | `/servicios` | Directorio de 10 servicios, sin conteo junto a cada categoría | `src/components/services/` |
-| `/nosotros` | Audiencias, proceso, principios, herramientas | `src/components/about/` |
+| `/nosotros` | Cabecera, franja de herramientas, audiencias, proceso, principios | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
 
 - Todas las páginas y `sitemap.xml` se prerenderizan. `/api/contact` solo
