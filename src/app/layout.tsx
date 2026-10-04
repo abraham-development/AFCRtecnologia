@@ -5,10 +5,12 @@ import localFont from 'next/font/local';
 import './globals.css';
 
 import Preloader from '@/components/effects/Preloader';
+import { PRELOADER_SCRIPT } from '@/components/effects/preloader-script';
 import ReadingProgress from '@/components/effects/ReadingProgress';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import SmoothScrollProvider from '@/components/layout/SmoothScrollProvider';
+import InlineScript from '@/components/ui/InlineScript';
 import { agency } from '@/content/agency';
 import { allServices } from '@/content/services';
 import { siteUrl } from '@/lib/seo/site-url';
@@ -166,6 +168,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
 
         <Preloader />
+        {/* Conteo 00 -> 100 en linea: corre al llegar el HTML, sin esperar a React */}
+        <InlineScript code={PRELOADER_SCRIPT} />
         <ReadingProgress />
 
         <SmoothScrollProvider>

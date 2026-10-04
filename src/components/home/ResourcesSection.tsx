@@ -26,7 +26,14 @@ function ResourceCard({ article }: { article: ResourceArticle }) {
         className="group grid gap-[1.2rem] px-6 py-[1.2rem] sm:grid-cols-12 sm:gap-8 md:px-8 md:py-6"
       >
         <div className="relative sm:col-span-4">
-          <ResourceCover article={article} decorative sizes="(min-width: 640px) 30vw, 100vw" className="h-60" />
+          {/* Celular: portada entera en 16:9. Desde sm: alto de 240 px con recorte
+              central (las portadas llevan el motivo en el cuadrado central). */}
+          <ResourceCover
+            article={article}
+            decorative
+            sizes="(min-width: 640px) 30vw, 100vw"
+            className="aspect-video sm:aspect-auto sm:h-60"
+          />
         </div>
 
         <div className="flex flex-col sm:col-span-8">

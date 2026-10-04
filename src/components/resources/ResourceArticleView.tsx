@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import CtaBand from '@/components/layout/CtaBand';
 import ResourceCover from '@/components/resources/ResourceCover';
-import { coverSources, resourceHref, resourcesCopy } from '@/content/resources';
+import { resourceHref, resourcesCopy } from '@/content/resources';
 import { readingTimeFor } from '@/lib/reading-time';
 import type { ResourceArticle } from '@/types';
 
@@ -220,25 +220,6 @@ export function ResourceArticleView({ article, related }: ResourceArticleViewPro
 
           <figure className="mt-10">
             <ResourceCover article={article} priority fit="full" sizes="(min-width: 820px) 768px, 100vw" />
-            {article.cover ? (
-              <figcaption className="mt-3 flex justify-end">
-                <a
-                  href={coverSources(article.cover).full}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cursor="expand"
-                  className="text-micro text-text-secondary hover:text-accent-cyan group inline-flex min-h-11 items-center gap-2 transition-colors"
-                >
-                  {resourcesCopy.coverFull}
-                  <ArrowUpRight
-                    size={13}
-                    strokeWidth={1.5}
-                    aria-hidden="true"
-                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </a>
-              </figcaption>
-            ) : null}
           </figure>
 
           <div className="mt-12 max-w-[68ch] space-y-6 text-[1.0625rem] leading-[1.75]">{renderBody(article.body)}</div>

@@ -3,88 +3,48 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
+import { PRELOAD_DONE_EVENT, PRELOADER_ID } from '@/components/effects/preloader-script';
 import BrandLogo from '@/components/ui/BrandLogo';
 import { agency } from '@/content/agency';
 import { markAppReady } from '@/lib/utils';
 
-const STORAGE_KEY = 'afcr:preloaded';
-const DURATION = 1400;
-/** Lo maximo que un cuadro puede adelantar el conteo (ms). */
-const MAX_STEP = 50;
-/** Pausa con el 100 en pantalla antes de abrir la cortina (ms). */
-const HOLD_AT_100 = 120;
-
-/** easeOutCubic: el contador desacelera al acercarse a 100. */
-const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+declare global {
+  interface Window {
+    /** Estado del conteo que publica PRELOADER_SCRIPT (layout.tsx). */
+    __afcrPreload?: { done: boolean };
+  }
+}
 
 /**
- * Cortina de carga. Cuenta 00 -> 100 en 1.4s como maximo y se abre
- * verticalmente con una mascara. Solo se muestra una vez por sesion.
+ * Cortina de carga en cada carga completa del sitio (navegar entre paginas no
+ * la repite: vive en el layout). El conteo 00 -> 100 y la barra los mueve
+ * PRELOADER_SCRIPT, en linea justo despues de este componente, para que corran
+ * desde el primer cuadro sin esperar a la hidratacion. Aqui solo se abre la
+ * cortina con una mascara vertical cuando el conteo avisa que llego a 100.
  */
 export function Preloader() {
-  const [count, setCount] = useState(0);
   const [done, setDone] = useState(false);
-  /** Visita recurrente o movimiento reducido: se desmonta sin animar. */
+  /** Movimiento reducido: el script ya la oculto; se desmonta sin animar. */
   const [skip, setSkip] = useState(false);
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    let alreadySeen = false;
-    try {
-      alreadySeen = window.sessionStorage.getItem(STORAGE_KEY) === '1';
-    } catch {
-      alreadySeen = false;
-    }
-
-    if (alreadySeen || reduced) {
-      markAppReady();
-      // En el siguiente frame, fuera del efecto: nada de renders en cascada.
-      const immediate = requestAnimationFrame(() => setSkip(true));
-      return () => cancelAnimationFrame(immediate);
-    }
-
-    document.body.style.overflow = 'hidden';
     let frame = 0;
-    let holdTimer = 0;
-    /** Ultimo cuadro pintado; null hasta el primero. */
-    let prev: number | null = null;
-    /** Tiempo de conteo acumulado, solo de cuadros que llegaron a pintarse. */
-    let elapsed = 0;
 
-    // El reloj corre por cuadros pintados, no por tiempo de pared: mientras la
-    // carga bloquea el hilo (hidratacion, Three, fuentes) no se pinta nada, y
-    // medir desde el efecto se comia el conteo (00 -> 88, o 00 y abrir).
-    // Cada cuadro aporta como mucho MAX_STEP, asi siempre se ven los numeros
-    // intermedios; y empezar en el primer cuadro evita valores negativos.
-    const tick = (now: number) => {
-      if (prev !== null) elapsed += Math.min(now - prev, MAX_STEP);
-      prev = now;
-
-      const raw = Math.min(1, elapsed / DURATION);
-      setCount(Math.round(ease(raw) * 100));
-
-      if (raw < 1) {
-        frame = requestAnimationFrame(tick);
-        return;
-      }
-
-      try {
-        window.sessionStorage.setItem(STORAGE_KEY, '1');
-      } catch {
-        /* modo privado: no persistimos, no pasa nada */
-      }
-      // El 100 se pinta antes de abrir: AnimatePresence anima la salida con el
-      // ultimo render, y cerrar en el mismo cuadro mostraba el numero anterior.
-      holdTimer = window.setTimeout(() => setDone(true), HOLD_AT_100);
+    const finish = () => {
+      // En el siguiente frame, fuera del efecto: nada de renders en cascada.
+      frame = requestAnimationFrame(() => (reduced ? setSkip(true) : setDone(true)));
     };
 
-    frame = requestAnimationFrame(tick);
+    if (reduced) markAppReady();
+
+    // El conteo pudo terminar antes de hidratar (telefono lento) o despues.
+    if (window.__afcrPreload?.done) finish();
+    else window.addEventListener(PRELOAD_DONE_EVENT, finish, { once: true });
 
     return () => {
       cancelAnimationFrame(frame);
-      window.clearTimeout(holdTimer);
-      document.body.style.overflow = '';
+      window.removeEventListener(PRELOAD_DONE_EVENT, finish);
     };
   }, []);
 
@@ -107,6 +67,7 @@ export function Preloader() {
         {!done && !skip ? (
           <motion.div
             key="preloader"
+            id={PRELOADER_ID}
             className="afcr-preloader bg-bg-darkest noise fixed inset-0 z-[200] flex flex-col justify-between p-6 md:p-10"
             initial={{ clipPath: 'inset(0 0 0% 0)' }}
             exit={{ clipPath: 'inset(0 0 100% 0)' }}
@@ -118,16 +79,23 @@ export function Preloader() {
             <div className="flex items-end justify-between gap-6">
               <BrandLogo priority sizes="296px" className="h-[clamp(2.75rem,9vw,5rem)] min-w-0 shrink" />
 
-              <p className="font-mono text-[clamp(3rem,14vw,9rem)] leading-[0.8] font-light tabular-nums">
-                {count.toString().padStart(2, '0')}
+              {/* El texto lo escribe el script: React no debe corregirlo al hidratar */}
+              <p
+                data-preload-count
+                suppressHydrationWarning
+                className="font-mono text-[clamp(3rem,14vw,9rem)] leading-[0.8] font-light tabular-nums"
+              >
+                00
               </p>
             </div>
 
-            {/* Barra de progreso */}
+            {/* Barra de progreso (escala la mueve el script) */}
             <div className="bg-border-editorial relative mt-6 h-px w-full overflow-hidden">
-              <motion.span
+              <span
+                data-preload-bar
+                suppressHydrationWarning
                 className="bg-accent-cyan absolute inset-y-0 left-0 block w-full origin-left"
-                style={{ scaleX: count / 100 }}
+                style={{ transform: 'scaleX(0)' }}
               />
             </div>
           </motion.div>

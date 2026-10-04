@@ -21,10 +21,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Un modelo de IA genérico desconoce tu organización y puede inventar datos con total seguridad. RAG conecta la IA con tus documentos oficiales para responder con sustento y citar la fuente.',
     cover: {
-      name: 'rag',
-      alt: 'Infografía «LLM aislado vs. arquitectura RAG»: a la izquierda, un modelo aislado que inventa datos, desconoce el contexto interno y expone información confidencial; a la derecha, una arquitectura RAG que consulta los documentos oficiales, cita la fuente exacta y se actualiza al subir un archivo, con una tabla comparativa al pie.',
-      width: 2752,
-      height: 1536,
+      name: 'rag-portada',
+      alt: 'Esfera de vidrio luminosa sobre un archivo de documentos: hilos de luz cian, verde, ámbar y coral bajan hasta fichas concretas, como una IA que responde citando sus fuentes.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'Durante los últimos años, la adopción masiva de la Inteligencia Artificial generativa despertó grandes expectativas en directorios, gerencias y despachos públicos. La promesa de automatizar tareas complejas, redactar informes y atender consultas al instante motivó a miles de organizaciones a experimentar con modelos fundacionales de lenguaje (LLMs) como ChatGPT, Claude o Gemini.',
@@ -99,10 +99,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Tus clientes escriben por WhatsApp a toda hora y esperan una respuesta rápida. Un agente de IA atiende, cotiza y agenda, y deriva a una persona cuando hace falta.',
     cover: {
-      name: 'whatsapp',
-      alt: 'Lámina «Atención por mensajería a cualquier hora»: los mensajes llegan de noche y en fin de semana; un bot de menú con solo tres opciones corta la conversación; un agente de IA responde con datos del negocio, cotiza, agenda y registra al cliente; y deriva a una persona con el historial completo.',
-      width: 1280,
-      height: 720,
+      name: 'whatsapp-portada',
+      alt: 'Smartphone de pie sobre una superficie oscura, rodeado de burbujas de chat de vidrio iluminadas en verde, con una luna creciente arriba: atención a cualquier hora.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'Para muchos negocios en el Perú, WhatsApp es el canal principal de ventas. Por ahí llegan las preguntas por precios, horarios, stock y formas de pago. El problema es que los mensajes no respetan el horario de oficina: llegan de noche, los fines de semana o todos al mismo tiempo. Y cada mensaje que se queda sin respuesta es un cliente que puede escribirle a la competencia.',
@@ -132,10 +132,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Copiar datos entre sistemas, enviar recordatorios, armar reportes. Cuando estas tareas se automatizan, tu equipo recupera tiempo para el trabajo que sí requiere criterio.',
     cover: {
-      name: 'automatizacion',
-      alt: 'Lámina «De la tarea manual al flujo»: el ciclo de copiar un formulario, reenviar un correo y armar el reporte del lunes; el flujo en que llega un formulario, se crea el contacto y se avisa al vendedor, con factura, recordatorio y reporte semanal; y las tareas con IA de clasificar correos, extraer datos y resumir.',
-      width: 1280,
-      height: 720,
+      name: 'automatizacion-portada',
+      alt: 'Cinta transportadora oscura por la que avanzan cubos de vidrio iluminados en ámbar a través de varias estaciones, como tareas que se ejecutan solas.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'En casi todas las empresas hay tareas que nadie disfruta: copiar los datos de un formulario a una hoja de cálculo, reenviar correos al área correcta, armar el mismo reporte cada lunes o recordarle a un cliente que tiene un pago pendiente. Cada una toma pocos minutos, pero sumadas a lo largo de la semana consumen horas valiosas. Y como se hacen a mano, también son una fuente constante de errores.',
@@ -165,10 +165,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Un agente de IA no solo conversa: consulta tus sistemas, sigue tus reglas y ejecuta tareas. Así se diferencia de un asistente genérico y así se diseña uno para tu empresa.',
     cover: {
-      name: 'agentes',
-      alt: 'Lámina «Del chatbot al agente que actúa»: un chatbot genérico que solo conversa; un agente unido al CRM, al correo, a documentos y a tickets que prepara una propuesta con las plantillas del negocio; y una compuerta de aprobación humana para enviar, borrar o hablar con un cliente importante.',
-      width: 1280,
-      height: 720,
+      name: 'agentes-portada',
+      alt: 'Nodo orquestador de vidrio conectado a una tarjeta de contacto, un sobre, un documento y un ticket, con un arco coral de aprobación humana debajo.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'Muchas empresas ya probaron asistentes de IA genéricos: ayudan a redactar un correo o a resumir un documento, pero se quedan cortos cuando el trabajo depende de los sistemas, los datos y las reglas propias del negocio. Ahí es donde entran los agentes de IA personalizados.',
@@ -195,10 +195,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Antes de escribirte, un cliente revisa tu web. La velocidad, la claridad y la confianza deciden si te contacta o vuelve a Google a buscar otra opción.',
     cover: {
-      name: 'web',
-      alt: 'Lámina «La web como primera impresión»: las tres preguntas de qué haces, si es para el visitante y cómo contactarte; un celular que tarda frente a una página clara; y las señales de dominio propio, candado, contacto real e información al día, con el camino del formulario al correo o al CRM.',
-      width: 1280,
-      height: 720,
+      name: 'web-portada',
+      alt: 'Ventanas de navegador de vidrio escalonadas en profundidad, con la del frente iluminada como una primera impresión.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'Las redes sociales son útiles para darte a conocer, pero no son tu casa: no controlas el algoritmo, el formato ni las reglas, que pueden cambiar en cualquier momento. Tu página web es el único espacio digital que es completamente tuyo. Y en la mayoría de los casos es lo primero que revisa un cliente antes de decidir si te escribe.',
@@ -225,10 +225,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Es probable que tu equipo ya use IA, con o sin permiso. Capacitarlo convierte ese uso improvisado en productividad real y evita riesgos con información sensible.',
     cover: {
-      name: 'capacitacion',
-      alt: 'Lámina «Capacitar antes que comprar la herramienta»: el uso improvisado que mete un contrato y una lista de clientes en una herramienta pública; qué aprender, incluidos los límites, las instrucciones, la verificación y qué no se comparte; y la práctica con el informe mensual y una guía interna.',
-      width: 1280,
-      height: 720,
+      name: 'capacitacion-portada',
+      alt: 'Mesa de taller con cuadernos abiertos y sillas alrededor; sobre ella, una esfera de luz ámbar envía hilos de colores a los apuntes.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'Aunque tu empresa no haya adoptado oficialmente la inteligencia artificial, es muy probable que tu equipo ya la esté usando: para redactar correos, resumir documentos o resolver dudas. Eso no es malo en sí mismo, pero cuando el uso es improvisado aparecen riesgos que muchas organizaciones no ven hasta que es tarde.',
@@ -255,10 +255,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Un sistema estándar sirve hasta que tu operación empieza a adaptarse a él. Estas son las señales de que conviene desarrollar software propio y cómo hacerlo con menos riesgo.',
     cover: {
-      name: 'software',
-      alt: 'Lámina «Paquete o software a medida»: contabilidad y correo como procesos que ya cubre un paquete; el mismo registro copiado en varios lugares cuando hace falta algo propio; aplicación web desde el navegador y aplicación móvil con cámara, ubicación o sin conexión; y el camino de una primera versión, entregas por etapas y código y datos propios.',
-      width: 1280,
-      height: 720,
+      name: 'software-portada',
+      alt: 'Bloques de vidrio iluminados en verde que encajan en una base a medida, junto a una caja genérica cerrada y oscura.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'Muchas empresas funcionan con una mezcla de hojas de cálculo, aplicaciones sueltas y un sistema comprado que cubre parte del trabajo. Al inicio basta. Con el crecimiento aparecen los parches: datos que se copian a mano de un lugar a otro, procesos que dependen de una sola persona y reportes que toman horas en armarse.',
@@ -286,10 +286,10 @@ export const resourceArticles: ResourceArticle[] = [
     excerpt:
       'Un mini PC ocupa poco espacio y suele consumir menos energía que una torre; las cámaras te dejan ver tu local desde el celular. Bien elegidos e instalados, simplifican el día a día.',
     cover: {
-      name: 'dispositivos',
-      alt: 'Lámina «Mini PC y cámaras para el local»: un mini PC en caja o recepción, silencioso y de poco espacio; el plano de una tienda con cámaras en caja, estanterías, almacén y entrada, y la vista desde el celular; y el cartel de zona de videovigilancia, con aviso, contraseña de fábrica e instalación.',
-      width: 1280,
-      height: 720,
+      name: 'dispositivos-portada',
+      alt: 'Un mini PC y una cámara domo de seguridad sobre un plinto oscuro, con luz de contorno coral.',
+      width: 2048,
+      height: 1152,
     },
     body: [
       'No toda la tecnología de una empresa es software. Los equipos donde trabaja tu equipo y los dispositivos que protegen tu local también influyen en la productividad y en la tranquilidad del día a día. Dos opciones que se han vuelto muy populares son los mini PC y los sistemas de cámaras de seguridad.',
@@ -331,7 +331,6 @@ export function coverSources(cover: ResourceCoverImage) {
   return {
     src: `${base}-1600.webp`,
     srcSet: `${base}-800.webp 800w, ${base}-1600.webp 1600w, ${base}-${cover.width}.webp ${cover.width}w`,
-    full: `${base}-${cover.width}.webp`,
     og: `${base}-og.jpg`,
   };
 }
@@ -349,8 +348,6 @@ export const resourcesCopy = {
   authorLabel: 'Autor',
   readingLabel: 'de lectura',
   readMore: 'Leer artículo',
-  /** Enlace bajo la portada: las infografias se leen mejor a tamano completo. */
-  coverFull: 'Ver imagen en tamaño completo',
   back: 'Volver a recursos',
   relatedTitle: 'Sigue leyendo',
   ctaTitle: '¿Quieres aplicar esto en tu negocio?',

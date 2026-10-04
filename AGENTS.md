@@ -155,10 +155,15 @@ producto salvo petición explícita.
   clase del body antes de hidratar (caso observado: `expansion-alids-init`).
 - Noticias y MCP eliminados por decisión del usuario (2026-09-29): no existen
   `/noticias/*`, `/api/mcp`, ni el código de Supabase del sitio, y los tokens
-  `afcr_…` quedaron revocados en `agent_tokens`. Las tablas (`news_posts`,
-  `agent_tokens`) y el bucket `news-covers` siguen en Supabase sin uso; las
-  migraciones de `supabase/` documentan ese esquema. No reintroducir noticias
-  ni el MCP sin pedido.
+  `afcr_…` quedaron revocados en `agent_tokens`. No reintroducir noticias ni
+  el MCP sin pedido.
+- **El sitio no tiene base de datos** (pedido del usuario, 2026-10-04): se
+  retiraron la carpeta `supabase/` (migraciones y seed, que siguen en el
+  historial de Git), `.mcp.json` (servidor MCP de Supabase para agentes) y
+  las variables `SUPABASE_*` de `.env.local` y `.env.production`. En hPanel,
+  el usuario quita a mano `SUPABASE_URL` y `SUPABASE_API_KEY`. El proyecto de
+  Supabase (tablas `news_posts` y `agent_tokens`, bucket `news-covers`) queda
+  sin uso y no se borró.
 - En su lugar, la Home muestra «RECURSOS» (pedido del usuario, 2026-10-01):
   8 artículos, uno por servicio, que explican el problema y la solución y solo
   invitan a contactar en el cierre (promoción indirecta). Temas, en este orden:
@@ -167,7 +172,8 @@ producto salvo petición explícita.
   dispositivos (mini PC y cámaras de seguridad). El título va al pie del hero,
   entre dos líneas editoriales, en mayúsculas por CSS y con una bajada.
   Debajo, un artículo por fila con la card editorial: portada a la izquierda
-  (alto fijo de 240 px, `h-60`, pedido del usuario; no volver a 4:3) y
+  (desde `sm`, alto fijo de 240 px, `h-60`, pedido del usuario; no volver a
+  4:3; en celular, entera en 16:9 con `aspect-video`) y
   autor «Equipo de AFCRtecnologia», título, resumen, tema y lectura. **Sin
   fecha** (decisión del usuario: son atemporales). Cada card abre
   `/recursos/[slug]` con el texto completo, «Sigue leyendo» y `CtaBand`.
@@ -175,16 +181,32 @@ producto salvo petición explícita.
   pedido. Su cuerpo usa la sintaxis completa de `ResourceArticle.body`
   (`##`, `###`, `- `, `1. `, tabla con `| ` y `**negrita**`); la tabla se
   muestra apilada por fila en celular y completa desde `sm`.
-- Portadas: una infografía por artículo en `public/recursos/`, exportada con
-  PIL a `<name>-{800,1600,<ancho original>}.webp` (q 84, compuesta sobre blanco
-  si trae alfa) y `<name>-og.jpg` de 1200 px para redes; en el artículo,
-  `cover: { name, alt, width, height }`. La de RAG la entregó el usuario. Las
-  otras siete son láminas del contenido de cada artículo (papel marfil,
-  paneles en ámbar, verde, teal y coral, no un solo azul; no foto de stock
-  ni viñeta). En la card se recortan al centro (240 px
-  de alto, imagen decorativa); en el artículo van enteras, con su proporción y
-  un enlace a tamaño completo. Sin portada, `ResourceCover` muestra la
-  tipográfica (tema en Fraunces, recortado, con grano). No usar fotos de stock.
+- Portadas (pedido del usuario, 2026-10-04): serie de 8 renders 3D
+  editoriales oscuros, generados con APIMart (`gpt-image-2`, 16:9, 2K).
+  Reemplazaron por completo las infografías en papel marfil, incluida la de
+  RAG: no volver a infografías ni a láminas claras.
+  - Estilo común: navy profundo, vidrio esmerilado y metal oscuro, luz
+    volumétrica y acentos de la paleta de los cometas (cian, verde, ámbar,
+    coral). **Sin texto, letras, logos ni caras.** El motivo va dentro del
+    cuadrado central: desde `sm` la card recorta casi a 1:1.
+  - La RAG elegida sirvió de referencia de estilo para las demás. Agentes usa
+    otra composición para no repetir la de RAG.
+  - Archivos `public/recursos/<tema>-portada-{800,1600,2048}.webp` (q 84) y
+    `<tema>-portada-og.jpg` de 1200 px para redes; en el artículo,
+    `cover: { name, alt, width, height }` con un `alt` que describe la escena.
+    Si una imagen trae alfa, se compone sobre `#0d1828`.
+  - `ResourceCover` las enmarca con un marco doble editorial (borde, paspartú
+    navy y línea interior) en la card y en el artículo; en el artículo van
+    enteras y ya no hay enlace «Ver imagen en tamaño completo».
+  - Sin portada, `ResourceCover` muestra la tipográfica (tema en Fraunces,
+    recortado, con grano), con el mismo marco. No usar fotos de stock.
+  - Para generar más: key en `APIMART_API_KEY` de `.env.local`; scripts y
+    candidatas fuera del repo (`~/Proyectos/AFCRtecnologia-portadas-candidatas/`).
+    API: `POST https://api.apimart.ai/v1/images/generations` (`model`,
+    `prompt`, `size: "16:9"`, `resolution`) devuelve un `task_id`; se consulta
+    `GET /v1/tasks/{id}` hasta `completed` y se descarga de
+    `data.result.images[0].url[0]`. Las URL caducan en 24–72 h. La red hacia
+    APIMart corta a veces (ETIMEDOUT): reintentar la consulta, no la creación.
 - Los artículos no inventan clientes, métricas, precios ni plazos.
 
 ---
@@ -224,7 +246,6 @@ producto salvo petición explícita.
 | Catálogo de servicios | `src/content/services.ts` |
 | Recursos: artículos y copy | `src/content/resources.ts` |
 | Recursos: lista, portada y artículo | `src/components/home/ResourcesSection.tsx` · `src/components/resources/` |
-| Esquema Supabase sin uso (noticias/MCP retirados) | `supabase/migrations/` · `supabase/seed.sql` |
 | Validación compartida | `src/lib/validations.ts` |
 | Endpoint Node | `src/app/api/contact/route.node.ts` |
 | Fallback PHP estático | `public/contact.php` |
@@ -351,8 +372,12 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   nuevo, no solo reiniciar la app.
 - Datos aún marcadores: correo y dirección en `src/content/agency.ts`; URLs de
   Facebook, Instagram y LinkedIn; páginas legales del footer.
-- Las variables `SUPABASE_*` de hPanel ya no las usa el sitio; pueden
-  retirarse allí (recordar que la API de variables reemplaza el conjunto).
+- `APIMART_API_KEY` (solo en `.env.local`) sirve para generar las portadas
+  de Recursos en local. **No va a Hostinger** y ningún código del sitio la
+  lee; los scripts de generación viven fuera del repo.
+- Para cambiar variables en Hostinger: la API reemplaza el conjunto completo
+  y devuelve los valores enmascarados. Con un solo cambio, es más seguro
+  hacerlo a mano en hPanel.
 - Trampa verificada en producción, útil si vuelve algún contenido dinámico:
   Hostinger corre **varios procesos Node** y no completa el trabajo que Next
   deja en segundo plano: `revalidateTag` solo refrescaba un proceso y el ISR
@@ -393,11 +418,31 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   - Para probar el despertar en Chrome headless hay que lanzar con los
     `--blink-settings` de puntero fino (ver el hover del logotipo): sin ellos
     no hay puntero fino y el listener no se registra.
-  - Preloader (trampa verificada): el conteo corre por cuadros pintados.
-    Empieza en el primer rAF, cada cuadro suma como mucho 50 ms y el 100 se
-    sostiene 120 ms antes de abrir. Medido desde el efecto, el bloqueo de
-    carga se comía el conteo (00 → 88, valores negativos, o 00 y abrir), y
-    `AnimatePresence` anima la salida con el último render pintado.
+  - Preloader (pedido del usuario, 2026-10-04): la cortina cuenta 00 → 100
+    en **cada carga completa**; navegar entre páginas no la repite, porque
+    vive en el layout. Ya no hay marca de sesión.
+    - El conteo y la barra los mueve `PRELOADER_SCRIPT`
+      (`src/components/effects/preloader-script.ts`), en línea en `layout.tsx`
+      justo después de `<Preloader />`. `Preloader` solo abre la cortina
+      cuando el script avisa con `afcr:preload-done`.
+    - Trampa verificada: si el conteo depende de React, en un teléfono la
+      hidratación tarda 2–3 s. En recargas se veía un «00» congelado y luego
+      la página; en la primera visita el conteo saltaba (00 → 88, incluso
+      negativos). El script corre al llegar el HTML y avanza por cuadros
+      pintados (máximo 50 ms por cuadro, así nunca salta), y sostiene el 100
+      120 ms antes de avisar.
+    - El número y la barra llevan `suppressHydrationWarning`: React no debe
+      corregir lo que escribió el script.
+    - El script se incrusta con `InlineScript` (`src/components/ui/`), no con
+      un `<script>` directo ni con `next/script`. React 19 avisa
+      («Encountered a script tag…») cada vez que crea un `<script>` en el
+      navegador, por ejemplo al recargar en caliente el layout en desarrollo.
+      `next/script` con `beforeInteractive` tampoco lo evita y además retrasa
+      la ejecución hasta que carga el runtime de Next. `InlineScript` emite el
+      script ejecutable en el servidor y lo declara `text/plain` (inerte) en
+      el cliente.
+    - Medido en móvil emulado (CPU 1× y 6×, primera carga y recarga): 33–43
+      números pintados en subida y la cortina se abre siempre en «100».
   - Los cometas de la card son el mayor costo restante. El usuario decidió
     no tocarlos: no optimizarlos sin pedido.
 - `prefers-reduced-motion` desactiva Lenis, partículas y preloader (el cursor
