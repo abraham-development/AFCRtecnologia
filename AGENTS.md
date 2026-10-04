@@ -384,15 +384,20 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   - En ≤ 768 px el fondo WebGL va sin niebla desde el inicio (la atmósfera
     la pone el degradado `webgl-fallback` a través del lienzo transparente),
     con 700 partículas, ~30 fps y umbral de degradación de 45 ms.
-  - Las palabras de `ParticleText` apagan su bucle al quedar en reposo y solo
-    las despierta un mouse cercano (`(hover: hover) and (pointer: fine)`).
-    En táctil se arman una vez y quedan quietas. En ≤ 768 px usan el 60 % del
-    presupuesto de partículas.
+  - En ≤ 768 px el titular del hero es texto real, sin partículas (pedido del
+    usuario, 2026-10-04): `ParticleText` sale del efecto antes de muestrear y
+    queda el texto de respaldo (marfil y cian, Fraunces estática). Arriba de
+    ese ancho, las palabras apagan su bucle al quedar en reposo y solo las
+    despierta un mouse cercano (`(hover: hover) and (pointer: fine)`); en
+    tablets táctiles se arman una vez y quedan quietas.
   - Para probar el despertar en Chrome headless hay que lanzar con los
     `--blink-settings` de puntero fino (ver el hover del logotipo): sin ellos
     no hay puntero fino y el listener no se registra.
-  - Medido en móvil emulado (CPU 4×): las letras pasan de redibujarse en cada
-    cuadro a 0 cuadros tras armarse, y el script baja de ~35 a ~20 ms/s.
+  - Preloader (trampa verificada): el conteo corre por cuadros pintados.
+    Empieza en el primer rAF, cada cuadro suma como mucho 50 ms y el 100 se
+    sostiene 120 ms antes de abrir. Medido desde el efecto, el bloqueo de
+    carga se comía el conteo (00 → 88, valores negativos, o 00 y abrir), y
+    `AnimatePresence` anima la salida con el último render pintado.
   - Los cometas de la card son el mayor costo restante. El usuario decidió
     no tocarlos: no optimizarlos sin pedido.
 - `prefers-reduced-motion` desactiva Lenis, partículas y preloader (el cursor

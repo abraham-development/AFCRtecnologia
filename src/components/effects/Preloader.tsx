@@ -9,6 +9,10 @@ import { markAppReady } from '@/lib/utils';
 
 const STORAGE_KEY = 'afcr:preloaded';
 const DURATION = 1400;
+/** Lo maximo que un cuadro puede adelantar el conteo (ms). */
+const MAX_STEP = 50;
+/** Pausa con el 100 en pantalla antes de abrir la cortina (ms). */
+const HOLD_AT_100 = 120;
 
 /** easeOutCubic: el contador desacelera al acercarse a 100. */
 const ease = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -41,11 +45,23 @@ export function Preloader() {
     }
 
     document.body.style.overflow = 'hidden';
-    const start = performance.now();
     let frame = 0;
+    let holdTimer = 0;
+    /** Ultimo cuadro pintado; null hasta el primero. */
+    let prev: number | null = null;
+    /** Tiempo de conteo acumulado, solo de cuadros que llegaron a pintarse. */
+    let elapsed = 0;
 
+    // El reloj corre por cuadros pintados, no por tiempo de pared: mientras la
+    // carga bloquea el hilo (hidratacion, Three, fuentes) no se pinta nada, y
+    // medir desde el efecto se comia el conteo (00 -> 88, o 00 y abrir).
+    // Cada cuadro aporta como mucho MAX_STEP, asi siempre se ven los numeros
+    // intermedios; y empezar en el primer cuadro evita valores negativos.
     const tick = (now: number) => {
-      const raw = Math.min(1, (now - start) / DURATION);
+      if (prev !== null) elapsed += Math.min(now - prev, MAX_STEP);
+      prev = now;
+
+      const raw = Math.min(1, elapsed / DURATION);
       setCount(Math.round(ease(raw) * 100));
 
       if (raw < 1) {
@@ -58,13 +74,16 @@ export function Preloader() {
       } catch {
         /* modo privado: no persistimos, no pasa nada */
       }
-      setDone(true);
+      // El 100 se pinta antes de abrir: AnimatePresence anima la salida con el
+      // ultimo render, y cerrar en el mismo cuadro mostraba el numero anterior.
+      holdTimer = window.setTimeout(() => setDone(true), HOLD_AT_100);
     };
 
     frame = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(frame);
+      window.clearTimeout(holdTimer);
       document.body.style.overflow = '';
     };
   }, []);

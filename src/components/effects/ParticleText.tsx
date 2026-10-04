@@ -44,8 +44,6 @@ const REPEL_FORCE = 620;
 const SPRING = 0.085;
 const DAMPING = 0.8;
 const DEFAULT_MAX_PARTICLES = 7000;
-/** En pantallas chicas el titular mide menos: basta con 60 % del presupuesto. */
-const SMALL_SCREEN_BUDGET = 0.6;
 /** Reposo: todas las particulas en casa (px) y casi quietas (px/cuadro). */
 const REST_DISTANCE = 0.35;
 const REST_SPEED = 0.05;
@@ -55,7 +53,8 @@ const REST_SPEED = 0.05;
  * y vuelven a agruparse. El texto real permanece en el DOM (invisible pero
  * accesible); si el canvas no puede montarse, se muestra con acento cian.
  * Cuando todo queda en reposo el bucle se apaga y solo lo despierta un mouse
- * cercano; en tactil las letras se arman una vez y quedan quietas.
+ * cercano; en tactil las letras se arman una vez y quedan quietas. En celular
+ * (<= 768 px) no hay particulas: se muestra el texto real.
  */
 export function ParticleText({
   text,
@@ -75,6 +74,9 @@ export function ParticleText({
 
   useEffect(() => {
     if (reduced || !active) return;
+    // Celular: el titular queda como texto real (pedido del usuario: las
+    // particulas pesaban y estiraban la carga). Mismo corte que el fondo WebGL.
+    if (window.matchMedia('(max-width: 768px)').matches) return;
 
     const wrap = wrapRef.current;
     const textEl = textRef.current;
@@ -100,9 +102,6 @@ export function ParticleText({
     // Solo un mouse real dispersa las letras. En tactil se arman una vez y
     // quedan quietas: el arrastre del scroll no debe despertar el bucle.
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const budget = window.matchMedia('(max-width: 768px)').matches
-      ? Math.round(maxParticles * SMALL_SCREEN_BUDGET)
-      : maxParticles;
     /** Bucle detenido porque todo esta en reposo (el lienzo conserva el ultimo cuadro). */
     let sleeping = false;
 
@@ -188,7 +187,7 @@ export function ParticleText({
           }
         }
 
-        if (sampled.length <= budget) break;
+        if (sampled.length <= maxParticles) break;
         step += 1;
       }
 
