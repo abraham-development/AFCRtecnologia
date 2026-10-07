@@ -184,7 +184,7 @@ interface ResourceArticleViewProps {
 export function ResourceArticleView({ article, related }: ResourceArticleViewProps) {
   return (
     <>
-      <article className="shell pt-40 pb-20 md:pt-48 md:pb-28">
+      <article className="shell pt-40 pb-20 sm:pt-28 md:pt-36 md:pb-28 lg:pt-48">
         <div className="mx-auto max-w-3xl">
           <Link
             href="/#recursos"

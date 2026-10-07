@@ -1,3 +1,5 @@
+import { storeCopy } from './store';
+
 /**
  * Textos propios de cada pagina (cabeceras, metadatos y CTA).
  * El contenido de catalogo vive en `services.ts`, `resources.ts` y `agency.ts`.
@@ -42,6 +44,25 @@ export const pageIntros = {
     metaDescription:
       'Escríbenos por WhatsApp o déjanos tu mensaje: te respondemos en menos de 24 horas hábiles.',
   },
+  store: {
+    title: 'Tienda online',
+    lede: storeCopy.lede,
+    metaTitle: 'Tienda online',
+    metaDescription:
+      storeCopy.lede,
+  },
+  signIn: {
+    title: 'Iniciar sesión',
+    lede: 'Entra con tu cuenta de la tienda.',
+    metaTitle: 'Iniciar sesión',
+    metaDescription: 'Inicia sesión en tu cuenta de la tienda de AFCRtecnologia.',
+  },
+  signUp: {
+    title: 'Crear una nueva cuenta',
+    lede: 'Regístrate para usar la tienda.',
+    metaTitle: 'Crear una nueva cuenta',
+    metaDescription: 'Crea una cuenta en la tienda de AFCRtecnologia.',
+  },
 };
 
 /** Cierre de la pagina de servicios. */
@@ -49,4 +70,11 @@ export const servicesCloser = {
   title: '¿No sabes por cuál empezar?',
   body: 'Cuéntanos qué quieres resolver y te recomendamos el camino más corto.',
   cta: 'Hablemos',
+};
+
+/** Cierre de la tienda: aun no hay catalogo publicado. */
+export const storeCloser = {
+  title: '¿Necesitas un equipo?',
+  body: 'Cuéntanos para qué lo quieres y te decimos cuál corresponde, con disponibilidad y precio.',
+  cta: 'Escríbenos',
 };

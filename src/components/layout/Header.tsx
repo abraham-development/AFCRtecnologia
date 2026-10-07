@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+import AccountActions from '@/components/layout/AccountActions';
 import FullscreenMenu from '@/components/layout/FullscreenMenu';
 import BrandIcon from '@/components/ui/BrandIcon';
 import BrandLogo from '@/components/ui/BrandLogo';
@@ -56,76 +57,88 @@ export function Header() {
             <BrandLogo priority sizes="193px" className="h-[clamp(2.5rem,3.8vw,3.25rem)] short:h-8" />
           </Link>
 
-          <span aria-hidden="true" className="bg-border-editorial hidden h-px flex-1 lg:block" />
+          <span
+            aria-hidden="true"
+            className="bg-border-editorial hidden h-px min-w-4 flex-1 sm:block short:!hidden"
+          />
 
-          {/* Acceso rapido + hamburguesa */}
-          <div className="flex shrink-0 items-center gap-4 md:gap-6">
+          <AccountActions className="hidden sm:flex" />
+
+          {/* Solo celular, y tambien si la barra de enlaces no cabe (poca altura). */}
+          <button
+            ref={toggleRef}
+            type="button"
+            data-cursor="expand"
+            onClick={() => setMenuOpen(true)}
+            aria-expanded={menuOpen}
+            aria-haspopup="dialog"
+            aria-label="Abrir menú"
+            className="group border-accent-cyan/70 bg-bg-darkest/80 hover:border-accent-cyan hover:bg-accent-cyan focus-visible:bg-accent-cyan flex h-12 w-12 shrink-0 items-center justify-center border transition-[background-color,border-color,transform] duration-300 hover:-translate-y-0.5 active:translate-y-0 lg:hidden short:!flex"
+          >
+            <span aria-hidden="true" className="flex w-6 flex-col items-end gap-1.5">
+              <span className="bg-accent-cyan group-hover:bg-bg-darkest group-focus-visible:bg-bg-darkest block h-0.5 w-6 transition-colors duration-300" />
+              <span className="bg-accent-cyan group-hover:bg-bg-darkest group-focus-visible:bg-bg-darkest block h-0.5 w-4 transition-all duration-300 group-hover:w-6" />
+              <span className="bg-accent-cyan group-hover:bg-bg-darkest group-focus-visible:bg-bg-darkest block h-0.5 w-6 transition-colors duration-300" />
+            </span>
+          </button>
+        </div>
+
+        {/* En pantallas estrechas los dos botones no caben junto al logo. */}
+        <div className="shell flex justify-end pb-3 sm:hidden">
+          <AccountActions />
+        </div>
+
+        {/* Segundo nivel: enlaces a la izquierda, WhatsApp a la derecha.
+            En celular y en pantallas bajas lo reemplaza la hamburguesa. */}
+        <nav
+          aria-label="Navegación principal"
+          className="border-border-editorial hidden border-y lg:block short:!hidden"
+        >
+          <div className="shell flex h-11 items-center justify-between gap-6">
+            <ul className="flex min-w-0 items-center gap-6 xl:gap-10">
+              {navItems.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <li key={link.href} className="shrink-0">
+                    <Link
+                      href={link.href}
+                      data-cursor="expand"
+                      aria-current={active ? 'page' : undefined}
+                      className={cn(
+                        'group relative flex h-11 items-center text-[0.8125rem] font-medium tracking-[-0.005em] whitespace-nowrap transition-colors xl:text-[0.9375rem]',
+                        active ? 'text-text-primary' : 'text-text-primary/75 hover:text-text-primary',
+                      )}
+                    >
+                      {link.label}
+                      {active ? (
+                        <span
+                          aria-hidden="true"
+                          className="border-accent-cyan pointer-events-none absolute -inset-x-1 inset-y-1.5 border"
+                        />
+                      ) : null}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
             {hasWhatsApp ? (
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor="expand"
-                className="group border-accent-cyan/70 bg-bg-darkest/80 text-[0.875rem] font-medium text-text-primary hover:border-accent-cyan hover:bg-accent-cyan hover:text-bg-darkest focus-visible:bg-accent-cyan focus-visible:text-bg-darkest hidden max-w-[15.5rem] items-center gap-2.5 border px-3 py-2 text-left leading-tight transition-[background-color,border-color,color] duration-300 sm:inline-flex lg:max-w-none lg:px-4"
+                className="group border-accent-cyan/70 bg-bg-darkest/80 text-text-primary hover:border-accent-cyan hover:bg-accent-cyan hover:text-bg-darkest focus-visible:bg-accent-cyan focus-visible:text-bg-darkest inline-flex h-9 shrink-0 items-center gap-2.5 border px-3.5 text-[0.8125rem] font-medium whitespace-nowrap transition-[background-color,border-color,color] duration-300 xl:px-4 xl:text-[0.875rem]"
               >
                 {headerCopy.advisorCta}
-                <BrandIcon network="whatsapp" size={16} className="shrink-0 text-accent-cyan group-hover:text-bg-darkest group-focus-visible:text-bg-darkest" />
+                <BrandIcon
+                  network="whatsapp"
+                  size={16}
+                  className="text-accent-cyan group-hover:text-bg-darkest group-focus-visible:text-bg-darkest shrink-0"
+                />
               </a>
             ) : null}
-
-            <button
-              ref={toggleRef}
-              type="button"
-              data-cursor="expand"
-              onClick={() => setMenuOpen(true)}
-              aria-expanded={menuOpen}
-              aria-haspopup="dialog"
-              aria-label="Abrir menú"
-              className="group border-accent-cyan/70 bg-bg-darkest/80 hover:border-accent-cyan hover:bg-accent-cyan focus-visible:bg-accent-cyan flex h-12 w-12 items-center justify-center border transition-[background-color,border-color,transform] duration-300 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <span aria-hidden="true" className="flex w-6 flex-col items-end gap-1.5">
-                <span className="bg-accent-cyan group-hover:bg-bg-darkest group-focus-visible:bg-bg-darkest block h-0.5 w-6 transition-colors duration-300" />
-                <span className="bg-accent-cyan group-hover:bg-bg-darkest group-focus-visible:bg-bg-darkest block h-0.5 w-4 transition-all duration-300 group-hover:w-6" />
-                <span className="bg-accent-cyan group-hover:bg-bg-darkest group-focus-visible:bg-bg-darkest block h-0.5 w-6 transition-colors duration-300" />
-              </span>
-            </button>
           </div>
-        </div>
-
-        {/* Segundo nivel: navbar, entre dos lineas divisorias */}
-        {/* En moviles apaisados (poca altura) se oculta: queda el menu hamburguesa */}
-        <nav
-          aria-label="Navegación principal"
-          className={cn(
-            'border-border-editorial border-y short:hidden',
-          )}
-        >
-          <ul className="shell flex h-11 items-center justify-between sm:justify-start sm:gap-10 md:gap-14">
-            {navItems.map((link) => {
-              const active = isActive(link.href);
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    data-cursor="expand"
-                    aria-current={active ? 'page' : undefined}
-                    className={cn(
-                      'group relative flex h-11 items-center text-[0.8125rem] font-medium tracking-[-0.005em] transition-colors min-[375px]:text-[0.875rem] md:text-[0.9375rem]',
-                      active ? 'text-text-primary' : 'text-text-primary/75 hover:text-text-primary',
-                    )}
-                  >
-                    {link.label}
-                    {active ? (
-                      <span
-                        aria-hidden="true"
-                        className="border-accent-cyan pointer-events-none absolute -inset-x-1 inset-y-1.5 border"
-                      />
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
         </nav>
       </motion.header>
 

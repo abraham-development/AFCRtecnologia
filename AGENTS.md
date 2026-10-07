@@ -12,9 +12,14 @@ este archivo.
 
 ## Protocolo de memoria entre sesiones
 
-Un hilo nuevo no ve los chats anteriores. Este archivo es la única memoria que
-cruza sesiones: Cursor lo inyecta al empezar. No buscar el contexto en
-transcripciones, en `CLAUDE.md` ni en el hilo previo.
+Un hilo nuevo no ve los chats anteriores. Cursor inyecta este archivo al
+empezar: es la única memoria que cruza sesiones. No buscar el contexto en
+transcripciones, en `CLAUDE.md` ni en el hilo previo. `PRODUCT.md` guarda la
+verdad de producto; este archivo guarda cómo está hecho el sitio y qué no
+debe reintroducirse.
+
+La memoria es el texto vigente de cada sección, no un historial. Otro hilo
+solo acierta si la frase que leería sigue siendo cierta.
 
 ### Al comenzar
 
@@ -31,16 +36,20 @@ transcripciones, en `CLAUDE.md` ni en el hilo previo.
 
 ### Qué escribir antes de cerrar el hilo
 
-Actualizar la sección afectada en el mismo cambio, sustituyendo la frase que
-dejó de ser cierta. No añadir una bitácora ni un diario de tareas. Entra aquí
-solo lo que otro hilo repetiría mal si no lo lee:
+Si el hilo cambió una decisión, una trampa, una ruta, el build o cualquier
+frase que otro hilo repetiría mal, sustituir esa frase en la sección dueña,
+dentro del mismo cambio. Hacerlo aunque el usuario no lo pida. No añadir una
+bitácora, un diario de tareas ni un resumen de la sesión.
+
+Entra aquí solo esto:
 
 - Decisiones explícitas del usuario sobre copy visible, logo, navegación,
   contacto y qué no debe reintroducirse.
 - Arquitectura, invariantes, trampas ya verificadas y el procedimiento de
   build o despliegue.
-- La fecha de «Estado estable actual» solo cuando ese bloque se recontrasta
-  con el código.
+- La fecha de «Estado estable actual» solo cuando ese bloque entero se
+  recontrasta con el código. Un hecho nuevo dentro del bloque lleva su propia
+  fecha («pedido del usuario, YYYY-MM-DD») y no mueve la del encabezado.
 
 No guardar secretos, valores de `.env*`, teléfonos, tokens, PIDs, URLs de
 preview temporales ni si un servidor local sigue encendido.
@@ -49,13 +58,31 @@ preview temporales ni si un servidor local sigue encendido.
 `skills-lock.json` son artefactos de herramientas. No agregarlos a commits de
 producto salvo petición explícita.
 
+### Dónde anotar cada recuerdo
+
+Sustituir la frase vigente en una sola sección. No copiarla en otra.
+
+| Si otro hilo lo repetiría mal | Sección dueña |
+| --- | --- |
+| Copy, logo, navegación, contacto, layout pedido y qué no reintroducir | Estado estable actual |
+| Rutas y qué renderiza cada página | Mapa del sitio |
+| Dónde vive el código | Mapa de código |
+| Versiones y comandos | Comandos y stack |
+| Build, Hostinger y export estático | Compilación y despliegue |
+| Variables y datos sensibles | Variables, datos y seguridad |
+| Accesibilidad, rendimiento y teclado | Invariantes de accesibilidad y rendimiento |
+| Bug o límite ya comprobado | Trampas verificadas |
+| Audiencias, servicios y afirmaciones comerciales | `PRODUCT.md` |
+
 ### Antes de entregar
 
-1. Ejecutar `npm run typecheck && npm run lint && npm run build`.
-2. Si el cambio se desplegará en Hostinger, ejecutar además la simulación de
+1. Dejar ya sustituida, en la sección dueña, cualquier frase que este hilo
+   haya dejado de hacer cierta.
+2. Ejecutar `npm run typecheck && npm run lint && npm run build`.
+3. Si el cambio se desplegará en Hostinger, ejecutar además la simulación de
    producción descrita en «Despliegue».
-3. Revisar `git diff --check` y `git status --short`.
-4. Informar con claridad qué quedó local, qué se confirmó visualmente y si hubo
+4. Revisar `git diff --check` y `git status --short`.
+5. Informar con claridad qué quedó local, qué se confirmó visualmente y si hubo
    commit, push o despliegue. Nunca asumir que una de esas acciones ocurrió.
 
 ---
@@ -84,8 +111,13 @@ producto salvo petición explícita.
   `afcr-logotipo.png` alimenta el `logo` del JSON-LD y
   `src/app/opengraph-image.png` / `twitter-image.png` lo muestran al compartir.
   No redibujarlo en CSS. La placa metálica de
-  `public/brand/afcr-logotipo-plateado.png` no se muestra. El header conserva el CTA a WhatsApp —solo si existe la variable— y una
-  hamburguesa visible de tres líneas. La frase «ONLINE - LATAM & GLOBAL» se
+  `public/brand/afcr-logotipo-plateado.png` no se muestra. El header conserva el CTA a WhatsApp —solo si existe la variable— en el
+  navbar, a la derecha. En el topbar, a la derecha, van «Iniciar sesión» y
+  «Crear una nueva cuenta» (`/iniciar-sesion` y `/crear-cuenta`); bajo `sm` bajan
+  a una segunda fila porque no caben junto al logo y la hamburguesa. La
+  hamburguesa de tres líneas solo aparece en celular
+  (bajo `lg`) y cuando la barra no cabe por poca altura (`short`); en laptop
+  y escritorio desaparece. La frase «ONLINE - LATAM & GLOBAL» se
   eliminó intencionalmente y no debe reintroducirse.
 - El header de dos niveles tiene un solo fondo, propio y constante (no
   transparente sobre el hero): token `--color-bg-header` (`#1a2539`, pizarra
@@ -95,8 +127,11 @@ producto salvo petición explícita.
   página activa se marca con un contorno cian alrededor de su nombre, sin
   subrayado.
 - El texto del CTA del header es «Contacta con un asesor por WhatsApp» y abre
-  `wa.me` en una pestaña nueva. La estructura y el contenido del menú
-  fullscreen no se alteran al retocar la hamburguesa.
+  `wa.me` en una pestaña nueva. Vive en el navbar, alineado a la derecha.
+  La estructura del menú fullscreen no se altera al retocar la hamburguesa;
+  sus ítems salen de `navItems`, igual que el navbar y el footer. Al pie del
+  menú se repiten «Iniciar sesión» y «Crear una nueva cuenta», porque la
+  cortina tapa el topbar.
 - En el hero, el botón principal dice «Empieza un proyecto con nosotros» y el
   secundario «Ver Servicios». No hay atajos de una sola letra: el usuario los
   retiró porque una pulsación accidental cambiaba de página.
@@ -153,17 +188,149 @@ producto salvo petición explícita.
 - `RootLayout` usa `suppressHydrationWarning` tanto en `<html>` como en
   `<body>`. El segundo evita falsos positivos cuando una extensión modifica la
   clase del body antes de hidratar (caso observado: `expansion-alids-init`).
-- Noticias y MCP eliminados por decisión del usuario (2026-09-29): no existen
-  `/noticias/*`, `/api/mcp`, ni el código de Supabase del sitio, y los tokens
+- Noticias y el MCP del sitio eliminados por decisión del usuario (2026-09-29): no existen
+  `/noticias/*` ni `/api/mcp`, y los tokens
   `afcr_…` quedaron revocados en `agent_tokens`. No reintroducir noticias ni
   el MCP sin pedido.
-- **El sitio no tiene base de datos** (pedido del usuario, 2026-10-04): se
-  retiraron la carpeta `supabase/` (migraciones y seed, que siguen en el
-  historial de Git), `.mcp.json` (servidor MCP de Supabase para agentes) y
-  las variables `SUPABASE_*` de `.env.local` y `.env.production`. En hPanel,
-  el usuario quita a mano `SUPABASE_URL` y `SUPABASE_API_KEY`. El proyecto de
-  Supabase (tablas `news_posts` y `agent_tokens`, bucket `news-covers`) queda
-  sin uso y no se borró.
+- El contenido corporativo sigue siendo estático. A pedido del usuario,
+  las cuentas de la tienda usan Supabase Auth con `@supabase/supabase-js`.
+  El cliente vive en `src/lib/auth/`; las pantallas incluyen registro con
+  contraseña y ojito, confirmación y recuperación con código de 6 dígitos,
+  callback OAuth con PKCE y cuenta. La sesión es de cliente, sin cookies SSR:
+  `/cuenta` no entrega datos privados desde Next ni sustituye autorización
+  mediante RLS o controles de servidor. Se conserva el export estático.
+  SMTP de Hostinger y las cinco plantillas de confirmación, recuperación,
+  acceso, cambio de correo y reautenticación se configuran por la CLI con
+  `npm run auth:configure`: `--check`, `--diff`, `--apply` y `--verify`.
+  El script carga `.env.local` con el parser de Next, genera un fragmento
+  temporal solo de Auth, oculta secretos y conserva ajustes no declarados.
+  La autenticación del buzón SMTP está verificada por TLS también desde Edge;
+  eso no prueba la recepción de los mensajes enviados por Supabase.
+  Supabase está configurado para OTP de 6 dígitos con vencimiento de 600 s
+  y contraseñas de al menos 12 caracteres, con mayúsculas, minúsculas y números.
+  Google OAuth está habilitado: se verificó que Auth redirige a Google con
+  el cliente configurado y el callback correcto para el sitio y localhost.
+  Falta probar un acceso completo con una cuenta de Google y la entrega real
+  de correo antes de validar el flujo completo. La exclusividad entre Google
+  y contraseña está aplicada mediante `afcr_private.enforce_auth_method`,
+  un hook SQL `security invoker` de emisión de tokens. El método inicial se
+  registra al insertar `auth.users`; no deriva de `user_metadata`. Las tablas
+  privadas tienen RLS y ningún permiso para `anon` ni `authenticated`.
+  `/cuenta` permite el cambio explícito con un OTP de 6 dígitos: vence en
+  600 s, admite cinco intentos y seis envíos por hora, con 60 s entre envíos.
+  `auth-method` valida el usuario, sesión y revisión antes de operar; su RPC
+  es exclusiva de `service_role`. Guarda HMAC del código, nunca el código.
+  Al pasar a Google se exige una identidad Google verificada con el mismo
+  correo; el hook cambia el método solo después del OTP y OAuth exitosos.
+  Al pasar a contraseña, una reserva impide escrituras simultáneas; el método
+  anterior sigue activo hasta que la API administrativa guarda la contraseña.
+  Esa API revoca todas las sesiones antes de retornar: la finalización solo
+  admite la reserva y prueba verificadas de la solicitud, sin exigir la sesión
+  ya revocada. La revisión invalida los refresh y operaciones de sesiones viejas;
+  los futuros datos privados deben comprobar sesión y revisión además de `auth.uid()`.
+  Auth identifica como `otp` tanto signup como recovery por código: se admite
+  en cuentas de contraseña y se rechaza en cuentas Google. La recuperación
+  nunca cambia el método de una cuenta Google.
+  `npm run auth:deploy-method` publica la función y el secreto SMTP desde un
+  workdir nuevo; un deploy de la CLI desde el workdir original devolvió éxito
+  conservando un bundle anterior. Verificar siempre los archivos remotos y
+  probar el endpoint, no solo el resultado de deploy. El secreto de correo
+  está en Edge, separado de las variables públicas del build de Hostinger.
+  Se verificaron registro/recuperación OTP, permisos y conexión SMTP reales,
+  y el cambio real a contraseña con el estado inicial Google simulado.
+  `supabase/tests/auth_methods.sql` verifica la exclusividad y límites con
+  fixtures descartables dentro de una transacción; no enviar correos de prueba.
+  Las migraciones de Auth locales coinciden con las versiones remotas; la
+  migración antigua de noticias solo existe en el historial remoto, así que
+  no ejecutar `db push` ignorando ese desfase ni restaurar noticias como solución.
+  Las tablas antiguas
+  `news_posts`, `agent_tokens` y el bucket `news-covers` siguen sin uso.
+  Codex mantiene una conexión MCP en `.codex/config.toml` limitada al proyecto
+  `zuqxtogggkundznzwulg`. La CLI 2.120.0 es una dependencia de desarrollo:
+  se ejecuta con `npx supabase`; `supabase/` conserva la configuración local
+  generada por `init`, y `.temp/` mantiene el vínculo remoto fuera de Git.
+  Trampa de la CLI 2.120.0: `config pull` no incluyó SMTP ni cuerpos de
+  plantillas en el archivo recuperado; no usarlo como respaldo completo de Auth.
+  No pushear el config local completo con sus valores por defecto a producción;
+  usar el script específico de Auth. En la terminal del agente, el login
+  interactivo exige `--agent no --output-format text` con TTY.
+- La tienda es un ecommerce (pedido del usuario, 2026-10-06): sidebar con solo
+  «MiniPcs» y «Cámaras de seguridad», cards de productos a la derecha y categorías
+  apiladas en celular. `products` en Supabase es la fuente de precio y stock;
+  empieza vacío hasta recibir catálogo, fotografías y precios reales. No publicar
+  productos de muestra. `src/content/store.ts` centraliza el copy.
+  El carrito usa Zustand 5.0.15 y localStorage (`afcr-store-cart-v1`), con
+  hidratación explícita para evitar divergencias SSR. `/carrito` y el drawer
+  llevan a `/checkout` sin exigir login. Auth no limpia el carrito.
+  `/checkout` resuelve la sesión antes de mostrar gate o stepper. El gate reutiliza
+  `AuthForm` con `onSuccess`, nombres/apellidos y tabs; el login continúa sin
+  navegar. Registro con sesión inmediata continúa; sin ella guarda correo
+  pendiente en sessionStorage y abre `/verificar?next=/checkout`. OTP, recuperación
+  y OAuth admiten retorno exclusivamente a `/checkout` o `/admin` (sin redirect libre).
+  El stepper es datos → envío → pago → confirmación, sin cobro online. Lima/Callao
+  exige uno de los 50 distritos metropolitanos, calle y referencia; provincias
+  usa selector de departamento y un punto Urbano real. El catálogo publicado se
+  carga por `store_pickup_points`; el servidor lo consulta y la RPC de pedido
+  valida otra vez el punto dentro de la transacción. Sin puntos o ante un error
+  no se continúa. La RPC nueva necesita la migración de administración pendiente.
+  Ubigeos: `src/data/peru-locations.json`, fuente
+  INEI indicada en el archivo contiguo; contiene códigos del censo 2017. Actualizar
+  con fuente oficial antes de incorporar puntos en distritos posteriores.
+  `/api/orders` (`route.node.ts`, solo Node) exige bearer y `getUser()`, valida
+  el body con Zod y normaliza la dirección. La RPC pública es invoker; delega en
+  un definer privado que exige `auth.uid()`, sesión existente y revisión del
+  método activo. RLS de perfiles, pedidos, ítems y carrito comprueba lo mismo:
+  un JWT anterior al cambio de método no obtiene datos privados.
+  La RPC inserta perfil/pedido/ítems y borra `cart_items` atómicamente; resuelve
+  ubicación en la tabla privada, precios y stock en `products`, y recalcula el
+  importe. Un `request_id` por confirmación permite reintentar sin duplicar;
+  rechaza reutilizarlo con otro payload. Solo la RPC puede crear pedidos; no
+  conceder inserción directa que eluda precios o dirección. Al confirmar, el
+  cliente limpia el carrito y conserva el recibo canónico para el resumen.
+  `/cuenta/pedidos` muestra solo órdenes propias. El importe confirmado corresponde
+  a productos; envío pendiente y cobro posterior se muestran expresamente.
+  La política/tarifa de envío todavía necesita respuesta del usuario. No hay
+  reserva ni descuento de stock en el remoto mientras la migración de administración
+  siga pendiente. Esa migración propone reservar en checkout y reintegrar al cancelar
+  o devolver; requiere la aprobación solicitada antes de aplicarse. Los puntos se
+  gestionarán en la tabla privada desde el panel; no insertar agencias inventadas.
+  `supabase/tests/store_checkout.sql` prueba precios, direcciones, aislamiento,
+  idempotencia y revocación dentro de BEGIN/ROLLBACK. También se verificaron
+  HTTP 401/400/201 y limpieza del carrito con cuenta/producto/orden descartables,
+  eliminados al terminar y sin correos. La revisión de navegador usa datos
+  sintéticos y API simulada; no certifica recepción de OTP ni Google real.
+  El export estático conserva las pantallas, pero no tiene `/api/orders`:
+  el checkout operativo requiere el build Node de Hostinger.
+- Administración de ecommerce (pedido del usuario, 2026-10-06): `/admin`, acceso
+  desde `/cuenta` solo al recibir `store_is_admin=true`. Implementación local
+  preparada; `20261007033005_store_administration.sql` **no aplicada**:
+  la revisión automática rechazó los cambios remotos de stock/pedidos/Storage
+  pendientes de confirmación del usuario. No desplegar estos cambios de frontend
+  antes de aplicar y verificar la migración aprobada. El correo configurado
+  todavía no tenía una cuenta al inspeccionarlo; no crear una contraseña por el usuario.
+  La migración liga el correo permitido a un UUID solo después de verificarlo,
+  en `afcr_private.store_admins`; las consultas vuelven a comprobar sesión,
+  revisión, UUID y correo verificado actual. Nunca conceder permisos mediante
+  `user_metadata` ni solo escondiendo el enlace.
+  Panel: resumen real, productos con SKU/galería/borrador/publicación/archivo,
+  inventario y motivos de ajuste, pedidos y pagos manuales, clientes de pedidos,
+  puntos Urbano y actividad. Las escrituras pasan por RPC invoker y definer
+  privado con comprobación explícita de administrador. Productos/pedidos/puntos
+  usan revisión para impedir sobrescrituras; ajustes de stock también idempotencia.
+  Las notas internas de pedidos no tienen permiso SELECT para clientes.
+  Reserva propuesta: trigger transaccional al insertar ítems, stock disponible
+  reducido y movimiento registrado; cancelación/devolución reintegra una sola vez.
+  Preparación → reparto/recojo → entrega, con pasos válidos; no hay cobros ni
+  reembolsos automáticos. Pago manual exige costo de envío y referencia; registrar
+  reembolso exige cancelación/devolución y motivo.
+  Fotos: bucket público `store-products`, carga/borrado solo para administrador
+  vigente, JPG/PNG/WebP de hasta 5 MB, máximo 8 por ficha. Nombres UUID sin upsert.
+  La política de borrado conserva cualquier archivo referenciado por un producto;
+  el editor intenta limpiar nuevas cargas no usadas al cerrarse.
+  `supabase/tests/store_administration.sql` y pruebas temporales pasaron en
+  PostgreSQL local PGlite con adaptadores de Auth/Storage; **no** certifican el
+  remoto ni el servicio real de archivos. UI verificada con API/datos sintéticos,
+  sin publicar productos, agencias ni métricas de muestra.
 - En su lugar, la Home muestra «RECURSOS» (pedido del usuario, 2026-10-01):
   8 artículos, uno por servicio, que explican el problema y la solución y solo
   invitan a contactar en el cierre (promoción indirecta). Temas, en este orden:
@@ -220,9 +387,20 @@ producto salvo petición explícita.
 | `/servicios` | Directorio de 10 servicios, sin conteo junto a cada categoría | `src/components/services/` |
 | `/nosotros` | Cabecera, franja de herramientas, audiencias, proceso, principios | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
+| `/tienda` | Catálogo: MiniPcs y cámaras de seguridad (pendiente de productos reales) | `src/app/tienda/page.tsx` |
+| `/iniciar-sesion` | Entrar a la cuenta de la tienda | `src/app/iniciar-sesion/page.tsx` |
+| `/crear-cuenta` | Crear cuenta de la tienda | `src/app/crear-cuenta/page.tsx` |
+| `/recuperar-contrasena` | Código de recuperación y nueva contraseña | `src/app/recuperar-contrasena/page.tsx` |
+| `/auth/callback` | Retorno de Google; intercambio PKCE en cliente | `src/app/auth/callback/page.tsx` |
+| `/cuenta` | Sesión, cambio de método y acceso al historial; sin datos privados renderizados en servidor | `src/app/cuenta/page.tsx` |
+| `/carrito` | Carrito persistente en el cliente | `src/app/carrito/page.tsx` |
+| `/checkout` | Gate de cuenta y stepper de cuatro pasos | `src/app/checkout/page.tsx` |
+| `/verificar` | Confirmación OTP y retorno al checkout | `src/app/verificar/page.tsx` |
+| `/cuenta/pedidos` | Historial privado mediante RLS | `src/app/cuenta/pedidos/page.tsx` |
+| `/admin` | Administración de ecommerce; migración remota pendiente | `src/app/admin/page.tsx` · `src/components/admin/` |
 
-- Todas las páginas y `sitemap.xml` se prerenderizan. `/api/contact` solo
-  existe en el build Node.
+- Todas las páginas y `sitemap.xml` se prerenderizan. `/api/contact` y
+  `/api/orders` solo existen en el build Node.
 - Cada página exporta `metadata`; cada artículo además publica JSON-LD
   `Article`. El sitemap (`src/lib/seo/sitemap.ts`) deriva sus rutas de
   `navItems` y de los artículos. `siteUrl` vive en `src/lib/seo/site-url.ts`.
@@ -326,7 +504,7 @@ Reglas críticas:
   `build:hostinger`.
 - Hostinger instala solo `dependencies`. `tailwindcss`,
   `@tailwindcss/postcss`, `typescript` y `@types/*` deben permanecer allí;
-  únicamente ESLint y `eslint-config-next` van en `devDependencies`.
+  ESLint, `eslint-config-next` y la CLI de Supabase van en `devDependencies`.
 - Antes de pushear un cambio que afecte el build, copiar a un temporal,
   ejecutar `npm install --omit=dev` y después `npm run build:hostinger`.
 - No desplegar en `magenta-flamingo-697303.hostingersite.com`: pertenece al
@@ -337,8 +515,7 @@ Reglas críticas:
 `BUILD_TARGET=static` activa `output: 'export'`, genera `out/`, desactiva el
 route handler y usa `/contact.php`. Mantener estas condiciones:
 
-- Lo que exige servidor lleva extensión `.node.ts(x)` (hoy solo
-  `/api/contact`); `pageExtensions` la excluye del modo estático.
+- Lo que exige servidor lleva extensión `.node.ts(x)` (hoy `/api/contact` y `/api/orders`); `pageExtensions` la excluye del modo estático.
 - `robots.ts` y `sitemap.xml/route.ts` conservan `dynamic = 'force-static'`,
   que exige `output: 'export'`.
 - `headers()` solo se declara en modo Node; Apache usa `public/.htaccess`.
@@ -370,6 +547,15 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   hace un reemplazo total y devuelve valores enmascarados.
 - `NEXT_PUBLIC_*` se incrusta en el HTML. Cambiar esas variables exige un build
   nuevo, no solo reiniciar la app.
+- Auth añade `NEXT_PUBLIC_SUPABASE_URL` y
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, públicas y necesarias en cada build.
+  `.env.local` reserva campos `HOSTINGER_SMTP_*`, `AUTH_EMAIL_*`,
+  `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`,
+  `SUPABASE_ACCESS_TOKEN` (opcional si la CLI ya tiene sesión), `AUTH_SITE_URL`
+  y `AUTH_REDIRECT_URLS` para configurar
+  el servicio remoto. Los secretos de SMTP, Google y Management API son solo
+  para herramientas locales: nunca prefijarlos con `NEXT_PUBLIC_` ni
+  incorporarlos al cliente. Guardarlos en `.env.local` no configura Auth por sí solo.
 - Datos aún marcadores: correo y dirección en `src/content/agency.ts`; URLs de
   Facebook, Instagram y LinkedIn; páginas legales del footer.
 - `APIMART_API_KEY` (solo en `.env.local`) sirve para generar las portadas

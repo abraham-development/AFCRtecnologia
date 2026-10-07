@@ -20,7 +20,7 @@ interface PageIntroProps {
  */
 export function PageIntro({ title, lede, aside, titleId }: PageIntroProps) {
   return (
-    <header className="shell pt-40 pb-16 md:pt-48 md:pb-24">
+    <header className="shell pt-40 pb-16 sm:pt-28 md:pt-36 md:pb-24 lg:pt-48">
       <div className="grid gap-12 lg:grid-cols-12 lg:items-end lg:gap-16">
         <div className="lg:col-span-8">
           <motion.h1

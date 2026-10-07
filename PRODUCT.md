@@ -47,14 +47,40 @@ Servicios confirmados (2026-09-24):
 10. Venta de dispositivos tecnológicos (mini PC y cámaras de seguridad)
 11. Sistemas RAG: IA que responde con los documentos de la empresa (confirmado 2026-10-01)
 
-Estructura del sitio (2026-09-24): una página por ítem del navbar —Home,
-Servicios, Nosotros, Contáctanos. La Home muestra «Recursos»: 8 artículos del
+Estructura del sitio: una página por ítem del navbar —Home, Servicios,
+Tienda online, Nosotros, Contáctanos (tienda añadida el 2026-10-05; aún sin
+catálogo comercial confirmado). La Home muestra «Recursos»: 8 artículos del
 «Equipo de AFCRtecnologia», uno por servicio (RAG, agente de IA para WhatsApp,
 automatizaciones, agentes de IA personalizados, páginas web, capacitaciones,
 software a medida y venta de mini PC y cámaras de seguridad), cada uno con su
 página en `/recursos/<slug>`. La sección de noticias y su MCP se retiraron el
 2026-09-29.
+La tienda será un ecommerce con solo dos categorías: MiniPcs y cámaras de
+seguridad. Sidebar en escritorio, índice apilado en celular y cards de equipos.
+El carrito sobrevive a login, registro y verificación. La cuenta se resuelve
+mediante un gate dentro de `/checkout`, seguido de datos, envío, pago y
+confirmación. El pedido requiere cuenta; aún no se cobra online. Lima y Callao
+usan delivery con distrito oficial, calle y referencia. Provincias usa puntos
+Urbano confirmados; sin ellos no se permite continuar. Catálogo de productos,
+fotografías, tarifas de envío y puntos reales pendientes del usuario: no
+inventarlos ni publicar ejemplos como productos a la venta.
 Restricciones técnicas en `AGENTS.md`.
+
+El administrador autorizado gestionará la tienda desde `/admin`: fichas,
+fotografías, publicación, stock, pedidos y pagos manuales, clientes de pedidos,
+puntos Urbano confirmados e historial de cambios. El acceso exige su cuenta
+verificada y permisos comprobados en la base. Panel local preparado; aplicación
+remota pendiente de aprobación de las políticas de stock y almacenamiento.
+No incluye cobro online, reembolso automático ni inventa catálogo o agencias.
+
+Las cuentas de la tienda deben ofrecer registro con contraseña y control para
+mostrarla, confirmación de correo por código de 6 dígitos y acceso con Google.
+El usuario exige un solo método activo por cuenta: pasar a contraseña desactiva
+Google y pasar a Google desactiva contraseña. El cambio se hace explícitamente
+desde «Mi cuenta», verificando un código de 6 dígitos; el método anterior se
+desactiva cuando el nuevo queda listo. La configuración SMTP corresponde
+al buzón de Hostinger; no presentar el flujo como terminado antes de verificar
+los correos y la restricción de método en Supabase.
 
 ## Brand Commitments
 

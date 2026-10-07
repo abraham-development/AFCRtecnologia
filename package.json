@@ -4,6 +4,8 @@
   "private": true,
   "description": "Landing page corporativa de AFCRtecnologia — agencia boutique de IA y automatizacion avanzada (Lima, Peru).",
   "scripts": {
+    "auth:configure": "node scripts/configure-auth.mjs",
+    "auth:deploy-method": "node scripts/deploy-auth-method.mjs",
     "dev": "next dev",
     "build": "next build",
     "build:hostinger": "next build --webpack",
@@ -15,6 +17,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
+    "@supabase/supabase-js": "2.117.2",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
@@ -30,11 +33,13 @@
     "tailwindcss": "^4.3.3",
     "three": "^0.186.0",
     "typescript": "^5.9.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "zustand": "5.0.15"
   },
   "devDependencies": {
     "eslint": "^9.39.0",
-    "eslint-config-next": "^16.3.5"
+    "eslint-config-next": "^16.3.5",
+    "supabase": "2.120.0"
   },
   "engines": {
     "node": ">=20.9.0"

@@ -100,13 +100,18 @@ export const socialLinks: SocialLink[] = [
 export const navItems: NavItem[] = [
   { index: '01', label: 'Home', href: '/', meta: 'Inicio y recursos' },
   { index: '02', label: 'Servicios', href: '/servicios', meta: 'Diez servicios' },
-  { index: '03', label: 'Nosotros', href: '/nosotros', meta: 'Quiénes somos' },
-  { index: '04', label: 'Contáctanos', href: '/contacto', meta: 'Respuesta < 24 h' },
+  { index: '03', label: 'Tienda online', href: '/tienda', meta: 'Mini PC y cámaras' },
+  { index: '04', label: 'Nosotros', href: '/nosotros', meta: 'Quiénes somos' },
+  { index: '05', label: 'Contáctanos', href: '/contacto', meta: 'Respuesta < 24 h' },
 ];
 
 /** Textos del encabezado. */
 export const headerCopy = {
   advisorCta: 'Contacta con un asesor por WhatsApp',
+  signIn: 'Iniciar sesión',
+  signUp: 'Crear una nueva cuenta',
+  signInHref: '/iniciar-sesion',
+  signUpHref: '/crear-cuenta',
 };
 
 /** Destino del CTA «Empieza un proyecto con nosotros». */

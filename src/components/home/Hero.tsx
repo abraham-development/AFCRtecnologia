@@ -52,7 +52,7 @@ export function Hero() {
     <section
       id="hero"
       aria-label="Inicio"
-      className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-34 pb-8 md:pt-38 md:pb-10"
+      className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-36 pb-8 sm:pt-24 md:pt-28 md:pb-10 lg:pt-38"
     >
       <WebGLHeroBackground />
 

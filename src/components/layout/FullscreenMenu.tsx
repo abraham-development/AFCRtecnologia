@@ -5,6 +5,7 @@ import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
+import AccountActions from '@/components/layout/AccountActions';
 import { agency, hasWhatsApp, navItems, whatsappUrl } from '@/content/agency';
 
 interface FullscreenMenuProps {
@@ -102,7 +103,7 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
             </button>
           </div>
 
-          {/* Indice 01 — 04 */}
+          {/* Indice de secciones */}
           <nav aria-label="Secciones" className="shell flex flex-1 flex-col justify-center py-10">
             <ul className="w-full">
               {navItems.map((item, index) => (
@@ -143,6 +144,7 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="shell hairline-t grid shrink-0 gap-6 py-8 md:grid-cols-2"
           >
+            <AccountActions className="md:col-span-2" onNavigate={onClose} />
             <div>
               <p className="text-micro text-text-secondary mb-3">CONTACTO DIRECTO</p>
               <a
