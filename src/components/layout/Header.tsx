@@ -85,7 +85,7 @@ export function Header() {
 
         {/* En pantallas estrechas los dos botones no caben junto al logo. */}
         <div className="shell flex justify-end pb-3 sm:hidden">
-          <AccountActions />
+          <AccountActions className="w-full" />
         </div>
 
         {/* Segundo nivel: enlaces a la izquierda, WhatsApp a la derecha.

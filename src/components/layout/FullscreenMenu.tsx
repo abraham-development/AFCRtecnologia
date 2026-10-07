@@ -144,7 +144,7 @@ export function FullscreenMenu({ open, onClose }: FullscreenMenuProps) {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="shell hairline-t grid shrink-0 gap-6 py-8 md:grid-cols-2"
           >
-            <AccountActions className="md:col-span-2" onNavigate={onClose} />
+            <AccountActions className="md:col-span-2" onNavigate={onClose} placement="above" />
             <div>
               <p className="text-micro text-text-secondary mb-3">CONTACTO DIRECTO</p>
               <a

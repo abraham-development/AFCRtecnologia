@@ -113,8 +113,12 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   No redibujarlo en CSS. La placa metálica de
   `public/brand/afcr-logotipo-plateado.png` no se muestra. El header conserva el CTA a WhatsApp —solo si existe la variable— en el
   navbar, a la derecha. En el topbar, a la derecha, van «Iniciar sesión» y
-  «Crear una nueva cuenta» (`/iniciar-sesion` y `/crear-cuenta`); bajo `sm` bajan
-  a una segunda fila porque no caben junto al logo y la hamburguesa. La
+  «Crear una nueva cuenta» (`/iniciar-sesion` y `/crear-cuenta`) si no hay sesión.
+  Con sesión (pedido del usuario, 2026-10-07), se sustituyen por «Hola, <correo>»,
+  desplegable con Mi perfil, Mis pedidos y Seguridad de la cuenta, y «Cerrar sesión».
+  El correo largo se trunca en el botón y aparece entero en el desplegable.
+  Bajo `sm` las acciones bajan a una segunda fila porque no caben junto al logo
+  y la hamburguesa; no añadir scroll horizontal. La
   hamburguesa de tres líneas solo aparece en celular
   (bajo `lg`) y cuando la barra no cabe por poca altura (`short`); en laptop
   y escritorio desaparece. La frase «ONLINE - LATAM & GLOBAL» se
@@ -130,8 +134,8 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   `wa.me` en una pestaña nueva. Vive en el navbar, alineado a la derecha.
   La estructura del menú fullscreen no se altera al retocar la hamburguesa;
   sus ítems salen de `navItems`, igual que el navbar y el footer. Al pie del
-  menú se repiten «Iniciar sesión» y «Crear una nueva cuenta», porque la
-  cortina tapa el topbar.
+  menú se repiten las acciones de cuenta según la sesión, porque la cortina
+  tapa el topbar. El desplegable abre hacia arriba dentro de esa cortina.
 - En el hero, el botón principal dice «Empieza un proyecto con nosotros» y el
   secundario «Ver Servicios». No hay atajos de una sola letra: el usuario los
   retiró porque una pulsación accidental cambiaba de página.
@@ -196,7 +200,16 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   las cuentas de la tienda usan Supabase Auth con `@supabase/supabase-js`.
   El cliente vive en `src/lib/auth/`; las pantallas incluyen registro con
   contraseña y ojito, confirmación y recuperación con código de 6 dígitos,
-  callback OAuth con PKCE y cuenta. La sesión es de cliente, sin cookies SSR:
+  callback OAuth con PKCE y cuenta. `/cuenta#perfil` permite editar nombres,
+  apellidos y celular: Auth guarda solo esos datos personales en user_metadata
+  (nunca permisos); si existe perfil de compras, se actualiza con su RLS vigente.
+  Sin perfil de compras, el checkout usa esos datos hasta crear el perfil al
+  confirmar una orden. Un fallo parcial se informa y admite reintento; no modifica
+  direcciones ni pedidos anteriores. `/cuenta#seguridad` conserva el cambio de
+  método con OTP. `useAuthUser` resuelve la identidad inicial con getUser y descarta
+  respuestas tardías si cambió la sesión durante la consulta; no permite restaurar una sesión
+  ya cerrada. Cerrar sesión desde topbar o cuenta usa scope local y conserva el
+  carrito. La sesión es de cliente, sin cookies SSR:
   `/cuenta` no entrega datos privados desde Next ni sustituye autorización
   mediante RLS o controles de servidor. Se conserva el export estático.
   SMTP de Hostinger y las cinco plantillas de confirmación, recuperación,
@@ -392,7 +405,7 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
 | `/crear-cuenta` | Crear cuenta de la tienda | `src/app/crear-cuenta/page.tsx` |
 | `/recuperar-contrasena` | Código de recuperación y nueva contraseña | `src/app/recuperar-contrasena/page.tsx` |
 | `/auth/callback` | Retorno de Google; intercambio PKCE en cliente | `src/app/auth/callback/page.tsx` |
-| `/cuenta` | Sesión, cambio de método y acceso al historial; sin datos privados renderizados en servidor | `src/app/cuenta/page.tsx` |
+| `/cuenta` | Perfil editable, seguridad y acceso al historial; sin datos privados renderizados en servidor | `src/app/cuenta/page.tsx` |
 | `/carrito` | Carrito persistente en el cliente | `src/app/carrito/page.tsx` |
 | `/checkout` | Gate de cuenta y stepper de cuatro pasos | `src/app/checkout/page.tsx` |
 | `/verificar` | Confirmación OTP y retorno al checkout | `src/app/verificar/page.tsx` |
@@ -417,6 +430,8 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
 | Layout, metadata y JSON-LD | `src/app/layout.tsx` |
 | Tokens, Tailwind y estilos globales | `src/app/globals.css` |
 | Header, menú, footer y scroll | `src/components/layout/` |
+| Acciones de cuenta del topbar y desplegable | `src/components/layout/AccountActions.tsx` |
+| Perfil editable y seguridad de la cuenta | `src/components/auth/ProfileForm.tsx` · `src/components/auth/AccountPanel.tsx` |
 | Preloader, partículas, WebGL | `src/components/effects/` |
 | Microinteracciones compartidas | `src/components/ui/` |
 | Logotipo web | `src/components/ui/BrandLogo.tsx` |
@@ -549,6 +564,10 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   nuevo, no solo reiniciar la app.
 - Auth añade `NEXT_PUBLIC_SUPABASE_URL` y
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, públicas y necesarias en cada build.
+  En Hostinger tienen que llamarse así: `SUPABASE_URL` y `SUPABASE_API_KEY`
+  no las lee el cliente. Sin las `NEXT_PUBLIC_*`, crear cuenta con Google
+  muestra «El acceso a cuentas no está disponible ahora» (verificado
+  2026-10-07). Cambiarlas exige un build nuevo, no solo reiniciar.
   `.env.local` reserva campos `HOSTINGER_SMTP_*`, `AUTH_EMAIL_*`,
   `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`,
   `SUPABASE_ACCESS_TOKEN` (opcional si la CLI ya tiene sesión), `AUTH_SITE_URL`
@@ -659,6 +678,15 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   Tailwind extraiga clases corruptas desde documentación o binarios.
 - Usar la variante `short:` ya declarada; no repetir variantes arbitrarias de
   `max-height` en JSX.
+
+### Supabase Auth
+
+- El SDK 2.117.2 emite `SIGNED_IN` al recuperar el usuario de localStorage,
+  antes de `INITIAL_SESSION`. Ese evento de arranque no debe invalidar la
+  respuesta de `getUser`: de otro modo reaparecen datos de perfil en caché.
+- `signOut({scope: 'local'})` elimina la sesión del navegador incluso cuando
+  el servidor devuelve un error. El aviso de ese caso vive fuera del bloque
+  autenticado, que se desmonta al recibir `SIGNED_OUT`.
 
 ### Canvas 2D
 

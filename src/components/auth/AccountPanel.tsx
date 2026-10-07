@@ -8,31 +8,42 @@ import { authCopy } from '@/content/auth';
 import { useAuthUser } from '@/hooks/useAuthUser';
 import { getAuthClient } from '@/lib/auth/client';
 import { authErrorMessage } from '@/lib/auth/errors';
+import { HEADER_OFFSET, scrollToSection } from '@/lib/utils';
 import { MethodChange } from './MethodChange';
 import { AdminLink } from '@/components/admin/AdminLink';
+import { ProfileForm } from './ProfileForm';
 
 export function AccountPanel() {
   const { user, loading } = useAuthUser();
+  const userId = user?.id;
   const router = useRouter();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     if (!loading && !user) router.replace('/iniciar-sesion');
   }, [loading, user, router]);
+  useEffect(() => {
+    if (loading || !userId) return;
+    const frame = requestAnimationFrame(() => {
+      const hash = window.location.hash.slice(1);
+      if (hash !== 'perfil' && hash !== 'seguridad') return;
+      scrollToSection(hash, HEADER_OFFSET);
+      document.getElementById(hash)?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [loading, userId]);
   async function signOut() {
     setBusy(true); setError('');
     try {
-      const { error: issue } = await getAuthClient().auth.signOut();
+      const { error: issue } = await getAuthClient().auth.signOut({ scope: 'local' });
       if (issue) throw issue;
       router.replace('/iniciar-sesion');
     } catch (issue) { setError(authErrorMessage(issue)); setBusy(false); }
   }
   if (loading || !user) return <p role="status" className="text-text-secondary">{authCopy.account.loading}</p>;
   return <div>
-    <dl className="divide-border-editorial divide-y">
-      <div className="pb-6"><dt className="text-text-secondary text-sm">{authCopy.account.email}</dt><dd className="mt-2 text-lg break-all">{user.email}</dd></div>
-    </dl>
-    <MethodChange email={user.email ?? ''} userId={user.id}/>
+    <ProfileForm key={user.id} user={user}/>
+    <section id="seguridad" tabIndex={-1} aria-label={authCopy.navigation.security} className="scroll-mt-40 mt-10 border-t border-border-editorial pt-8"><MethodChange email={user.email ?? ''} userId={user.id}/></section>
     <AdminLink userId={user.id}/>
     {error ? <p role="alert" className="mb-6 text-sm leading-relaxed text-red-300">{error}</p> : null}
     <Link href="/cuenta/pedidos" className="text-accent-cyan mt-5 inline-flex min-h-12 items-center underline-offset-4 hover:underline">{checkoutCopy.orders}</Link>

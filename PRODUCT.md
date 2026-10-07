@@ -73,6 +73,11 @@ verificada y permisos comprobados en la base. Panel local preparado; aplicación
 remota pendiente de aprobación de las políticas de stock y almacenamiento.
 No incluye cobro online, reembolso automático ni inventa catálogo o agencias.
 
+Al iniciar sesión, el topbar muestra «Hola, <correo>» con un desplegable para
+perfil, pedidos y seguridad, junto a «Cerrar sesión» (pedido del usuario, 2026-10-07).
+El perfil permite editar nombres, apellidos y celular; los cambios no alteran
+los datos históricos de pedidos ni conceden permisos de administración.
+
 Las cuentas de la tienda deben ofrecer registro con contraseña y control para
 mostrarla, confirmación de correo por código de 6 dígitos y acceso con Google.
 El usuario exige un solo método activo por cuenta: pasar a contraseña desactiva
