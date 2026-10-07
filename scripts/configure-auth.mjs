@@ -71,7 +71,7 @@ try {
     'enabled = true',
     `site_url = ${JSON.stringify(process.env.AUTH_SITE_URL)}`,
     `additional_redirect_urls = ${JSON.stringify(redirects)}`,
-    'minimum_password_length = 12',
+    'minimum_password_length = 8',
     'enable_manual_linking = true',
     'password_requirements = "lower_upper_letters_digits"',
     '[auth.email]',

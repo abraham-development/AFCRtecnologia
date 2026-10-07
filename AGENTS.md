@@ -239,7 +239,9 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   `supabase/functions/welcome-email/README.md`. No ejecutar `db push`: la migración
   de administración continúa pendiente y no forma parte de la bienvenida.
   Supabase está configurado para OTP de 6 dígitos con vencimiento de 600 s
-  y contraseñas de al menos 12 caracteres, con mayúsculas, minúsculas y números.
+  y contraseñas de al menos 8 caracteres (pedido del usuario, 2026-10-07),
+  con mayúsculas, minúsculas y números. El mismo mínimo rige registro,
+  recuperación y cambio a contraseña; no volver a exigir 12 en los formularios.
   Google OAuth está habilitado: se verificó que Auth redirige a Google con
   el cliente configurado y el callback correcto para el sitio y localhost.
   El usuario confirmó acceso real con Google (2026-10-07); sigue pendiente verificar

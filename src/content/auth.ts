@@ -61,7 +61,7 @@ export const authCopy = {
   password: 'Contraseña',
   newPasswordLabel: 'Nueva contraseña',
   confirmPassword: 'Confirmar contraseña',
-  passwordHint: 'Usa al menos 12 caracteres, con mayúsculas, minúsculas y números.',
+  passwordHint: 'Usa al menos 8 caracteres, con mayúsculas, minúsculas y números.',
   showPassword: 'Mostrar contraseña',
   hidePassword: 'Ocultar contraseña',
   otp: 'Código de 6 dígitos',
@@ -91,7 +91,7 @@ export const authCopy = {
   },
   errors: {
     email: 'Escribe un correo válido.',
-    password: 'La contraseña debe tener entre 12 y 72 caracteres, mayúsculas, minúsculas y números.',
+    password: 'La contraseña debe tener entre 8 y 72 caracteres, mayúsculas, minúsculas y números.',
     passwordRequired: 'Escribe tu contraseña.',
     mismatch: 'Las contraseñas no coinciden.',
     otp: 'Escribe los 6 dígitos del código.',

@@ -83,7 +83,7 @@ Deno.serve(async request => {
       return response(result,result.error ? status(result.error) : 200);
     }
     if (!['verify_google','complete_password'].includes(body.action) || !/^\d{6}$/.test(body.token ?? '')) return response({ error:'AFCR_INVALID_REQUEST' },400);
-    if (body.action === 'complete_password' && (typeof body.password !== 'string' || body.password.length<12 || new TextEncoder().encode(body.password).length>72 || !/[a-z]/.test(body.password) || !/[A-Z]/.test(body.password) || !/\d/.test(body.password))) return response({ error:'AFCR_WEAK_PASSWORD' },400);
+    if (body.action === 'complete_password' && (typeof body.password !== 'string' || body.password.length<8 || new TextEncoder().encode(body.password).length>72 || !/[a-z]/.test(body.password) || !/[A-Z]/.test(body.password) || !/\d/.test(body.password))) return response({ error:'AFCR_WEAK_PASSWORD' },400);
     const completionId = body.action === 'complete_password' ? crypto.randomUUID() : undefined;
     const checked = await operation({ operation:'verify', id:body.id, hash:await digest(data.user.id,body.id,body.token),completion_id:completionId });
     if (checked.error) return response(checked,status(checked.error));
