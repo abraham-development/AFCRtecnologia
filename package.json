@@ -6,6 +6,7 @@
   "scripts": {
     "auth:configure": "node scripts/configure-auth.mjs",
     "auth:deploy-method": "node scripts/deploy-auth-method.mjs",
+    "auth:deploy-welcome": "node scripts/deploy-welcome-email.mjs",
     "dev": "next dev",
     "build": "next build",
     "build:hostinger": "next build --webpack",

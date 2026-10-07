@@ -219,12 +219,31 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   temporal solo de Auth, oculta secretos y conserva ajustes no declarados.
   La autenticación del buzón SMTP está verificada por TLS también desde Edge;
   eso no prueba la recepción de los mensajes enviados por Supabase.
+  Bienvenida automática (pedido del usuario, 2026-10-07): el trigger de
+  `auth.users.email_confirmed_at` encola una sola vez por UUID en
+  `afcr_private.welcome_emails`, tanto Google como OTP. Las cuentas ya verificadas
+  al activar el flujo quedan `skipped`, sin envío retroactivo. Cron revisa cada
+  minuto; `welcome-email` usa el mismo secreto SMTP de `auth-method`, el logo
+  oficial como PNG CID y copy en `src/content/welcome.ts`. No depende del frontend.
+  Cola con RLS sin políticas públicas y RPC exclusiva de service_role; el worker
+  exige un token aleatorio privado de Vault antes de cualquier operación. Nunca
+  extraer ese token ni ponerlo en variables públicas. Rechazos temporales admiten
+  seis intentos con espera; pérdida de acuse SMTP o worker vencido queda `uncertain`
+  sin reenvío automático para evitar duplicados. El SMTP no garantiza entrega única
+  tras perder un acuse. Un cambio de destinatario impide enviar al correo anterior.
+  Migraciones de bienvenida aplicadas y Cron activo; SMTP autenticado desde Edge,
+  permisos y cola probados con fixtures BEGIN/ROLLBACK sin enviar correos.
+  No certifica llegada a la bandeja real ni renderizado en todos los clientes de correo.
+  `npm run auth:deploy-welcome` publica solo esta función desde un workdir nuevo;
+  necesita el secreto SMTP existente. Ver procedimiento y consultas de estado en
+  `supabase/functions/welcome-email/README.md`. No ejecutar `db push`: la migración
+  de administración continúa pendiente y no forma parte de la bienvenida.
   Supabase está configurado para OTP de 6 dígitos con vencimiento de 600 s
   y contraseñas de al menos 12 caracteres, con mayúsculas, minúsculas y números.
   Google OAuth está habilitado: se verificó que Auth redirige a Google con
   el cliente configurado y el callback correcto para el sitio y localhost.
-  Falta probar un acceso completo con una cuenta de Google y la entrega real
-  de correo antes de validar el flujo completo. La exclusividad entre Google
+  El usuario confirmó acceso real con Google (2026-10-07); sigue pendiente verificar
+  recepción real del correo de bienvenida. La exclusividad entre Google
   y contraseña está aplicada mediante `afcr_private.enforce_auth_method`,
   un hook SQL `security invoker` de emisión de tokens. El método inicial se
   registra al insertar `auth.users`; no deriva de `user_metadata`. Las tablas

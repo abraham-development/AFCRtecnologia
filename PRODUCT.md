@@ -87,6 +87,12 @@ desactiva cuando el nuevo queda listo. La configuración SMTP corresponde
 al buzón de Hostinger; no presentar el flujo como terminado antes de verificar
 los correos y la restricción de método en Supabase.
 
+Los nuevos registros completados reciben una bienvenida de AFCRtecnologia
+(pedido del usuario, 2026-10-07): Google después de verificar la cuenta y
+contraseña después del OTP. Incluye acceso a la cuenta, tienda y soporte por
+respuesta al correo. No se repite en cada login, recuperación o cambio de método.
+No se envía retroactivamente a las cuentas ya verificadas al activar el flujo.
+
 ## Brand Commitments
 
 - Nombre: AFCRtecnologia (marca «AFCR» + «tecnologia»).
