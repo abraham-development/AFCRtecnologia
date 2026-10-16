@@ -236,8 +236,8 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   No certifica llegada a la bandeja real ni renderizado en todos los clientes de correo.
   `npm run auth:deploy-welcome` publica solo esta función desde un workdir nuevo;
   necesita el secreto SMTP existente. Ver procedimiento y consultas de estado en
-  `supabase/functions/welcome-email/README.md`. No ejecutar `db push`: la migración
-  de administración continúa pendiente y no forma parte de la bienvenida.
+  `supabase/functions/welcome-email/README.md`. No ejecutar `db push` (ver el
+  desfase del historial de noticias más abajo).
   Supabase está configurado para OTP de 6 dígitos con vencimiento de 600 s
   y contraseñas de al menos 8 caracteres (pedido del usuario, 2026-10-07),
   con mayúsculas, minúsculas y números. El mismo mínimo rige registro,
@@ -290,9 +290,12 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   interactivo exige `--agent no --output-format text` con TTY.
 - La tienda es un ecommerce (pedido del usuario, 2026-10-06): sidebar con solo
   «MiniPcs» y «Cámaras de seguridad», cards de productos a la derecha y categorías
-  apiladas en celular. `products` en Supabase es la fuente de precio y stock;
-  empieza vacío hasta recibir catálogo, fotografías y precios reales. No publicar
-  productos de muestra. `src/content/store.ts` centraliza el copy.
+  apiladas en celular. `products` en Supabase es la fuente de precio y stock.
+  No publicar productos de muestra, salvo los 4 «[PRUEBA]» que el usuario pidió
+  para probar compra y pago (2026-10-07): SKU `TEST-*`, S/ 5–15, sin foto.
+  `npm run store:test-products -- --insert|--remove` los publica o archiva (no
+  borra: los pedidos de prueba los referencian). Retirarlos antes de vender de
+  verdad. `src/content/store.ts` centraliza el copy.
   El carrito usa Zustand 5.0.15 y localStorage (`afcr-store-cart-v1`), con
   hidratación explícita para evitar divergencias SSR. `/carrito` y el drawer
   llevan a `/checkout` sin exigir login. Auth no limpia el carrito.
@@ -301,12 +304,61 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   navegar. Registro con sesión inmediata continúa; sin ella guarda correo
   pendiente en sessionStorage y abre `/verificar?next=/checkout`. OTP, recuperación
   y OAuth admiten retorno exclusivamente a `/checkout` o `/admin` (sin redirect libre).
-  El stepper es datos → envío → pago → confirmación, sin cobro online. Lima/Callao
-  exige uno de los 50 distritos metropolitanos, calle y referencia; provincias
-  usa selector de departamento y un punto Urbano real. El catálogo publicado se
-  carga por `store_pickup_points`; el servidor lo consulta y la RPC de pedido
-  valida otra vez el punto dentro de la transacción. Sin puntos o ante un error
-  no se continúa. La RPC nueva necesita la migración de administración pendiente.
+  El stepper es datos → envío → pago → confirmación. Lima/Callao
+  exige uno de los 50 distritos metropolitanos, calle y referencia. Provincias
+  recoge en una **agencia Shalom** (pedido del usuario, 2026-10-16; reemplazó a
+  Urbano, cuyos 78 puntos quedan archivados porque los pedidos antiguos los
+  referencian). Mapa de calles al estilo de shalom.com.pe/agencias: `AgencyMap`
+  (MapLibre GL 6 + OpenFreeMap, estilo `dark` recoloreado a la paleta navy) se carga
+  con `next/dynamic` y `ssr:false` solo en ese paso. La vista Perú colorea los
+  departamentos con los colores de la imagen del usuario (`recursos_internos/ChatGPT
+  Image…png`, solo referencia: era un dibujo de IA) y desvanece los colores al
+  acercar (zoom 5→8,5). Los polígonos están en `public/maps/peru-departments.geojson`
+  (Natural Earth, `scripts/build-peru-map.mjs`; ver `src/data/peru-departments-source.md`).
+  Lima Metropolitana (`LM`) y Callao van en gris como delivery.
+  Con ~340 agencias los pines se agrupan en clústeres con conteo hasta zoom 11 (clic
+  acerca); la agencia elegida va en una fuente aparte, siempre visible, y desde zoom 12
+  cada pin muestra su tarifa. Tocar un departamento hace `fitBounds`; tocar un pin,
+  `flyTo` a zoom 15,5 con padding hacia el lado que no tapa la ficha, y abre
+  `AgencyCard` (tarifa y modalidad, horario, central Shalom, «Cómo llegar» y «Elegir
+  esta agencia»; pin naranja si está elegida). `flyTo` deja fijo su padding: se limpia
+  con `setPadding` antes de encuadrar. `AgencySearch` es un combobox que filtra por
+  departamento, provincia, distrito, nombre o dirección, sin tildes, y muestra el
+  precio. `cooperativeGestures`: Ctrl + rueda o dos dedos, para no atrapar el scroll.
+  Etiquetas con `name:es`/`name`, nunca `name_en`. Debajo quedan el `<select>` (con
+  conteo y «desde S/ X») y la lista agrupada por ciudad con el precio de cada agencia;
+  sin WebGL solo se muestra la lista. `ShalomPickupPicker` compone todo.
+  Trampas verificadas: MapLibre impone `position: relative` a su contenedor con CSS
+  sin capa, que gana a Tailwind, así que el posicionamiento va en un envoltorio.
+  Su worker ESM no viaja en el bundle: `scripts/copy-maplibre-worker.mjs` lo copia a
+  `public/maplibre/` (ignorado por Git, ESLint y Tailwind) en `predev`, `prebuild`,
+  `prebuild:hostinger` y `prebuild:static`, y se fija con `setWorkerUrl`. Un fragmento
+  `next/dynamic` no se refresca en caliente: recargar la página tras editarlo.
+  Agencias Shalom: 344 de provincias que reciben encomiendas (`destino`), fuera de
+  Lima Metropolitana y Callao, en 24 departamentos; 342 publicadas. Fuente: copia de
+  la lista que muestra shalom.com.pe/agencias (`recursos_internos/shalom-agencias-2026-10-16.json`).
+  Su API va con token de proxy, sesión y respuesta cifrada: no se consulta ni se
+  automatiza; la copia se tomó cargando la página pública una vez en Chrome headless y
+  leyendo su estado. El sitio nunca consulta a Shalom ni copia su logo o fotos.
+  Tarifa (decisión del usuario, 2026-10-16): columna «PAQUETE MEDIANO» de
+  `recursos_internos/tarifas.pdf` (tarifario Shalom del 2026-10-12, origen Lima),
+  una por pedido, **terrestre** y aéreo solo si la agencia no tiene terrestre, sin
+  margen (S/ 12–23). `scripts/build-shalom-points.mjs <agencias.json> <tarifas.pdf>`
+  genera la migración: empareja por nombre normalizado (el PDF parte nombres largos en
+  dos líneas), resuelve ubigeo con `ubi_id` y nombres, valida coordenadas dentro del
+  departamento (`scripts/lib/peru-geo.mjs`; Mazuko va como verificada a mano porque el
+  polígono simplificado la deja en Puno) y deja inactiva la agencia sin tarifa
+  (Av. 27 de Noviembre CO en Huaraz y Villa San Francisco en Tacna). Re-ejecutable:
+  actualiza por id, conserva coordenadas corregidas y desactivaciones del panel, y
+  archiva las que ya no figuran. Con un tarifario nuevo, volver a correrlo.
+  Los scripts Urbano (`build-urbano-points.mjs`, `sync-urbano-agencies.mjs`) son
+  históricos: no volver a publicar puntos Urbano.
+  El catálogo publicado se
+  carga por `store_pickup_points` (solo Shalom activas con tarifa); el servidor lo
+  consulta y la RPC de pedido valida otra vez la agencia dentro de la transacción y
+  **fija `shipping_cost` con su tarifa** (el cliente nunca envía el precio). Sin
+  agencias o ante un error no se continúa. `shippingMethod` nuevo: `shalom_pickup`;
+  `urbano_pickup` solo existe en pedidos antiguos y la RPC lo rechaza.
   Ubigeos: `src/data/peru-locations.json`, fuente
   INEI indicada en el archivo contiguo; contiene códigos del censo 2017. Actualizar
   con fuente oficial antes de incorporar puntos en distritos posteriores.
@@ -319,28 +371,64 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   ubicación en la tabla privada, precios y stock en `products`, y recalcula el
   importe. Un `request_id` por confirmación permite reintentar sin duplicar;
   rechaza reutilizarlo con otro payload. Solo la RPC puede crear pedidos; no
-  conceder inserción directa que eluda precios o dirección. Al confirmar, el
-  cliente limpia el carrito y conserva el recibo canónico para el resumen.
-  `/cuenta/pedidos` muestra solo órdenes propias. El importe confirmado corresponde
-  a productos; envío pendiente y cobro posterior se muestran expresamente.
-  La política/tarifa de envío todavía necesita respuesta del usuario. No hay
-  reserva ni descuento de stock en el remoto mientras la migración de administración
-  siga pendiente. Esa migración propone reservar en checkout y reintegrar al cancelar
-  o devolver; requiere la aprobación solicitada antes de aplicarse. Los puntos se
-  gestionarán en la tabla privada desde el panel; no insertar agencias inventadas.
+  conceder inserción directa que eluda precios o dirección. El recibo (nuevo o
+  repetido) incluye `payment_status`; uno vencido no se cobra.
+  Pago con Culqi (pedido del usuario, 2026-10-07; modo prueba): en el paso Pago se
+  registra el pedido (reserva stock) y se abre Culqi Checkout Custom v4 con
+  tarjeta y Yape; el carrito se limpia solo al aprobarse el pago. Culqi cobra
+  productos + tarifa en recojo Shalom; en delivery de Lima cobra solo productos y
+  el envío se coordina y se cobra aparte (el admin fija `shipping_cost` después). El navegador solo envía el token; la Edge
+  Function `culqi-payment` valida bearer, sesión y revisión, toma el importe de
+  `orders` y cobra con `CULQI_SECRET_KEY` (secreto de Edge, nunca en Hostinger).
+  3DS: Culqi responde 200 + `action_code: REVIEW`; el cliente corre Culqi3DS y
+  reintenta con el mismo token, `device_finger_print_id` y `authentication_3DS`.
+  `afcr_private.store_payments` registra intentos (RLS sin acceso de clientes, RPC
+  solo `service_role`): uno en vuelo por pedido, máx. 10 por pedido. Timeout o
+  5xx de Culqi queda `uncertain`, no se reintenta: se concilia buscando el cargo
+  por `metadata.attempt_id` (o por webhook `…/culqi-payment/webhook`, que relee
+  evento y cargo en Culqi); sin cargo tras 10 min se libera. Pedidos impagos
+  vencen a los 30 min (Cron `afcr-store-expire-orders`, cada 5 min) y devuelven
+  el stock una vez. Mis pedidos ofrece «Pagar ahora» mientras no venza.
+  `culqi-payment` publicada con llaves de prueba (2026-10-07) y verificada contra
+  Culqi con cuenta/pedidos descartables ya eliminados: Visa 4111 y Yape 900000001
+  pagan (`outcome.code` AUT0000), la tarjeta 3DS devuelve REVIEW y el pago doble se
+  bloquea. Formulario de Culqi y reto 3DS probados en navegador real
+  (2026-10-07: Visa, Visa 3DS y Yape aprobados). Falta registrar el webhook en
+  CulqiPanel y cargar la llave pública en hPanel.
+  Con llaves `live` se cobra dinero real: no usarlas mientras existan los [PRUEBA].
+  Para crear una cuenta descartable por SQL: `auth.identities.email` es columna
+  generada (no insertarla).
+  `/cuenta/pedidos` muestra solo órdenes propias; envío pendiente se muestra
+  expresamente. En pedidos Shalom muestra la agencia, el N° de orden
+  (`tracking_reference`) y la clave de recojo (`orders.pickup_code`, 4–6 dígitos, la
+  registra el panel; SELECT de columna para el dueño) con botón copiar y enlace a
+  shalom.com.pe/rastrea. Las agencias se gestionan en la tabla privada
+  (`afcr_private.urbano_pickup_points`, nombre heredado, con `carrier`,
+  `carrier_code`, `shipping_price`, `shipping_mode`) desde el panel; no insertar
+  agencias ni tarifas inventadas. La compra con recojo se verificó en Chrome real
+  con Urbano (Cusco, Visa de prueba); con Shalom solo hay revisión visual con
+  Supabase simulado.
+  Migraciones `20261016120000_shalom_pickup.sql` (esquema y funciones, partiendo de
+  las definiciones vivas del remoto) y `20261016120100_shalom_points.sql` (datos):
+  aplicadas en el remoto con aprobación del usuario (2026-10-16), en una sola
+  transacción vía `db query --linked` + `migration repair`; los tres tests pasan
+  después. La RPC rechaza `urbano_pickup`: un frontend anterior a Shalom no puede
+  crear pedidos a provincias, así que producción necesita el despliegue de este código.
   `supabase/tests/store_checkout.sql` prueba precios, direcciones, aislamiento,
-  idempotencia y revocación dentro de BEGIN/ROLLBACK. También se verificaron
+  idempotencia y revocación dentro de BEGIN/ROLLBACK; `store_payments.sql`,
+  sesión, importe, 3DS, conciliación, vencimiento, envío posterior y cobro con
+  tarifa Shalom (pasan en el remoto, 2026-10-16, con las migraciones Shalom en la
+  misma transacción). También se verificaron
   HTTP 401/400/201 y limpieza del carrito con cuenta/producto/orden descartables,
   eliminados al terminar y sin correos. La revisión de navegador usa datos
   sintéticos y API simulada; no certifica recepción de OTP ni Google real.
   El export estático conserva las pantallas, pero no tiene `/api/orders`:
   el checkout operativo requiere el build Node de Hostinger.
 - Administración de ecommerce (pedido del usuario, 2026-10-06): `/admin`, acceso
-  desde `/cuenta` solo al recibir `store_is_admin=true`. Implementación local
-  preparada; `20261007033005_store_administration.sql` **no aplicada**:
-  la revisión automática rechazó los cambios remotos de stock/pedidos/Storage
-  pendientes de confirmación del usuario. No desplegar estos cambios de frontend
-  antes de aplicar y verificar la migración aprobada. El correo configurado
+  desde `/cuenta` solo al recibir `store_is_admin=true`.
+  `20261007033005_store_administration.sql` y `20261007150000_store_culqi_payments.sql`
+  aplicadas en el remoto con aprobación del usuario (2026-10-07), vía
+  `db query --linked` + `migration repair`. El correo configurado
   todavía no tenía una cuenta al inspeccionarlo; no crear una contraseña por el usuario.
   La migración liga el correo permitido a un UUID solo después de verificarlo,
   en `afcr_private.store_admins`; las consultas vuelven a comprobar sesión,
@@ -348,23 +436,25 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
   `user_metadata` ni solo escondiendo el enlace.
   Panel: resumen real, productos con SKU/galería/borrador/publicación/archivo,
   inventario y motivos de ajuste, pedidos y pagos manuales, clientes de pedidos,
-  puntos Urbano y actividad. Las escrituras pasan por RPC invoker y definer
+  agencias Shalom (tarifa y modalidad; primero las que no tienen tarifa; una agencia
+  sin tarifa no se publica; Urbano archivado no se puede publicar), clave de recojo
+  en pedidos Shalom (su envío no se edita) y actividad. Las escrituras pasan por RPC invoker y definer
   privado con comprobación explícita de administrador. Productos/pedidos/puntos
   usan revisión para impedir sobrescrituras; ajustes de stock también idempotencia.
   Las notas internas de pedidos no tienen permiso SELECT para clientes.
-  Reserva propuesta: trigger transaccional al insertar ítems, stock disponible
-  reducido y movimiento registrado; cancelación/devolución reintegra una sola vez.
-  Preparación → reparto/recojo → entrega, con pasos válidos; no hay cobros ni
-  reembolsos automáticos. Pago manual exige costo de envío y referencia; registrar
-  reembolso exige cancelación/devolución y motivo.
+  Reserva: trigger transaccional al insertar ítems, stock disponible
+  reducido y movimiento registrado; cancelación/devolución/vencimiento reintegra una sola vez.
+  Preparación → reparto/recojo → entrega, con pasos válidos; el panel no cobra ni
+  reembolsa. Pago manual exige costo de envío y referencia y se bloquea si hay un
+  cobro Culqi en vuelo; en pedidos Culqi la referencia del cargo no se edita y el
+  envío se fija después. Registrar reembolso exige cancelación/devolución y motivo
+  (la devolución de Culqi se hace en CulqiPanel).
   Fotos: bucket público `store-products`, carga/borrado solo para administrador
   vigente, JPG/PNG/WebP de hasta 5 MB, máximo 8 por ficha. Nombres UUID sin upsert.
   La política de borrado conserva cualquier archivo referenciado por un producto;
   el editor intenta limpiar nuevas cargas no usadas al cerrarse.
-  `supabase/tests/store_administration.sql` y pruebas temporales pasaron en
-  PostgreSQL local PGlite con adaptadores de Auth/Storage; **no** certifican el
-  remoto ni el servicio real de archivos. UI verificada con API/datos sintéticos,
-  sin publicar productos, agencias ni métricas de muestra.
+  `supabase/tests/store_administration.sql` pasa en el remoto (2026-10-07); no
+  certifica el servicio real de archivos de Storage.
 - En su lugar, la Home muestra «RECURSOS» (pedido del usuario, 2026-10-01):
   8 artículos, uno por servicio, que explican el problema y la solución y solo
   invitan a contactar en el cierre (promoción indirecta). Temas, en este orden:
@@ -421,7 +511,7 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
 | `/servicios` | Directorio de 10 servicios, sin conteo junto a cada categoría | `src/components/services/` |
 | `/nosotros` | Cabecera, franja de herramientas, audiencias, proceso, principios | `src/components/about/` |
 | `/contacto` | Canales + formulario `#formulario` | `src/components/contact/` |
-| `/tienda` | Catálogo: MiniPcs y cámaras de seguridad (pendiente de productos reales) | `src/app/tienda/page.tsx` |
+| `/tienda` | Catálogo: MiniPcs y cámaras de seguridad (hoy solo 4 productos [PRUEBA]) | `src/app/tienda/page.tsx` |
 | `/iniciar-sesion` | Entrar a la cuenta de la tienda | `src/app/iniciar-sesion/page.tsx` |
 | `/crear-cuenta` | Crear cuenta de la tienda | `src/app/crear-cuenta/page.tsx` |
 | `/recuperar-contrasena` | Código de recuperación y nueva contraseña | `src/app/recuperar-contrasena/page.tsx` |
@@ -431,7 +521,7 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
 | `/checkout` | Gate de cuenta y stepper de cuatro pasos | `src/app/checkout/page.tsx` |
 | `/verificar` | Confirmación OTP y retorno al checkout | `src/app/verificar/page.tsx` |
 | `/cuenta/pedidos` | Historial privado mediante RLS | `src/app/cuenta/pedidos/page.tsx` |
-| `/admin` | Administración de ecommerce; migración remota pendiente | `src/app/admin/page.tsx` · `src/components/admin/` |
+| `/admin` | Administración de ecommerce | `src/app/admin/page.tsx` · `src/components/admin/` |
 
 - Todas las páginas y `sitemap.xml` se prerenderizan. `/api/contact` y
   `/api/orders` solo existen en el build Node.
@@ -462,6 +552,9 @@ Sustituir la frase vigente en una sola sección. No copiarla en otra.
 | Recursos: lista, portada y artículo | `src/components/home/ResourcesSection.tsx` · `src/components/resources/` |
 | Validación compartida | `src/lib/validations.ts` |
 | Endpoint Node | `src/app/api/contact/route.node.ts` |
+| Mapa de agencias del checkout (MapLibre) | `src/components/checkout/ShalomPickupPicker.tsx` · `AgencyMap.tsx` · `AgencyCard.tsx` · `AgencySearch.tsx` · `public/maps/peru-departments.geojson` · `scripts/build-shalom-points.mjs` · `scripts/lib/peru-geo.mjs` |
+| Recojo Shalom en Mis pedidos | `src/components/store/ShalomPickupInfo.tsx` |
+| Pago Culqi: cliente, botón y Edge Function | `src/lib/store/culqi.ts` · `src/components/store/CulqiPayButton.tsx` · `supabase/functions/culqi-payment/` |
 | Fallback PHP estático | `public/contact.php` |
 
 ---
@@ -477,6 +570,8 @@ npm run build:hostinger # servidor Node con webpack; producción real
 npm run start           # sirve .next
 npm run build:static    # export alternativo → out/
 npm run package:static  # export + ZIP para hosting sin Node
+npm run store:deploy-payment        # publica culqi-payment y su secreto en Edge
+npm run store:test-products -- --insert|--remove  # productos [PRUEBA]
 ```
 
 Node local 22 · Node Hostinger 24 · npm. No usar pnpm.
@@ -487,6 +582,7 @@ Node local 22 · Node Hostinger 24 · npm. No usar pnpm.
 | React / React DOM | 19.3.0 | React Compiler vigilado por ESLint |
 | Tailwind CSS | 4.3.3 | CSS-first, sin `tailwind.config.ts` |
 | Motion | 13.4.0 | importar desde `motion/react` |
+| MapLibre GL | 6.13.0 | ESM; worker copiado a `public/maplibre/` antes de dev/build |
 | Three.js | 0.186.0 | API plana, sin React Three Fiber |
 | Lenis | 1.3.26 | scroll suave |
 | Zod | 4.6.5 | esquema cliente/servidor |
@@ -596,6 +692,12 @@ route handler y usa `/contact.php`. Mantener estas condiciones:
   el servicio remoto. Los secretos de SMTP, Google y Management API son solo
   para herramientas locales: nunca prefijarlos con `NEXT_PUBLIC_` ni
   incorporarlos al cliente. Guardarlos en `.env.local` no configura Auth por sí solo.
+- Culqi: `NEXT_PUBLIC_CULQI_PUBLIC_KEY` (`pk_test_…`/`pk_live_…`) es pública y
+  va en `.env.local` y en hPanel; cambiarla exige build nuevo. Sin ella el pago
+  muestra «no disponible». `CULQI_SECRET_KEY` (`sk_…`) solo vive en `.env.local`
+  para que `store:deploy-payment` la suba como secreto de Edge: **no va a
+  Hostinger** ni lleva `NEXT_PUBLIC_`. Ambas del mismo entorno (el script lo
+  comprueba). Con `pk_test_` el checkout muestra las tarjetas de prueba.
 - Datos aún marcadores: correo y dirección en `src/content/agency.ts`; URLs de
   Facebook, Instagram y LinkedIn; páginas legales del footer.
 - `APIMART_API_KEY` (solo en `.env.local`) sirve para generar las portadas

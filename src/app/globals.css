@@ -7,6 +7,7 @@
 @source not '../../.codex';
 @source not '../../.cursor';
 @source not '../../.impeccable';
+@source not '../../public/maplibre';
 
 /* Pantallas bajas (moviles en horizontal): header compacto */
 @custom-variant short (@media (max-height: 480px));
@@ -464,6 +465,14 @@ html.lenis body {
 @keyframes afcr-glow-in {
   from {
     opacity: 0;
+  }
+}
+
+/* Marcadores del mapa de recojo: aparecen después del zoom al departamento. */
+@keyframes afcr-map-marker-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
   }
 }
 

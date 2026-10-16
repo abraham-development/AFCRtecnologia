@@ -59,19 +59,23 @@ La tienda será un ecommerce con solo dos categorías: MiniPcs y cámaras de
 seguridad. Sidebar en escritorio, índice apilado en celular y cards de equipos.
 El carrito sobrevive a login, registro y verificación. La cuenta se resuelve
 mediante un gate dentro de `/checkout`, seguido de datos, envío, pago y
-confirmación. El pedido requiere cuenta; aún no se cobra online. Lima y Callao
-usan delivery con distrito oficial, calle y referencia. Provincias usa puntos
-Urbano confirmados; sin ellos no se permite continuar. Catálogo de productos,
-fotografías, tarifas de envío y puntos reales pendientes del usuario: no
-inventarlos ni publicar ejemplos como productos a la venta.
+confirmación. El pedido requiere cuenta y se paga en línea con Culqi (tarjeta o Yape). Lima y Callao
+usan delivery con distrito oficial, calle y referencia; ese envío se coordina y
+se cobra aparte. Provincias recoge en una agencia Shalom (desde 2026-10-16, en
+lugar de Urbano): el cliente ve en un mapa todas las agencias Shalom de
+provincias que reciben encomiendas, cada una con su tarifa fija (paquete mediano
+del tarifario Shalom), y paga productos + envío en el mismo cobro. Sin agencia
+con tarifa no se permite continuar. Catálogo de productos y fotografías
+pendientes del usuario: no inventarlos ni publicar ejemplos como productos a la
+venta, ni inventar agencias o tarifas.
 Restricciones técnicas en `AGENTS.md`.
 
 El administrador autorizado gestionará la tienda desde `/admin`: fichas,
 fotografías, publicación, stock, pedidos y pagos manuales, clientes de pedidos,
-puntos Urbano confirmados e historial de cambios. El acceso exige su cuenta
+agencias Shalom con su tarifa, N° de orden y clave de recojo, e historial de cambios. El acceso exige su cuenta
 verificada y permisos comprobados en la base. Panel local preparado; aplicación
 remota pendiente de aprobación de las políticas de stock y almacenamiento.
-No incluye cobro online, reembolso automático ni inventa catálogo o agencias.
+El panel no cobra ni reembolsa (los cobros los hace Culqi y las devoluciones CulqiPanel) ni inventa catálogo o agencias.
 
 Al iniciar sesión, el topbar muestra «Hola, <correo>» con un desplegable para
 perfil, pedidos y seguridad, junto a «Cerrar sesión» (pedido del usuario, 2026-10-07).

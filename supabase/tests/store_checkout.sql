@@ -11,6 +11,10 @@ select afcr_private.enforce_auth_method('{"user_id":"71000000-0000-4000-8000-000
 insert into public.products(id,name,category,price,stock,active) values
 ('73000000-0000-4000-8000-000000000001','Fixture descartable','minipcs',1234.50,3,true),
 ('73000000-0000-4000-8000-000000000002','Fixture oculto','security-cameras',200,1,false);
+-- Agencias: una Shalom con tarifa y una Urbano archivada (Urbano ya no se ofrece).
+insert into afcr_private.urbano_pickup_points(id,carrier,name,street,reference,hours,ubigeo,active,shipping_price,shipping_mode) values
+('fixture-shalom-71','shalom','Fixture Shalom','Calle descartable','Referencia descartable','Lun–Vie 08:00–20:00','040101',true,18.50,'terrestre'),
+('fixture-urbano-71','urbano','Fixture Urbano','Calle descartable','Referencia descartable','Lun–Vie 08:00–20:00','040101',false,null,null);
 insert into public.cart_items(user_id,product_id,quantity) values('71000000-0000-4000-8000-000000000001','73000000-0000-4000-8000-000000000001',2);
 select set_config('request.jwt.claims','{"sub":"71000000-0000-4000-8000-000000000001","session_id":"72000000-0000-4000-8000-000000000001","afcr_revision":1,"role":"authenticated"}',true);
 set local role authenticated;
@@ -55,6 +59,29 @@ do $$ declare payload jsonb; bad jsonb; result jsonb; replay jsonb; code text; b
   insert into public.orders(user_id,total,shipping_address,request_id,request_hash) values('71000000-0000-4000-8000-000000000002',0,'{}',gen_random_uuid(),'x');
   raise exception 'Inserción directa aceptada';
  exception when insufficient_privilege then null; end;
+end $$;
+-- Recojo Shalom: la tarifa sale de la agencia aunque el cliente intente fijar otra.
+do $$ declare pickup jsonb; result jsonb; code text; begin
+ pickup:='{"request_id":"74000000-0000-4000-8000-000000000002","items":[{"product_id":"73000000-0000-4000-8000-000000000001","quantity":1,"unit_price":1234.50}],"total":1234.5,"shipping_cost":0,"shipping_address":{"names":"Nombre","surnames":"Apellido","mobile":"999999999","shippingMethod":"shalom_pickup","pickupPointId":"fixture-shalom-71","shipping_price":1}}';
+ assert exists(select 1 from jsonb_array_elements(public.store_pickup_points()) p where p->>'id'='fixture-shalom-71'),'Agencia Shalom ofrecida';
+ assert not exists(select 1 from jsonb_array_elements(public.store_pickup_points()) p where p->>'carrier'<>'shalom'),'Solo agencias Shalom';
+ for i in 1..2 loop
+  begin
+   perform public.store_place_order(case i
+    when 1 then jsonb_set(jsonb_set(pickup,'{request_id}','"74000000-0000-4000-8000-000000000003"'),'{shipping_address,pickupPointId}','"fixture-urbano-71"')
+    else jsonb_set(jsonb_set(pickup,'{request_id}','"74000000-0000-4000-8000-000000000004"'),'{shipping_address,shippingMethod}','"urbano_pickup"') end);
+   raise exception 'Recojo Urbano aceptado: %',i;
+  exception when raise_exception then
+   get stacked diagnostics code=message_text;
+   assert code like 'STORE_INVALID%',code;
+  end;
+ end loop;
+ result:=public.store_place_order(pickup);
+ assert (result->>'shipping_cost')::numeric=18.50,'Envío fijado por la tarifa de la agencia';
+ assert result->'shipping_address'->>'carrier'='shalom' and result->'shipping_address'->>'pickupPointName'='Fixture Shalom','Agencia normalizada';
+ assert result->'shipping_address'->>'department'='Arequipa','Ubicación de la agencia';
+ assert (select shipping_cost from public.orders where id=(result->>'id')::uuid)=18.50,'Envío guardado en el pedido';
+ assert (public.store_place_order(pickup)->>'shipping_cost')::numeric=18.50,'Reintento conserva el envío';
 end $$;
 reset role;
 select set_config('request.jwt.claims','{"sub":"71000000-0000-4000-8000-000000000002","session_id":"72000000-0000-4000-8000-000000000002","afcr_revision":1,"role":"authenticated"}',true);

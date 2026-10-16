@@ -20,3 +20,6 @@ next-env.d.ts
 recursos_internos
 
 
+
+# Worker de MapLibre copiado desde node_modules en cada dev/build
+/public/maplibre/

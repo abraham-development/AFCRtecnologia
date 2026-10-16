@@ -61,7 +61,10 @@ do $$declare snapshot jsonb; target jsonb;change jsonb;code text;begin
  assert (select stock from public.products where id='83000000-0000-4000-8000-000000000091')=8,'No reintegra dos veces';
  begin perform public.store_admin_mutate('order_update',jsonb_set(jsonb_set(change,'{version}','3'),'{status}','"processing"'));raise exception 'Reapertura aceptada';
  exception when raise_exception then get stacked diagnostics code=message_text;assert code='STORE_INVALID_TRANSITION',code;end;
- perform public.store_admin_mutate('pickup_save','{"id":"fixture-admin-91","version":0,"name":"Fixture descartable","street":"Calle descartable","reference":"Referencia descartable","hours":"Horario descartable","ubigeo":"040101","active":true}');
+ begin perform public.store_admin_mutate('pickup_save','{"id":"fixture-admin-91","version":0,"name":"Fixture descartable","street":"Calle descartable","reference":"Referencia descartable","hours":"Horario descartable","ubigeo":"040101","active":true}');raise exception 'Agencia sin tarifa publicada';
+ exception when raise_exception then get stacked diagnostics code=message_text;assert code='STORE_INVALID_PICKUP',code;end;
+ perform public.store_admin_mutate('pickup_save','{"id":"fixture-admin-91","version":0,"name":"Fixture descartable","street":"Calle descartable","reference":"Referencia descartable","hours":"Horario descartable","ubigeo":"040101","active":true,"shipping_price":18.5,"shipping_mode":"terrestre"}');
+ assert exists(select 1 from jsonb_array_elements(public.store_pickup_points()) p where p->>'id'='fixture-admin-91' and (p->>'shipping_price')::numeric=18.5 and p->>'carrier'='shalom'),'Agencia con tarifa publicada como Shalom';
  assert exists(select 1 from jsonb_array_elements(public.store_pickup_points()) p where p->>'id'='fixture-admin-91'),'Punto publicado se ofrece al checkout';
  assert (public.store_admin_read('activity')->>'count')::int>=5,'Cambios auditados';
 end$$;

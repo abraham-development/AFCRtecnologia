@@ -9,6 +9,8 @@ const config = [
       'node_modules/**',
       'out/**',
       'next-env.d.ts',
+      // Worker de MapLibre copiado desde node_modules en cada dev/build (código de terceros minificado)
+      'public/maplibre/**',
       // Herramientas del entorno local, ajenas al codigo de la landing
       '.agents/**',
       '.claude/**',

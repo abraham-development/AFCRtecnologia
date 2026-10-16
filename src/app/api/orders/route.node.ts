@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { orderSchema,normalizeShipping } from '@/lib/store/order-validation';
-import type { UrbanoPickupPoint } from '@/data/urbano-pickup-points';
+import type { PickupPoint } from '@/data/pickup-points';
 export const runtime='nodejs';
 export async function POST(request:Request) {
  const token=request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
@@ -14,11 +14,11 @@ export async function POST(request:Request) {
   const text=await request.text();if(text.length>32768)return Response.json({error:'INVALID_ORDER'},{status:400});
   let body:unknown;try{body=JSON.parse(text);}catch{return Response.json({error:'INVALID_ORDER'},{status:400});}
   const parsed=orderSchema.safeParse(body);if(!parsed.success)return Response.json({error:'INVALID_ORDER'},{status:400});
-  let point:UrbanoPickupPoint|undefined;
-  if(parsed.data.shipping_address.shippingMethod==='urbano_pickup'){
+  let point:PickupPoint|undefined;
+  if(parsed.data.shipping_address.shippingMethod==='shalom_pickup'){
    const {data:points,error}=await client.rpc('store_pickup_points');
    if(error)return Response.json({error:'UNAVAILABLE'},{status:503});
-   point=(Array.isArray(points)?points:[]).find((p:UrbanoPickupPoint)=>p.id===parsed.data.shipping_address.pickupPointId);
+   point=(Array.isArray(points)?points:[]).find((p:PickupPoint)=>p.id===parsed.data.shipping_address.pickupPointId);
   }
   const shipping=normalizeShipping(parsed.data.shipping_address,point);if(!shipping)return Response.json({error:'INVALID_ADDRESS'},{status:400});
   const result=await client.rpc('store_place_order',{payload:{...parsed.data,shipping_address:shipping}});
